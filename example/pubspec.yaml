@@ -1,0 +1,39 @@
+name: syncly_example
+description: A complete example demonstrating how to use Syncly with modular architecture
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Modular for dependency injection and navigation
+  flutter_modular: ^6.3.2
+  
+  # State management
+  flutter_triple: ^1.2.7+4
+  
+  # Local storage
+  shared_preferences: ^2.2.2
+  
+  # HTTP client
+  dio: ^5.3.2
+  
+  # UUID generation
+  uuid: ^4.1.0
+  
+  # Syncly library (local dependency)
+  syncly:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
