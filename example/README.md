@@ -83,7 +83,7 @@ O exemplo demonstra como:
 
 3. **Registrar modelos para sincronização**:
    ```dart
-   _syncProvider.registerModel<Todo>(
+   _syncConfig.registerModel<Todo>(
      'todos',
      fromJson: Todo.fromJson,
      toJson: (todo) => todo.toJson(),
@@ -92,7 +92,7 @@ O exemplo demonstra como:
 
 4. **Adicionar itens para sincronização**:
    ```dart
-   await _syncProvider.addToSync(todo);
+   await _syncConfig.addToSync(todo);
    ```
 
 ## Configuração da API

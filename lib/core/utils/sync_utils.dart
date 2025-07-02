@@ -1,7 +1,6 @@
 import 'dart:convert';
-import '../enums/sync_operation.dart';
 import '../services/sync_error_manager.dart';
-import '../config/sync_config.dart';
+import '../config/sync_constants.dart';
 import 'package:flutter/foundation.dart';
 
 /// Utilitários para o serviço de sincronização
@@ -29,7 +28,7 @@ class SyncUtils {
   /// [consecutiveFailures] Número de falhas consecutivas
   /// Returns o delay em segundos
   static int calculateRetryDelay(int consecutiveFailures) {
-    return SyncConfig.calculateRetryDelay(consecutiveFailures);
+    return SyncConstants.calculateRetryDelay(consecutiveFailures);
   }
 
   /// Salva um log de erro global usando o gerenciador de erros interno
@@ -79,10 +78,10 @@ class SyncUtils {
       int consecutiveFailures, bool isNetworkError) {
     if (isNetworkError) {
       // Para erros de rede, ser mais tolerante
-      return consecutiveFailures >= (SyncConfig.maxRetryAttempts + 2);
+      return consecutiveFailures >= (SyncConstants.maxRetryAttempts + 2);
     } else {
       // Para outros erros, entrar em recovery mais cedo
-      return consecutiveFailures >= SyncConfig.maxRetryAttempts;
+      return consecutiveFailures >= SyncConstants.maxRetryAttempts;
     }
   }
 
@@ -91,7 +90,7 @@ class SyncUtils {
   /// [consecutiveFailures] Número de falhas consecutivas
   /// Returns true se atingiu o limite absoluto
   static bool hasReachedAbsoluteFailureLimit(int consecutiveFailures) {
-    return consecutiveFailures >= SyncConfig.maxAbsoluteFailures;
+    return consecutiveFailures >= SyncConstants.maxAbsoluteFailures;
   }
 
   /// Gera uma mensagem de status baseada no número de falhas
@@ -163,7 +162,7 @@ class SyncUtils {
   /// [date] Data a ser verificada
   /// Returns true se está dentro do timeout
   static bool isWithinOfflineTimeout(DateTime date) {
-    final cutoffDate = DateTime.now().subtract(SyncConfig.offlineTimeout);
+    final cutoffDate = DateTime.now().subtract(SyncConstants.offlineTimeout);
     return date.isAfter(cutoffDate);
   }
 

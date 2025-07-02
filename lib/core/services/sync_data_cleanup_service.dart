@@ -1,5 +1,5 @@
 import 'dart:convert';
-import '../../sync_provider.dart';
+import '../../sync_config.dart';
 
 import '../interfaces/i_storage_provider.dart';
 import '../interfaces/i_logger_debug_provider.dart';
@@ -20,7 +20,7 @@ class SyncDataCleanupService implements ISyncDataCleanupService {
   final IStorageProvider _storageProvider;
   final ISyncLoggerDebugProvider? _loggerProvider;
   final ISyncErrorManager _errorManager;
-  final SyncProvider _syncProvider;
+  final SyncConfig _syncConfig;
 
   // Prefixos para diferentes tipos de dados
   static const String _syncDataPrefix = 'sync_data_';
@@ -33,7 +33,7 @@ class SyncDataCleanupService implements ISyncDataCleanupService {
     this._storageProvider,
     this._loggerProvider,
     this._errorManager,
-    this._syncProvider,
+    this._syncConfig,
   );
 
   @override
@@ -174,7 +174,7 @@ class SyncDataCleanupService implements ISyncDataCleanupService {
       stats['syncMetadata'] = await _countDataByPrefix(_syncMetadataPrefix);
 
       // Verificar se há sessão ativa
-      final hasSession = await _syncProvider.isAuthenticated();
+      final hasSession = await _syncConfig.isAuthenticated();
       stats['hasActiveSession'] = hasSession ? 1 : 0;
 
       _loggerProvider?.info(

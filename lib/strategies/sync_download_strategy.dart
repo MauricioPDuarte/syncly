@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../core/services/sync_data_cleanup_service.dart';
 import '../core/interfaces/i_download_strategy.dart';
-import '../sync_provider.dart';
+import '../sync_config.dart';
 
 import '../sync_configurator.dart';
 
@@ -22,24 +22,24 @@ class SyncDownloadStrategy {
   );
 
   // Helper para obter o sync provider
-  /// Obtém o SyncProvider via SyncConfigurator
-  SyncProvider? _getSyncProvider() {
+  /// Obtém o SyncConfig via SyncConfigurator
+  SyncConfig? _getSyncConfig() {
     return SyncConfigurator.provider;
   }
 
   /// Executa o download completo de dados do servidor
   Future<void> fetchDataFromServer() async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
-    if (syncProvider?.enableDebugLogs == true) {
+    if (syncConfig?.enableDebugLogs == true) {
       debugPrint(
           '[SyncDownloadStrategy] === INICIANDO BUSCA DE DADOS DO SERVIDOR ===');
     }
 
     try {
       // Mostrar notificação de progresso para busca de dados
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.showProgressNotification(
+      if (syncConfig?.enableNotifications == true) {
+      await syncConfig!.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -62,12 +62,12 @@ class SyncDownloadStrategy {
       // Cancelar notificações
       await _cancelNotifications();
 
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] === BUSCA DE DADOS DO SERVIDOR CONCLUÍDA ===');
       }
     } catch (e) {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] ERRO GERAL durante busca de dados do servidor: $e');
       }
@@ -81,16 +81,16 @@ class SyncDownloadStrategy {
 
   /// Limpa dados antigos antes da sincronização
   Future<void> _clearOldData() async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] Limpando dados antigos antes da sincronização...');
       }
 
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.showProgressNotification(
+      if (syncConfig?.enableNotifications == true) {
+        await syncConfig!.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -100,11 +100,11 @@ class SyncDownloadStrategy {
 
       await _dataCleanupService.clearSyncData();
 
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint('[SyncDownloadStrategy] Dados antigos limpos com sucesso');
       }
     } catch (e) {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint('[SyncDownloadStrategy] ERRO ao limpar dados antigos: $e');
       }
       throw Exception('Falha ao limpar dados antigos: $e');
@@ -113,15 +113,15 @@ class SyncDownloadStrategy {
 
   /// Executa todas as estratégias de download registradas
   Future<List<DownloadResult>> _executeDownloadStrategies() async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint('[SyncDownloadStrategy] Salvando dados no banco local...');
       }
 
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.showProgressNotification(
+      if (syncConfig?.enableNotifications == true) {
+        await syncConfig!.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -131,8 +131,8 @@ class SyncDownloadStrategy {
 
       final results = <DownloadResult>[];
 
-      for (final strategy in syncProvider?.downloadStrategies ?? []) {
-        if (syncProvider?.enableDebugLogs == true) {
+      for (final strategy in syncConfig?.downloadStrategies ?? []) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint(
               '[SyncDownloadStrategy] Executando estratégia: ${strategy.runtimeType}');
         }
@@ -140,7 +140,7 @@ class SyncDownloadStrategy {
         results.add(result);
 
         if (!result.success) {
-          if (syncProvider?.enableDebugLogs == true) {
+          if (syncConfig?.enableDebugLogs == true) {
             debugPrint(
                 '[SyncDownloadStrategy] Estratégia ${strategy.runtimeType} falhou: ${result.message}');
           }
@@ -148,7 +148,7 @@ class SyncDownloadStrategy {
               'Falha na estratégia ${strategy.runtimeType}: ${result.message}');
         }
 
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint(
               '[SyncDownloadStrategy] Estratégia ${strategy.runtimeType} executada com sucesso: ${result.itemsDownloaded} itens');
         }
@@ -156,7 +156,7 @@ class SyncDownloadStrategy {
 
       return results;
     } catch (e) {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] ERRO ao executar estratégias de download: $e');
       }
@@ -182,16 +182,16 @@ class SyncDownloadStrategy {
 
   /// Gerencia pré-cache de imagens e limpeza de órfãs
   Future<void> _handleImageCaching(Set<String> mediaIds) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] Iniciando pré-cache e limpeza de imagens...');
       }
 
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.showProgressNotification(
+      if (syncConfig?.enableNotifications == true) {
+        await syncConfig!.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -202,18 +202,18 @@ class SyncDownloadStrategy {
       // TODO: Implementar serviço interno de cache de imagens no módulo sync
       // Por enquanto, apenas logamos que o processo seria executado
       if (mediaIds.isNotEmpty) {
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint(
               '[SyncDownloadStrategy] ${mediaIds.length} imagens identificadas para pré-cache');
         }
       } else {
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint('[SyncDownloadStrategy] Nenhuma imagem para pré-carregar');
         }
       }
     } catch (e) {
       // Não interromper a sincronização se o pré-cache falhar
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint('[SyncDownloadStrategy] Erro no pré-cache de imagens: $e');
       }
       // Continuar com a sincronização
@@ -222,19 +222,19 @@ class SyncDownloadStrategy {
 
   /// Cancela todas as notificações de sincronização
   Future<void> _cancelNotifications() async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncDownloadStrategy] Cancelando todas as notificações de sincronização...');
       }
 
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.cancelAllNotifications();
+      if (syncConfig?.enableNotifications == true) {
+        await syncConfig!.cancelAllNotifications();
       }
     } catch (e) {
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint('[SyncDownloadStrategy] Falha ao cancelar notificações: $e');
       }
       // Não é crítico, continuar

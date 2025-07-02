@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 /// Interface abstrata para cliente REST
 abstract class RestClient {

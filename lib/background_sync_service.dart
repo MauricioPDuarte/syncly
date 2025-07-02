@@ -2,19 +2,17 @@ import 'dart:async';
 import 'package:workmanager/workmanager.dart';
 import 'core/interfaces/i_sync_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
 import 'sync_service.dart';
 import 'sync_configurator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/enums/sync_status.dart';
-import 'core/config/sync_config.dart';
-import 'sync_provider.dart';
+import 'core/config/sync_constants.dart';
+import 'sync_config.dart';
 
 class BackgroundSyncService {
   static bool _isInitialized = false;
 
-  /// Obtém o SyncProvider via SyncConfigurator
-  static SyncProvider? _getSyncProvider() {
+  /// Obtém o SyncConfig via SyncConfigurator
+  static SyncConfig? _getSyncConfig() {
     return SyncConfigurator.provider;
   }
 
@@ -29,28 +27,28 @@ class BackgroundSyncService {
         isInDebugMode: kDebugMode,
       );
 
-      // Inicializar serviço de notificações usando o SyncProvider
+      // Inicializar serviço de notificações usando o SyncConfig
       try {
-        final syncProvider = _getSyncProvider();
-        if (syncProvider != null && syncProvider.enableNotifications) {
-          await syncProvider.initializeNotifications();
+        final syncConfig = _getSyncConfig();
+        if (syncConfig != null && syncConfig.enableNotifications) {
+          await syncConfig.initializeNotifications();
         }
       } catch (e) {
-        // Fallback silencioso se SyncProvider não estiver disponível
-        final syncProvider = _getSyncProvider();
-        if (syncProvider != null && syncProvider.enableDebugLogs) {
+        // Fallback silencioso se SyncConfig não estiver disponível
+        final syncConfig = _getSyncConfig();
+        if (syncConfig != null && syncConfig.enableDebugLogs) {
           debugPrint('Erro ao inicializar notificações: $e');
         }
       }
 
       _isInitialized = true;
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+    if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('BackgroundSyncService inicializado com sucesso');
       }
     } catch (e) {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+    if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao inicializar BackgroundSyncService: $e');
       }
       rethrow;
@@ -64,14 +62,14 @@ class BackgroundSyncService {
     }
 
     try {
-      await Workmanager().cancelByUniqueName(SyncConfig.backgroundSyncTaskName);
+      await Workmanager().cancelByUniqueName(SyncConstants.backgroundSyncTaskName);
 
       //  Registrar nova tarefa periódica
       await Workmanager().registerPeriodicTask(
-        SyncConfig.backgroundSyncTaskName,
-        SyncConfig.backgroundSyncTaskName,
-        frequency: SyncConfig.backgroundSyncFrequency,
-        initialDelay: SyncConfig.backgroundSyncInterval,
+        SyncConstants.backgroundSyncTaskName,
+      SyncConstants.backgroundSyncTaskName,
+      frequency: SyncConstants.backgroundSyncFrequency,
+      initialDelay: SyncConstants.backgroundSyncInterval,
         constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: true,
@@ -81,13 +79,13 @@ class BackgroundSyncService {
       );
 
       _isInitialized = true;
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Sincronização em background iniciada');
       }
     } catch (e) {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao iniciar sincronização em background: $e');
       }
       rethrow;
@@ -97,7 +95,7 @@ class BackgroundSyncService {
   /// Para a sincronização em background
   static Future<void> stopBackgroundSync() async {
     try {
-      await Workmanager().cancelByUniqueName(SyncConfig.backgroundSyncTaskName);
+      await Workmanager().cancelByUniqueName(SyncConstants.backgroundSyncTaskName);
       await _dismissAllNotifications();
       debugPrint('Sincronização em background parada');
     } catch (e) {
@@ -114,38 +112,38 @@ class BackgroundSyncService {
     bool indeterminate = false,
   }) async {
     try {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider == null || !syncProvider.enableNotifications) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig == null || !syncConfig.enableNotifications) {
         return;
       }
 
       // Verificar se as notificações estão habilitadas
-      final areEnabled = await syncProvider.areNotificationsEnabled();
+      final areEnabled = await syncConfig.areNotificationsEnabled();
       if (!areEnabled) {
-        if (syncProvider.enableDebugLogs) {
+        if (syncConfig.enableDebugLogs) {
           debugPrint('Notificações não estão habilitadas');
         }
         return;
       }
 
       if (indeterminate || (progress == null || maxProgress == null)) {
-        await syncProvider.showNotification(
+        await syncConfig.showNotification(
           title: title,
           message: body,
-          notificationId: SyncConfig.progressNotificationId,
+          notificationId: SyncConstants.progressNotificationId,
         );
       } else {
-        await syncProvider.showProgressNotification(
+        await syncConfig.showProgressNotification(
           title: title,
           message: body,
           progress: progress,
           maxProgress: maxProgress,
-          notificationId: SyncConfig.progressNotificationId,
+          notificationId: SyncConstants.progressNotificationId,
         );
       }
     } catch (e) {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao exibir notificação de progresso: $e');
       }
     }
@@ -158,28 +156,28 @@ class BackgroundSyncService {
     bool isSuccess = true,
   }) async {
     try {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider == null || !syncProvider.enableNotifications) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig == null || !syncConfig.enableNotifications) {
         return;
       }
 
       // Verificar se as notificações estão habilitadas
-      final areEnabled = await syncProvider.areNotificationsEnabled();
+      final areEnabled = await syncConfig.areNotificationsEnabled();
       if (!areEnabled) {
-        if (syncProvider.enableDebugLogs) {
+        if (syncConfig.enableDebugLogs) {
           debugPrint('Notificações não estão habilitadas');
         }
         return;
       }
 
-      await syncProvider.showNotification(
+      await syncConfig.showNotification(
         title: title,
         message: body,
-        notificationId: SyncConfig.syncNotificationId,
+        notificationId: SyncConstants.syncNotificationId,
       );
     } catch (e) {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao mostrar notificação de resultado: $e');
       }
     }
@@ -188,15 +186,15 @@ class BackgroundSyncService {
   /// Remove todas as notificações de sincronização
   static Future<void> _dismissAllNotifications() async {
     try {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableNotifications) {
-        await syncProvider.cancelNotification(SyncConfig.syncNotificationId);
-        await syncProvider
-            .cancelNotification(SyncConfig.progressNotificationId);
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableNotifications) {
+        await syncConfig.cancelNotification(SyncConstants.syncNotificationId);
+    await syncConfig
+        .cancelNotification(SyncConstants.progressNotificationId);
       }
     } catch (e) {
-      final syncProvider = _getSyncProvider();
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      final syncConfig = _getSyncConfig();
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao remover notificações: $e');
       }
     }
@@ -223,7 +221,7 @@ class BackgroundSyncService {
     try {
       await Workmanager().registerOneOffTask(
         'immediate_sync',
-        SyncConfig.backgroundSyncTaskName,
+        SyncConstants.backgroundSyncTaskName,
         initialDelay: const Duration(seconds: 1),
         constraints: Constraints(
           networkType: NetworkType.connected,
@@ -265,39 +263,39 @@ void callbackDispatcher() {
 Future<void> _performBackgroundSync() async {
   ISyncService? syncService;
 
-  // Obter SyncProvider com fallback
-  SyncProvider? syncProvider;
+  // Obter SyncConfig com fallback
+  SyncConfig? syncConfig;
 
   try {
-    syncProvider = SyncConfigurator.provider;
+    syncConfig = SyncConfigurator.provider;
   } catch (e) {
-    debugPrint('SyncProvider não disponível via SyncConfigurator: $e');
+    debugPrint('SyncConfig não disponível via SyncConfigurator: $e');
   }
 
   try {
-    if (syncProvider != null && syncProvider.enableDebugLogs) {
+    if (syncConfig != null && syncConfig.enableDebugLogs) {
       debugPrint('Iniciando sincronização em background');
     }
 
     // Verificar se há usuário autenticado antes de sincronizar
     try {
-      if (syncProvider != null) {
-        final isAuthenticated = await syncProvider.isAuthenticated();
+      if (syncConfig != null) {
+        final isAuthenticated = await syncConfig.isAuthenticated();
         if (!isAuthenticated) {
-          if (syncProvider.enableDebugLogs) {
+          if (syncConfig.enableDebugLogs) {
             debugPrint(
                 'Usuário não autenticado - cancelando sincronização em background');
           }
           return;
         }
       } else {
-        // SyncProvider não disponível - cancelando sincronização
+        // SyncConfig não disponível - cancelando sincronização
         debugPrint(
-            'SyncProvider não disponível - cancelando sincronização em background');
+            'SyncConfig não disponível - cancelando sincronização em background');
         return;
       }
     } catch (e) {
-      if (syncProvider != null && syncProvider.enableDebugLogs) {
+      if (syncConfig != null && syncConfig.enableDebugLogs) {
         debugPrint('Erro ao verificar autenticação: $e');
       }
       return;
@@ -316,7 +314,7 @@ Future<void> _performBackgroundSync() async {
     final initialPendingCount = await syncService.getPendingItemsCount();
 
     if (initialPendingCount == 0) {
-      if (syncProvider.enableDebugLogs == true) {
+      if (syncConfig.enableDebugLogs == true) {
         debugPrint('Nenhum item pendente para sincronizar');
       }
       await BackgroundSyncService.showSyncResultNotification(
@@ -368,7 +366,7 @@ Future<void> _performBackgroundSync() async {
           final finalPendingCount = syncData.pendingItems ?? 0;
           final syncedCount = initialPendingCount - finalPendingCount;
 
-          if (syncProvider?.enableDebugLogs == true) {
+          if (syncConfig?.enableDebugLogs == true) {
             debugPrint(
                 'Sincronização em background concluída com sucesso - $syncedCount itens sincronizados, $finalPendingCount restantes');
           }
@@ -384,7 +382,7 @@ Future<void> _performBackgroundSync() async {
           break;
         case SyncStatus.error:
         case SyncStatus.offline:
-          if (syncProvider?.enableDebugLogs == true) {
+          if (syncConfig?.enableDebugLogs == true) {
             debugPrint(
                 'Erro na sincronização em background - Status: ${syncData.status}, Mensagem: ${syncData.message}, Itens pendentes: ${syncData.pendingItems}');
           }
@@ -416,11 +414,11 @@ Future<void> _performBackgroundSync() async {
       syncService.syncData.removeListener(syncListener);
     }
 
-    if (syncProvider.enableDebugLogs == true) {
+    if (syncConfig.enableDebugLogs == true) {
       debugPrint('Processo de sincronização em background finalizado');
     }
   } catch (e) {
-    if (syncProvider?.enableDebugLogs == true) {
+    if (syncConfig?.enableDebugLogs == true) {
       debugPrint('Erro inesperado na sincronização em background: $e');
     }
 

@@ -1,6 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:syncly/sync.dart';
-import '../../core/services/storage/storage.dart';
+import 'package:syncly_example/core/core_module.dart';
 import 'data/datasources/todo_local_datasource.dart';
 import 'data/repositories/todo_repository_impl.dart';
 import 'presentation/pages/todo_page.dart';
@@ -12,49 +11,29 @@ import 'domain/usecases/delete_todo_usecase.dart';
 import 'presentation/controllers/todo_controller.dart';
 
 class TodoModule extends Module {
+    @override
+      List<Module> get imports =>  [
+      CoreModule(),
+    ];
+
   @override
   void binds(Injector i) {
     // Datasources
-    i.addLazySingleton<TodoLocalDatasource>(
-      () => TodoLocalDatasource(
-        i.get<StorageService>(),
-        i.get<ISyncService>(),
-      ),
-    );
+    i.addLazySingleton<TodoLocalDatasource>(TodoLocalDatasource.new);
 
     // Repositories
-    i.addLazySingleton<TodoRepository>(
-      () => TodoRepositoryImpl(
-        i.get<TodoLocalDatasource>()
-      ),
-    );
+    i.addLazySingleton<TodoRepository>(TodoRepositoryImpl.new);
+
 
     // Use cases
-    i.addLazySingleton<GetAllTodosUsecase>(
-      () => GetAllTodosUsecase(i.get<TodoRepository>()),
-    );
+    i.addLazySingleton<GetAllTodosUsecase>(GetAllTodosUsecase.new);
+    i.addLazySingleton<CreateTodoUsecase>(CreateTodoUsecase.new);
+    i.addLazySingleton<ToggleTodoUsecase>(ToggleTodoUsecase.new);
+    i.addLazySingleton<DeleteTodoUsecase>(DeleteTodoUsecase.new);
 
-    i.addLazySingleton<CreateTodoUsecase>(
-      () => CreateTodoUsecase(i.get<TodoRepository>()),
-    );
-
-    i.addLazySingleton<ToggleTodoUsecase>(
-      () => ToggleTodoUsecase(i.get<TodoRepository>()),
-    );
-
-    i.addLazySingleton<DeleteTodoUsecase>(
-      () => DeleteTodoUsecase(i.get<TodoRepository>()),
-    );
 
     // Controllers
-    i.addLazySingleton<TodoController>(
-      () => TodoController(
-        i.get<GetAllTodosUsecase>(),
-        i.get<CreateTodoUsecase>(),
-        i.get<ToggleTodoUsecase>(),
-        i.get<DeleteTodoUsecase>(),
-      ),
-    );
+    i.addLazySingleton<TodoController>(TodoController.new);
   }
 
   @override

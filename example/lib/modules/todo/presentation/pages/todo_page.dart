@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:syncly/sync.dart';
 import '../controllers/todo_controller.dart';
 import '../widgets/todo_item_widget.dart';
 import '../widgets/add_todo_dialog.dart';
@@ -33,6 +34,14 @@ class _TodoPageState extends State<TodoPage> {
         title: const Text('Syncly Todo Example'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          // Indicador de sincronização
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: SyncIndicator(
+              showText: false,
+              onTap: () => SyncDetailsBottomSheet.show(context),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: controller.loadTodos,
@@ -59,9 +68,19 @@ class _TodoPageState extends State<TodoPage> {
                 
                 return Column(
                   children: [
-                    Text(
-                      'Todo Statistics',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Todo Statistics',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        // Indicador de sincronização com texto
+                        SyncIndicator(
+                          showText: true,
+                          onTap: () => SyncDetailsBottomSheet.show(context),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Row(

@@ -1,16 +1,16 @@
-import 'package:syncly/sync.dart';
+import 'package:syncly_example/core/services/sync/sync.dart';
 import '../../../../core/services/storage/storage.dart';
 import '../../domain/entities/todo.dart';
 
 class TodoLocalDatasource {
   final StorageService _prefsService;
-  final ISyncService _syncService;
+  final AppSyncService _syncService;
   static const String _todosKey = 'todos';
 
   TodoLocalDatasource(this._prefsService, this._syncService);
 
   Future<List<Todo>> getAllTodos() async {
-    final todosJson = _prefsService.getJsonList(_todosKey);
+    final todosJson = await _prefsService.getJsonList(_todosKey);
     if (todosJson == null) return [];
     
     return todosJson.map((json) => Todo.fromJson(json)).toList();
@@ -57,7 +57,6 @@ class TodoLocalDatasource {
 
   Future<void> deleteTodo(String id) async {
     final todos = await getAllTodos();
-    final todoToDelete = todos.firstWhere((todo) => todo.id == id, orElse: () => throw Exception('Todo not found'));
     todos.removeWhere((todo) => todo.id == id);
     await _saveTodos(todos);
     
@@ -65,7 +64,6 @@ class TodoLocalDatasource {
     await _syncService.logDelete(
       entityType: 'Todo',
       entityId: id,
-      data: todoToDelete.toJson(),
     );
   }
 

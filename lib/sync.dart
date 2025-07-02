@@ -4,19 +4,19 @@
 /// 
 /// ## Uso Básico
 /// 
-/// 1. Implemente uma classe que estende [SyncProvider]
+/// 1. Implemente uma classe que estende [SyncConfig]
 /// 2. Inicialize com [SyncConfigurator.initialize]
 /// 3. Use [SyncConfigurator.syncService] para acessar funcionalidades
 /// 
 /// ```dart
 /// // 1. Implementar provider
-/// class MySyncProvider extends SyncProvider {
+/// class MySyncConfig extends SyncConfig {
 ///   // implementar métodos obrigatórios
 /// }
 /// 
 /// // 2. Inicializar
 /// await SyncConfigurator.initialize(
-///   provider: MySyncProvider(),
+///   provider: MySyncConfig(),
 /// );
 /// 
 /// // 3. Usar
@@ -30,7 +30,7 @@ library sync;
 // ========== EXPORTS PRINCIPAIS ==========
 
 /// Classe principal para implementação pelo usuário
-export 'sync_provider.dart' show SyncProvider;
+export 'sync_config.dart' show SyncConfig;
 
 /// Configurador principal do sistema
 export 'sync_configurator.dart' show SyncConfigurator;
@@ -86,7 +86,7 @@ export 'core/presentation/widgets/sync_details_bottom_sheet.dart' show SyncDetai
 // ========== CONSTANTES E CONFIGURAÇÕES ==========
 
 /// Configurações estáticas do sistema
-export 'core/config/sync_config.dart' show SyncConfig;
+export 'core/config/sync_constants.dart' show SyncConstants;
 
 // ========== EXEMPLO DE IMPLEMENTAÇÃO ==========
 

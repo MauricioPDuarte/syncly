@@ -10,10 +10,10 @@ abstract class AppSyncService {
   Future<void> startBackgroundSync();
   Future<void> resetSyncState();
   Future<void> logCreate(
-      String entityType, String entityId, Map<String, dynamic> data);
-  Future<void> logUpdate(
-      String entityType, String entityId, Map<String, dynamic> data);
-  Future<void> logDelete(String entityType, String entityId);
+      {required String entityType, required String entityId, required Map<String, dynamic> data});
+  Future<void> logUpdate({
+     required String entityType, required String entityId,  required Map<String, dynamic> data});
+  Future<void> logDelete({required String entityType, required String entityId});
   Future<int> getPendingItemsCount();
   bool get isOnline;
   bool get isSyncing;

@@ -1,12 +1,20 @@
 import '../entities/sync_data.dart';
 import '../enums/sync_operation.dart';
 import 'package:flutter/foundation.dart';
+import '../../sync_initializer.dart';
 
 /// Interface para o serviço de sincronização
 ///
 /// Define os contratos para sincronização de dados entre o app e o servidor.
 /// Gerencia o estado de conectividade, fila de sincronização e recuperação de erros.
 abstract class ISyncService {
+  /// Obtém a instância do serviço de sincronização
+  /// 
+  /// Retorna a instância configurada através do SyncInitializer.
+  /// Lança uma exceção se o SyncInitializer não foi inicializado.
+  static ISyncService getInstance() {
+    return SyncInitializer.syncService;
+  }
   ValueNotifier<SyncData> get syncData;
   ValueNotifier<bool> get isOnline;
   Future<void> startSync();

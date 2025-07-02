@@ -2,15 +2,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../core/interfaces/i_logger_provider.dart';
-import 'package:uuid/uuid.dart';
-import 'dart:typed_data';
 import '../core/entities/sync_log.dart';
 import '../core/entities/sync_http_response.dart';
 import '../core/services/sync_error_manager.dart';
 import '../core/enums/sync_batch_type.dart';
-import '../core/config/sync_config.dart';
+import '../core/config/sync_constants.dart';
 import '../sync_configurator.dart';
-import '../sync_provider.dart';
+import '../sync_config.dart';
 
 
 /// Estratégia para upload de dados para o servidor
@@ -30,35 +28,35 @@ class SyncUploadStrategy {
     this._errorManager,
   );
 
-  /// Obtém o SyncProvider via SyncConfigurator
-  SyncProvider? _getSyncProvider() {
+  /// Obtém o SyncConfig via SyncConfigurator
+  SyncConfig? _getSyncConfig() {
     return SyncConfigurator.provider;
   }
 
   /// Função utilitária para logs de debug condicionais
   void _debugLog(String message) {
-    final syncProvider = _getSyncProvider();
-    if (syncProvider?.enableDebugLogs == true) {
+    final syncConfig = _getSyncConfig();
+    if (syncConfig?.enableDebugLogs == true) {
       debugPrint('[SyncUploadStrategy] $message');
     }
   }
 
   /// Executa o upload de dados para o servidor
   Future<void> syncUploadData() async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
       // Obter todos os logs pendentes ordenados por data de criação
       final allPendingLogs = await _syncLogger.getPendingLogs();
 
       if (allPendingLogs.isEmpty) {
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint('[SyncUploadStrategy] Nenhum dado pendente para upload');
         }
         return;
       }
 
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncUploadStrategy] Enviando ${allPendingLogs.length} itens pendentes para o servidor');
       }
@@ -70,7 +68,7 @@ class SyncUploadStrategy {
           allPendingLogs.where((log) => !log.isFileToUpload).toList();
 
       // Debug: verificar tipos de entidades nos logs de arquivo
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         final mediaLogs =
             fileLogs.where((log) => log.entityType == 'MEDIA').toList();
         debugPrint(
@@ -86,7 +84,7 @@ class SyncUploadStrategy {
       // Ordenar dados por data de criação
       dataLogs.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncUploadStrategy] Arquivos para upload: ${fileLogs.length}');
         debugPrint(
@@ -95,12 +93,12 @@ class SyncUploadStrategy {
 
       // FASE 1: Processar arquivos em lotes
       if (fileLogs.isNotEmpty) {
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint(
               '[SyncUploadStrategy] === INICIANDO UPLOAD DE ARQUIVOS ===');
         }
         await _processBatches(fileLogs, SyncBatchType.files);
-        if (syncProvider?.enableDebugLogs == true) {
+        if (syncConfig?.enableDebugLogs == true) {
           debugPrint(
               '[SyncUploadStrategy] === UPLOAD DE ARQUIVOS CONCLUÍDO ===');
         }
@@ -113,7 +111,7 @@ class SyncUploadStrategy {
         _debugLog('=== UPLOAD DE DADOS CONCLUÍDO ===');
       }
 
-      if (syncProvider?.enableDebugLogs == true) {
+      if (syncConfig?.enableDebugLogs == true) {
         debugPrint(
             '[SyncUploadStrategy] Todos os lotes foram processados com sucesso');
       }
@@ -125,7 +123,7 @@ class SyncUploadStrategy {
 
   /// Processa lotes de logs de sincronização
   Future<void> _processBatches(List<SyncLog> logs, SyncBatchType type) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     const int batchSize = 10; // Reduzido para lotes menores
     final int totalBatches = (logs.length / batchSize).ceil();
@@ -148,7 +146,7 @@ class SyncUploadStrategy {
         // Excluir todos os logs do lote após sincronização bem-sucedida
         for (final log in batch) {
           await _syncLogger.removeLog(log.syncId);
-          if (syncProvider?.enableDebugLogs == true) {
+          if (syncConfig?.enableDebugLogs == true) {
             debugPrint(
                 '[SyncUploadStrategy] Log excluído após sincronização: ${log.entityType}/${log.operation}');
           }
@@ -191,7 +189,7 @@ class SyncUploadStrategy {
   /// Faz a chamada real para a API de sincronização
   Future<void> _sendBatchToBackend(
       List<SyncLog> batch, SyncBatchType type) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
       _debugLog(
@@ -221,7 +219,7 @@ class SyncUploadStrategy {
 
   /// Envia lote de arquivos usando FormData
   Future<SyncHttpResponse> _sendFileBatch(List<SyncLog> batch) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
     final formData = FormData();
     final fileIds = <String>[];
 
@@ -318,13 +316,13 @@ class SyncUploadStrategy {
         '📤 Enviando FormData com ${formData.files.length} arquivos e ${fileIds.length} IDs');
 
     // Obter URL do endpoint de arquivos do provider
-    final provider = _getSyncProvider();
+    final provider = _getSyncConfig();
     if (provider == null) {
-      throw Exception('SyncProvider não está disponível');
+      throw Exception('SyncConfig não está disponível');
     }
     
     final fileSyncUrl =
-        provider.fileSyncEndpoint ?? SyncConfig.fileSyncEndpoint;
+        provider.fileSyncEndpoint ?? SyncConstants.fileSyncEndpoint;
 
     return await provider.httpPost(fileSyncUrl, data: formData);
   }
@@ -332,7 +330,7 @@ class SyncUploadStrategy {
   /// Envia lote de dados regulares usando JSON
   Future<SyncHttpResponse> _sendDataBatch(
       List<SyncLog> batch, SyncBatchType type) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     final batchData = {
       'type': type.displayName,
@@ -349,15 +347,15 @@ class SyncUploadStrategy {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    if (syncProvider == null) {
-      throw Exception('SyncProvider não está disponível');
+    if (syncConfig == null) {
+      throw Exception('SyncConfig não está disponível');
     }
     
     // Obter URL do endpoint de dados do provider
     final dataSyncUrl =
-        syncProvider.dataSyncEndpoint ?? SyncConfig.dataSyncEndpoint;
+        syncConfig.dataSyncEndpoint ?? SyncConstants.dataSyncEndpoint;
 
-    return await syncProvider.httpPost(dataSyncUrl, data: batchData);
+    return await syncConfig.httpPost(dataSyncUrl, data: batchData);
   }
 
   /// Registra um log de erro para um log de sincronização específico
@@ -366,7 +364,7 @@ class SyncUploadStrategy {
     required dynamic error,
     required Map<String, dynamic> context,
   }) async {
-    final syncProvider = _getSyncProvider();
+    final syncConfig = _getSyncConfig();
 
     try {
       // Usar o SyncErrorManager para registrar o erro

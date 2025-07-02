@@ -2,7 +2,6 @@ import '../app_sync_service.dart';
 import '../app_sync_data.dart';
 import 'package:syncly/sync.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 
 /// Implementação do serviço de sincronização da aplicação
 ///
@@ -14,7 +13,7 @@ class SynclyService implements AppSyncService {
   late final ValueNotifier<AppSyncData> _appSyncData;
 
   SynclyService() {
-    _syncService = Modular.get<ISyncService>();
+    _syncService = ISyncService.getInstance();
     _appSyncData = ValueNotifier(_convertToAppSyncData(_syncService.syncData.value));
     
     // Escutar mudanças no syncData original e converter para AppSyncData
@@ -106,7 +105,7 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logCreate(String entityType, String entityId, Map<String, dynamic> data) {
+  Future<void> logCreate({required String entityType, required String entityId, required Map<String, dynamic> data,}) {
     return _syncService.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -116,7 +115,7 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logUpdate(String entityType, String entityId, Map<String, dynamic> data) {
+  Future<void> logUpdate({required String entityType, required String entityId, required Map<String, dynamic> data}) {
     return _syncService.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -126,7 +125,7 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logDelete(String entityType, String entityId) {
+  Future<void> logDelete({required String entityType, required String entityId}) {
     return _syncService.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -135,10 +134,4 @@ class SynclyService implements AppSyncService {
     );
   }
 
-  @override
-  void dispose() {
-    _syncService.syncData.removeListener(_onSyncDataChanged);
-    _appSyncData.dispose();
-    _syncService.dispose();
-  }
 }

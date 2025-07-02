@@ -4,7 +4,7 @@ import 'core/interfaces/i_logger_provider.dart';
 import 'package:flutter/foundation.dart';
 
 import 'background_sync_service.dart';
-import 'core/config/sync_config.dart';
+import 'core/config/sync_constants.dart';
 import 'sync_configurator.dart';
 import 'core/entities/sync_data.dart';
 import 'core/enums/sync_operation.dart';
@@ -78,10 +78,10 @@ class SyncService implements ISyncService {
       _errorManager,
     );
 
-    final syncProvider = SyncConfigurator.provider;
-    if (syncProvider?.enableDebugLogs == true) {
+    final syncConfig = SyncConfigurator.provider;
+    if (syncConfig?.enableDebugLogs == true) {
       debugPrint(
-          '[SyncService] SyncService inicializado - syncInterval: ${SyncConfig.syncInterval.inSeconds}s, initialDelay: ${SyncConfig.initialSyncDelay.inSeconds}s, recoveryTimeout: ${SyncConfig.recoveryTimeout.inSeconds}s');
+          '[SyncService] SyncService inicializado - syncInterval: ${SyncConstants.syncInterval.inSeconds}s, initialDelay: ${SyncConstants.initialSyncDelay.inSeconds}s, recoveryTimeout: ${SyncConstants.recoveryTimeout.inSeconds}s');
     }
 
     _initConnectivityListener();
@@ -99,7 +99,7 @@ class SyncService implements ISyncService {
       return;
     }
 
-    await Future.delayed(SyncConfig.initialSyncDelay);
+    await Future.delayed(SyncConstants.initialSyncDelay);
     await forceSync(isManualCall: false);
   }
 
@@ -267,8 +267,8 @@ class SyncService implements ISyncService {
     try {
       _recoveryTimer?.cancel();
 
-      final syncProvider = SyncConfigurator.provider;
-      if (syncProvider != null && !await syncProvider.isAuthenticated()) {
+      final syncConfig = SyncConfigurator.provider;
+    if (syncConfig != null && !await syncConfig.isAuthenticated()) {
         _log('warning', 'Usuário não autenticado, sincronização cancelada.');
         _updateSyncStatus(
           SyncStatus.idle,
@@ -329,9 +329,9 @@ class SyncService implements ISyncService {
         metadata: {'isManualCall': isManualCall});
 
     final initialPendingCount = await getPendingItemsCount();
-    final syncProvider = SyncConfigurator.provider;
-    if (initialPendingCount > 0 && syncProvider?.enableNotifications == true) {
-      await syncProvider!.showProgressNotification(
+    final syncConfig = SyncConfigurator.provider;
+    if (initialPendingCount > 0 && syncConfig?.enableNotifications == true) {
+      await syncConfig!.showProgressNotification(
         title: 'Sincronizando',
         message: 'Sincronizando $initialPendingCount itens...',
         progress: 0,
@@ -353,8 +353,8 @@ class SyncService implements ISyncService {
           error: e, stackTrace: s);
       _consecutiveFailures++;
 
-      if (syncProvider?.enableNotifications == true) {
-        await syncProvider!.showNotification(
+      if (syncConfig?.enableNotifications == true) {
+      await syncConfig!.showNotification(
           title: 'Erro na Sincronização',
           message:
               'Não foi possível sincronizar os dados. Tentativa $_consecutiveFailures.',
@@ -401,7 +401,7 @@ class SyncService implements ISyncService {
       _updateSyncStatus(
         SyncStatus.degraded,
         SyncUtils.generateStatusMessage(
-            _consecutiveFailures, SyncConfig.maxAbsoluteFailures),
+            _consecutiveFailures, SyncConstants.maxAbsoluteFailures),
       );
     }
   }
@@ -410,7 +410,7 @@ class SyncService implements ISyncService {
     _log('info', 'Resetando estado para sync manual.');
     if (_isInOfflineMode ||
         syncData.value.status == SyncStatus.recovery ||
-        _consecutiveFailures >= SyncConfig.maxAbsoluteFailures) {
+        _consecutiveFailures >= SyncConstants.maxAbsoluteFailures) {
       _consecutiveFailures = 0;
       _isInOfflineMode = false;
       _recoveryTimer?.cancel();
@@ -435,9 +435,9 @@ class SyncService implements ISyncService {
       'pendingItems': finalPendingCount
     });
 
-    final syncProvider = SyncConfigurator.provider;
-    if (initialPendingCount > 0 && syncProvider?.enableNotifications == true) {
-      await syncProvider!.showNotification(
+    final syncConfig = SyncConfigurator.provider;
+    if (initialPendingCount > 0 && syncConfig?.enableNotifications == true) {
+      await syncConfig!.showNotification(
         title: 'Sincronização Concluída',
         message: 'Todos os seus dados estão atualizados.',
         channelId: 'sync_result',
@@ -499,7 +499,7 @@ class SyncService implements ISyncService {
     _stopSyncTimer();
     if (!isOnline.value) return;
 
-    _syncTimer = Timer.periodic(SyncConfig.syncInterval, (_) {
+    _syncTimer = Timer.periodic(SyncConstants.syncInterval, (_) {
       if (isOnline.value && !_isSyncInProgress) {
         _executeSyncSafely(isManualCall: false);
       }
@@ -533,9 +533,9 @@ class SyncService implements ISyncService {
   void _scheduleReconnectionAttempt() {
     _recoveryTimer?.cancel();
     _log('info',
-        'Agendando verificação de reconexão em ${SyncConfig.recoveryTimeout.inMinutes} min');
+        'Agendando verificação de reconexão em ${SyncConstants.recoveryTimeout.inMinutes} min');
 
-    _recoveryTimer = Timer(SyncConfig.recoveryTimeout, () async {
+    _recoveryTimer = Timer(SyncConstants.recoveryTimeout, () async {
       if (_isDisposed) return;
       if (await _connectivityService.isConnected()) {
         _log('info', 'Conexão detectada. Tentando sair do modo offline.');
@@ -569,7 +569,7 @@ class SyncService implements ISyncService {
 
       if (isConnected && !wasOnline) {
         _updatePendingItemsCount();
-        if (_consecutiveFailures < SyncConfig.maxRetryAttempts) {
+        if (_consecutiveFailures < SyncConstants.maxRetryAttempts) {
           _updateSyncStatus(SyncStatus.idle, 'Conexão restaurada');
           forceSync(isManualCall: false);
         } else {
@@ -628,7 +628,7 @@ class SyncService implements ISyncService {
   }
 
   Future<void> _reportCriticalErrorIfNeeded() async {
-    if (_consecutiveFailures >= SyncConfig.maxRetryAttempts) {
+    if (_consecutiveFailures >= SyncConstants.maxRetryAttempts) {
       try {
         await _errorReporter.scheduleErrorReporting();
         _log('info', 'Relatório de erro crítico agendado para envio.');
@@ -678,9 +678,9 @@ class SyncService implements ISyncService {
   // FIX 2: Correctly handle stackTrace and error objects for logging.
   void _log(String level, String message,
       {dynamic error, StackTrace? stackTrace, Map<String, dynamic>? metadata}) {
-    final syncProvider = SyncConfigurator.provider;
+    final syncConfig = SyncConfigurator.provider;
 
-    if (syncProvider?.enableDebugLogs == true) {
+    if (syncConfig?.enableDebugLogs == true) {
       // Prepare metadata with error and stacktrace strings if they exist
       final Map<String, dynamic> fullMetadata = {...?metadata};
       if (error != null) {

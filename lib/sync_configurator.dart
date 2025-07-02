@@ -1,7 +1,7 @@
 import 'core/interfaces/i_sync_log_manager.dart';
 import 'core/services/sync_log_manager.dart';
 import 'package:get_it/get_it.dart';
-import 'sync_provider.dart';
+import 'sync_config.dart';
 import 'core/interfaces/i_sync_service.dart';
 import 'core/interfaces/i_download_strategy.dart';
 import 'core/services/sync_connectivity_service.dart';
@@ -21,17 +21,17 @@ import 'core/presentation/controllers/sync_indicator_controller.dart';
 /// Configurador principal do sistema de sincronização
 ///
 /// Esta classe simplifica a configuração do sync, permitindo que o usuário
-/// implemente apenas um SyncProvider e tenha todo o sistema funcionando.
+/// implemente apenas um SyncConfig e tenha todo o sistema funcionando.
 class SyncConfigurator {
-  static SyncProvider? _provider;
+  static SyncConfig? _provider;
   static bool _isInitialized = false;
 
   /// Inicializa o sistema de sync com o provider fornecido
   ///
-  /// [provider] - Implementação do SyncProvider com todas as configurações
+  /// [provider] - Implementação do SyncConfig com todas as configurações
   /// [registerInGetIt] - Se deve registrar automaticamente no GetIt (padrão: true)
   static Future<void> initialize({
-    required SyncProvider provider,
+    required SyncConfig provider,
     bool registerInGetIt = true,
   }) async {
     if (_isInitialized) {
@@ -97,7 +97,7 @@ class SyncConfigurator {
   static bool get isInitialized => _isInitialized;
 
   /// Obtém o provider atual
-  static SyncProvider? get provider => _provider;
+  static SyncConfig? get provider => _provider;
 
   /// Obtém o serviço de sync (após inicialização)
   static ISyncService get syncService {
@@ -109,7 +109,7 @@ class SyncConfigurator {
   }
 
   /// Registra todas as dependências no GetIt
-  static void _registerDependencies(SyncProvider provider) {
+  static void _registerDependencies(SyncConfig provider) {
     final getIt = GetIt.instance;
 
     // Registra as estratégias de download

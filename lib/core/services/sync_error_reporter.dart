@@ -1,5 +1,5 @@
 import '../entities/sync_error.dart';
-import '../../sync_provider.dart';
+import '../../sync_config.dart';
 import '../interfaces/i_logger_debug_provider.dart';
 import 'sync_error_manager.dart';
 
@@ -54,13 +54,13 @@ class SyncErrorReporter implements ISyncErrorReporter {
   final ISyncErrorManager _errorManager;
   final ISyncLoggerDebugProvider? _loggerProvider;
   final SyncErrorReportConfig _config;
-  final SyncProvider _syncProvider;
+  final SyncConfig _syncConfig;
 
   SyncErrorReporter(
     this._errorManager,
     this._loggerProvider,
     this._config,
-    this._syncProvider,
+    this._syncConfig,
   );
 
   @override
@@ -123,7 +123,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
     try {
       // Verificar autenticação
-      final isAuthenticated = await _syncProvider.isAuthenticated();
+      final isAuthenticated = await _syncConfig.isAuthenticated();
       if (!isAuthenticated) {
         _loggerProvider?.warning(
           'Cannot send errors: user not authenticated',
@@ -227,7 +227,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
       while (retryCount <= _config.maxRetries && !success) {
         try {
-          final response = await _syncProvider.httpPost(
+          final response = await _syncConfig.httpPost(
             _config.endpoint,
             data: payload,
           );
@@ -285,7 +285,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
   Future<Map<String, dynamic>> _createErrorPayload(
       List<SyncError> errors) async {
-    final userId = await _syncProvider.getCurrentUserId();
+    final userId = await _syncConfig.getCurrentUserId();
 
     return {
       'userId': userId,

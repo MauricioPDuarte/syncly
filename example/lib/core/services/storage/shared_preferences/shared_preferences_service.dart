@@ -3,86 +3,61 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../storage_service.dart';
 
 class SharedPreferencesService implements StorageService {
-  final SharedPreferences? _prefs;
-  final Map<String, dynamic> _mockStorage = {}; // Storage mock para exemplo
+  SharedPreferences? _prefs;
 
-  SharedPreferencesService(this._prefs);
+  SharedPreferencesService();
+
+  Future<void> _ensureInitialized() async {
+    _prefs ??= await SharedPreferences.getInstance();
+  }
 
   // Generic methods for storing and retrieving data
   @override
   Future<bool> setString(String key, String value) async {
-    if (_prefs != null) {
-      return await _prefs!.setString(key, value);
-    } else {
-      _mockStorage[key] = value;
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.setString(key, value);
   }
 
   @override
-  String? getString(String key) {
-    if (_prefs != null) {
-      return _prefs!.getString(key);
-    } else {
-      return _mockStorage[key] as String?;
-    }
+  Future<String?> getString(String key) async {
+    await _ensureInitialized();
+    return _prefs!.getString(key);
   }
 
   @override
   Future<bool> setBool(String key, bool value) async {
-    if (_prefs != null) {
-      return await _prefs!.setBool(key, value);
-    } else {
-      _mockStorage[key] = value;
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.setBool(key, value);
   }
 
   @override
-  bool? getBool(String key) {
-    if (_prefs != null) {
-      return _prefs!.getBool(key);
-    } else {
-      return _mockStorage[key] as bool?;
-    }
+  Future<bool?> getBool(String key) async {
+    await _ensureInitialized();
+    return _prefs!.getBool(key);
   }
 
   @override
   Future<bool> setInt(String key, int value) async {
-    if (_prefs != null) {
-      return await _prefs!.setInt(key, value);
-    } else {
-      _mockStorage[key] = value;
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.setInt(key, value);
   }
 
   @override
-  int? getInt(String key) {
-    if (_prefs != null) {
-      return _prefs!.getInt(key);
-    } else {
-      return _mockStorage[key] as int?;
-    }
+  Future<int?> getInt(String key) async {
+    await _ensureInitialized();
+    return _prefs!.getInt(key);
   }
 
   @override
   Future<bool> setStringList(String key, List<String> value) async {
-    if (_prefs != null) {
-      return await _prefs!.setStringList(key, value);
-    } else {
-      _mockStorage[key] = value;
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.setStringList(key, value);
   }
 
   @override
-  List<String>? getStringList(String key) {
-    if (_prefs != null) {
-      return _prefs!.getStringList(key);
-    } else {
-      return _mockStorage[key] as List<String>?;
-    }
+  Future<List<String>?> getStringList(String key) async {
+    await _ensureInitialized();
+    return _prefs!.getStringList(key);
   }
 
   // JSON methods for complex objects
@@ -93,8 +68,8 @@ class SharedPreferencesService implements StorageService {
   }
 
   @override
-  Map<String, dynamic>? getJson(String key) {
-    final jsonString = getString(key);
+  Future<Map<String, dynamic>?> getJson(String key) async {
+    final jsonString = await getString(key);
     if (jsonString == null) return null;
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
@@ -110,8 +85,8 @@ class SharedPreferencesService implements StorageService {
   }
 
   @override
-  List<Map<String, dynamic>>? getJsonList(String key) {
-    final jsonString = getString(key);
+  Future<List<Map<String, dynamic>>?> getJsonList(String key) async {
+    final jsonString = await getString(key);
     if (jsonString == null) return null;
     try {
       final decoded = jsonDecode(jsonString) as List;
@@ -123,39 +98,25 @@ class SharedPreferencesService implements StorageService {
 
   @override
   Future<bool> remove(String key) async {
-    if (_prefs != null) {
-      return await _prefs!.remove(key);
-    } else {
-      _mockStorage.remove(key);
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.remove(key);
   }
 
   @override
   Future<bool> clear() async {
-    if (_prefs != null) {
-      return await _prefs!.clear();
-    } else {
-      _mockStorage.clear();
-      return true;
-    }
+    await _ensureInitialized();
+    return await _prefs!.clear();
   }
 
   @override
-  bool containsKey(String key) {
-    if (_prefs != null) {
-      return _prefs!.containsKey(key);
-    } else {
-      return _mockStorage.containsKey(key);
-    }
+  Future<bool> containsKey(String key) async {
+    await _ensureInitialized();
+    return _prefs!.containsKey(key);
   }
 
   @override
-  Set<String> getKeys() {
-    if (_prefs != null) {
-      return _prefs!.getKeys();
-    } else {
-      return _mockStorage.keys.toSet();
-    }
+  Future<Set<String>> getKeys() async {
+    await _ensureInitialized();
+    return _prefs!.getKeys();
   }
 }
