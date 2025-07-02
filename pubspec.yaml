@@ -1,0 +1,57 @@
+name: syncly
+description: Sistema de sincronização independente para aplicações Flutter
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP Client
+  dio: ^5.4.0
+  
+  # Dependency Injection
+  get_it: ^7.6.4
+  
+  # Background Tasks
+  workmanager: ^0.5.2
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  
+  # UUID Generation
+  uuid: ^4.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+
+# Metadados do pacote
+homepage: https://github.com/MauricioPDuarte/syncly
+repository: https://github.com/MauricioPDuarte/syncly
+issue_tracker: https://github.com/MauricioPDuarte/syncly/issues
+
+# Tópicos para facilitar descoberta
+topics:
+  - sync
+  - synchronization
+  - flutter
+  - offline
+  - background-sync
+
+# Configurações específicas do Flutter
+flutter:
+  # Se houver assets específicos do sync
+  # assets:
+  #   - assets/icons/
+  
+  # Se houver fontes específicas
+  # fonts:
+  #   - family: SyncIcons
+  #     fonts:
+  #       - asset: fonts/SyncIcons.ttf
