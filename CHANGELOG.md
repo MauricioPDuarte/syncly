@@ -5,6 +5,41 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 04/06/2025
+
+### 🚀 Adicionado
+- **Sistema de Notificações Interno**: Novo `SyncNotificationService` centraliza toda a lógica de notificações
+- **Configuração Simplificada**: Desenvolvedores agora só precisam definir `enableNotifications = true`
+- **Padrão Singleton**: Garantia de uma única instância do serviço de notificações
+- **Logs de Desenvolvimento**: Sistema de logs detalhados para facilitar debug e desenvolvimento
+
+### 🔄 Modificado
+- **BREAKING CHANGE**: Removidos métodos de notificação obrigatórios do `SyncConfig`
+  - `initializeNotifications()` - agora gerenciado internamente
+  - `showNotification()` - substituído pelo serviço interno
+  - `showProgressNotification()` - substituído pelo serviço interno
+  - `cancelNotification()` - substituído pelo serviço interno
+  - `cancelAllNotifications()` - substituído pelo serviço interno
+  - `areNotificationsEnabled()` - removido, use `enableNotifications` property
+- **SyncConfigurator**: Atualizado para usar o serviço interno de notificações
+- **Todos os Serviços**: Migrados para usar `SyncNotificationService.instance`
+
+### 🛠️ Melhorado
+- **Experiência do Desenvolvedor**: Menos código boilerplate necessário
+- **Manutenibilidade**: Lógica de notificações centralizada em um local
+- **Flexibilidade**: Fácil extensão e customização do sistema de notificações
+- **Compatibilidade**: Propriedade `enableNotifications` mantida para compatibilidade
+
+### 📚 Documentação
+- Atualizada documentação HTML com novo sistema de notificações
+- README atualizado com exemplos simplificados
+- Removidos exemplos de implementação de métodos de notificação obsoletos
+
+### 🔧 Correções
+- Corrigido import incorreto em `sync_download_strategy.dart`
+- Removidas referências obsoletas a métodos de notificação
+- Validação completa com `flutter analyze` sem erros
+
 ## [0.0.2] - 03/06/2025
 
 ### Corrigido

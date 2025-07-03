@@ -13,6 +13,7 @@ import 'core/interfaces/i_sync_service.dart';
 import 'core/services/sync_connectivity_service.dart';
 import 'core/services/sync_error_manager.dart';
 import 'core/services/sync_error_reporter.dart';
+import 'core/services/sync_notification_service.dart';
 import 'core/utils/sync_utils.dart';
 import 'strategies/sync_download_strategy.dart';
 import 'strategies/sync_upload_strategy.dart';
@@ -324,7 +325,7 @@ class SyncService implements ISyncService {
     final initialPendingCount = await getPendingItemsCount();
     final syncConfig = SyncConfigurator.provider;
     if (initialPendingCount > 0 && syncConfig?.enableNotifications == true) {
-      await syncConfig!.showProgressNotification(
+      await SyncNotificationService.instance.showProgressNotification(
         title: 'Sincronizando',
         message: 'Sincronizando $initialPendingCount itens...',
         progress: 0,
@@ -347,7 +348,7 @@ class SyncService implements ISyncService {
       _consecutiveFailures++;
 
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.showNotification(
+        await SyncNotificationService.instance.showNotification(
           title: 'Erro na Sincronização',
           message:
               'Não foi possível sincronizar os dados. Tentativa $_consecutiveFailures.',
@@ -430,7 +431,7 @@ class SyncService implements ISyncService {
 
     final syncConfig = SyncConfigurator.provider;
     if (initialPendingCount > 0 && syncConfig?.enableNotifications == true) {
-      await syncConfig!.showNotification(
+      await SyncNotificationService.instance.showNotification(
         title: 'Sincronização Concluída',
         message: 'Todos os seus dados estão atualizados.',
         channelId: 'sync_result',

@@ -1,9 +1,9 @@
 import 'dart:async';
 import '../core/interfaces/i_download_strategy.dart';
+import '../core/services/sync_notification_service.dart';
 import '../core/utils/sync_utils.dart';
-import '../sync_config.dart';
-
 import '../sync_configurator.dart';
+import '../sync_config.dart';
 
 /// Orquestrador principal para download de dados do servidor
 ///
@@ -32,7 +32,7 @@ class SyncDownloadStrategy {
     try {
       // Mostrar notificação de progresso para busca de dados
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.showProgressNotification(
+        await SyncNotificationService.instance.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -77,7 +77,7 @@ class SyncDownloadStrategy {
           tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.showProgressNotification(
+        await SyncNotificationService.instance.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -105,7 +105,7 @@ class SyncDownloadStrategy {
           tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.showProgressNotification(
+        await SyncNotificationService.instance.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -167,7 +167,7 @@ class SyncDownloadStrategy {
           tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.showProgressNotification(
+        await SyncNotificationService.instance.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -202,7 +202,7 @@ class SyncDownloadStrategy {
           tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
-        await syncConfig!.cancelAllNotifications();
+        await SyncNotificationService.instance.cancelAllNotifications();
       }
     } catch (e) {
       SyncUtils.debugLog('Falha ao cancelar notificações: $e',

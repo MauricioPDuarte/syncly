@@ -17,6 +17,7 @@ import 'core/interfaces/i_storage_provider.dart';
 import 'core/services/storage_service.dart';
 import 'core/providers/default_sync_logger_provider.dart';
 import 'core/presentation/controllers/sync_indicator_controller.dart';
+import 'core/services/sync_notification_service.dart';
 
 /// Configurador principal do sistema de sincronização
 ///
@@ -49,9 +50,11 @@ class SyncConfigurator {
       _registerDependencies(provider);
     }
 
-    // Inicializa notificações se habilitadas
+    // Inicializa o serviço interno de notificações se habilitadas
     if (provider.enableNotifications) {
-      await provider.initializeNotifications();
+      await SyncNotificationService.instance.initialize(enabled: true);
+    } else {
+      await SyncNotificationService.instance.initialize(enabled: false);
     }
 
     _isInitialized = true;

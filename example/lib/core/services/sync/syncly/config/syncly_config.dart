@@ -255,77 +255,14 @@ class SynclyConfig extends SyncConfig {
   }
 
   @override
-  Future<String?> getAuthToken() async {
-    // ISyncAuthProvider não tem getToken, implementamos uma lógica básica
-    return null;
-  }
-
-  @override
-  Future<Map<String, String>> getAuthHeaders() async {
-    // ISyncAuthProvider não tem getHeaders, implementamos uma lógica básica
-    return {};
-  }
-
-  @override
   Future<String?> getCurrentUserId() async {
     // Implementação simplificada para exemplo
     return 'example_user_123';
   }
 
-  @override
-  Future<Map<String, dynamic>?> getCurrentSession() async {
-    // ISyncAuthProvider não tem getCurrentSession, implementamos uma lógica básica
-    return null;
-  }
-
-  // ========== IMPLEMENTAÇÃO DE NOTIFICAÇÕES ==========
-
-  @override
-  Future<void> initializeNotifications() async {
-    // Implementação simplificada para exemplo
-    debugPrint('Notifications initialized');
-  }
-
-  @override
-  Future<bool> areNotificationsEnabled() async {
-    // Implementação simplificada para exemplo
-    return true;
-  }
-
-  @override
-  Future<void> showNotification({
-    required String title,
-    required String message,
-    String? channelId,
-    int? notificationId,
-  }) async {
-    // Implementação simplificada para exemplo
-    debugPrint('Notification: $title - $message');
-  }
-
-  @override
-  Future<void> showProgressNotification({
-    required String title,
-    required String message,
-    required int progress,
-    required int maxProgress,
-    int? notificationId,
-  }) async {
-    // Implementação simplificada para exemplo
-    debugPrint('Progress: $title - $progress/$maxProgress - $message');
-  }
-
-  @override
-  Future<void> cancelNotification(int notificationId) async {
-    // Implementação simplificada para exemplo
-    debugPrint('Cancelled notification: $notificationId');
-  }
-
-  @override
-  Future<void> cancelAllNotifications() async {
-    // Implementação simplificada para exemplo
-    debugPrint('Cancelled all notifications');
-  }
+  // ========== NOTIFICAÇÕES GERENCIADAS INTERNAMENTE ==========
+  // O Syncly agora possui seu próprio serviço de notificações interno
+  // Não é necessário implementar métodos de notificação aqui
 
   // ========== IMPLEMENTAÇÃO DE LIMPEZA DE DADOS ==========
 

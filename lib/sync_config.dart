@@ -22,9 +22,6 @@ abstract class SyncConfig {
   /// Habilitar sincronização em background
   bool get enableBackgroundSync => true;
 
-  /// Habilitar notificações
-  bool get enableNotifications => true;
-
   // ========== CONFIGURAÇÕES DE TEMPO ==========
 
   /// Intervalo entre sincronizações automáticas
@@ -122,48 +119,16 @@ abstract class SyncConfig {
   /// Verificar se o usuário está autenticado
   Future<bool> isAuthenticated();
 
-  /// Obter token de autenticação atual
-  Future<String?> getAuthToken();
-
-  /// Obter headers de autenticação
-  Future<Map<String, String>> getAuthHeaders();
-
   /// Obter ID do usuário atual
   Future<String?> getCurrentUserId();
 
-  /// Obter informações da sessão atual
-  Future<Map<String, dynamic>?> getCurrentSession();
+  // ========== CONFIGURAÇÕES DE NOTIFICAÇÕES ==========
 
-  // ========== MÉTODOS OBRIGATÓRIOS - NOTIFICAÇÕES ==========
-
-  /// Inicializar sistema de notificações
-  Future<void> initializeNotifications();
-
-  /// Verificar se notificações estão habilitadas
-  Future<bool> areNotificationsEnabled();
-
-  /// Mostrar notificação simples
-  Future<void> showNotification({
-    required String title,
-    required String message,
-    String? channelId,
-    int? notificationId,
-  });
-
-  /// Mostrar notificação de progresso
-  Future<void> showProgressNotification({
-    required String title,
-    required String message,
-    required int progress,
-    required int maxProgress,
-    int? notificationId,
-  });
-
-  /// Cancelar notificação
-  Future<void> cancelNotification(int notificationId);
-
-  /// Cancelar todas as notificações
-  Future<void> cancelAllNotifications();
+  /// Habilitar notificações do sistema de sincronização
+  /// 
+  /// Quando habilitado, o Syncly mostrará notificações sobre o progresso
+  /// da sincronização, erros e status de conectividade usando seu serviço interno.
+  bool get enableNotifications => true;
 
   // ========== MÉTODOS OBRIGATÓRIOS - ESTRATÉGIAS DE DOWNLOAD ==========
 

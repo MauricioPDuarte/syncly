@@ -8,6 +8,7 @@ import 'core/enums/sync_status.dart';
 import 'core/config/sync_constants.dart';
 import 'sync_config.dart';
 import 'core/utils/sync_utils.dart';
+import 'core/services/sync_notification_service.dart';
 
 class BackgroundSyncService {
   static bool _isInitialized = false;
@@ -28,16 +29,8 @@ class BackgroundSyncService {
         isInDebugMode: kDebugMode,
       );
 
-      // Inicializar serviço de notificações usando o SyncConfig
-      try {
-        final syncConfig = _getSyncConfig();
-        if (syncConfig != null && syncConfig.enableNotifications) {
-          await syncConfig.initializeNotifications();
-        }
-      } catch (e) {
-        // Fallback silencioso se SyncConfig não estiver disponível
-        SyncUtils.debugLog('Erro ao inicializar notificações: $e', tag: 'BackgroundSyncService');
-      }
+      // As notificações são agora gerenciadas internamente pelo Syncly
+      // através do SyncNotificationService
 
       _isInitialized = true;
       SyncUtils.debugLog('BackgroundSyncService inicializado com sucesso', tag: 'BackgroundSyncService');
@@ -103,21 +96,14 @@ class BackgroundSyncService {
         return;
       }
 
-      // Verificar se as notificações estão habilitadas
-      final areEnabled = await syncConfig.areNotificationsEnabled();
-      if (!areEnabled) {
-        SyncUtils.debugLog('Notificações não estão habilitadas', tag: 'BackgroundSyncService');
-        return;
-      }
-
       if (indeterminate || (progress == null || maxProgress == null)) {
-        await syncConfig.showNotification(
+        await SyncNotificationService.instance.showNotification(
           title: title,
           message: body,
           notificationId: SyncConstants.progressNotificationId,
         );
       } else {
-        await syncConfig.showProgressNotification(
+        await SyncNotificationService.instance.showProgressNotification(
           title: title,
           message: body,
           progress: progress,
@@ -142,14 +128,7 @@ class BackgroundSyncService {
         return;
       }
 
-      // Verificar se as notificações estão habilitadas
-      final areEnabled = await syncConfig.areNotificationsEnabled();
-      if (!areEnabled) {
-        SyncUtils.debugLog('Notificações não estão habilitadas', tag: 'BackgroundSyncService');
-        return;
-      }
-
-      await syncConfig.showNotification(
+      await SyncNotificationService.instance.showNotification(
         title: title,
         message: body,
         notificationId: SyncConstants.syncNotificationId,
@@ -164,9 +143,8 @@ class BackgroundSyncService {
     try {
       final syncConfig = _getSyncConfig();
       if (syncConfig != null && syncConfig.enableNotifications) {
-        await syncConfig.cancelNotification(SyncConstants.syncNotificationId);
-    await syncConfig
-        .cancelNotification(SyncConstants.progressNotificationId);
+        await SyncNotificationService.instance.cancelNotification(SyncConstants.syncNotificationId);
+        await SyncNotificationService.instance.cancelNotification(SyncConstants.progressNotificationId);
       }
     } catch (e) {
       SyncUtils.debugLog('Erro ao remover notificações: $e', tag: 'BackgroundSyncService');

@@ -259,61 +259,55 @@ class MeuSyncConfig extends SyncConfig {
     return await UserService.getCurrentUserId();
   }
   
-  @override
-  Future<Map<String, dynamic>?> getCurrentSession() async {
-    // Implementar recuperação da sessão
-    return await SessionService.getCurrentSession();
-  }
-  
+
 }
 ```
 
-### Implementação de Notificações
+### Sistema de Notificações Simplificado
+
+**🎉 Novidade na v0.1.0**: O sistema de notificações agora é **totalmente gerenciado internamente** pelo Syncly!
 
 ```dart
 class MeuSyncConfig extends SyncConfig {
   @override
+  bool get enableNotifications => true; // Só isso é necessário!
+  
+  // ✅ Não é mais necessário implementar:
+  // - initializeNotifications()
+  // - showNotification()
+  // - showProgressNotification()
+  // - cancelNotification()
+  // - cancelAllNotifications()
+  // - areNotificationsEnabled()
+}
+```
+
+**Benefícios do novo sistema:**
+- ✅ **Menos código**: Apenas uma propriedade para habilitar
+- ✅ **Manutenção automática**: Notificações gerenciadas internamente
+- ✅ **Logs de desenvolvimento**: Sistema de debug integrado
+- ✅ **Compatibilidade**: Funciona imediatamente sem configuração adicional
+
+**Migração da v0.0.x para v0.1.0:**
+```dart
+// ❌ Antes (v0.0.x) - muito código boilerplate
+class MeuSyncConfig extends SyncConfig {
+  @override
   Future<void> initializeNotifications() async {
-    // Inicializar sistema de notificações
     await NotificationService.initialize();
   }
   
   @override
-  Future<bool> areNotificationsEnabled() async {
-    return await NotificationService.areEnabled();
+  Future<void> showNotification({...}) async {
+    // Implementação manual...
   }
-  
+  // ... mais métodos obrigatórios
+}
+
+// ✅ Agora (v0.1.0) - simples e direto
+class MeuSyncConfig extends SyncConfig {
   @override
-  Future<void> showNotification({
-    required String title,
-    required String message,
-    String? channelId,
-    int? notificationId,
-  }) async {
-    await NotificationService.show(
-      title: title,
-      message: message,
-      channelId: channelId ?? 'sync_channel',
-      id: notificationId ?? DateTime.now().millisecondsSinceEpoch,
-    );
-  }
-  
-  @override
-  Future<void> showProgressNotification({
-    required String title,
-    required String message,
-    required int progress,
-    required int maxProgress,
-    int? notificationId,
-  }) async {
-    await NotificationService.showProgress(
-      title: title,
-      message: message,
-      progress: progress,
-      maxProgress: maxProgress,
-      id: notificationId ?? 1001,
-    );
-  }
+  bool get enableNotifications => true;
 }
 ```
 
