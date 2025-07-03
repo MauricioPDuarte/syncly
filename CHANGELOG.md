@@ -5,7 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.1] - 2024-12-19
+## [0.0.2] - 03/06/2025
+
+### Corrigido
+- Correções pequenas, removendo métodos obsoletos.
+
+
+## [0.0.1]  03/06/2025
 
 ### Corrigido
 - Correção de parâmetros `isSuccess` e `error` na classe `SyncHttpResponse`

@@ -265,12 +265,6 @@ class MeuSyncConfig extends SyncConfig {
     return await SessionService.getCurrentSession();
   }
   
-  @override
-  Future<void> onAuthenticationFailed() async {
-    // Implementar ação quando autenticação falha
-    await AuthService.logout();
-    NavigationService.goToLogin();
-  }
 }
 ```
 

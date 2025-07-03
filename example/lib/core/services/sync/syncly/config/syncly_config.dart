@@ -104,7 +104,7 @@ class SynclyConfig extends SyncConfig {
         headers: headers?.cast<String, String>(),
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -126,7 +126,7 @@ class SynclyConfig extends SyncConfig {
         headers: headers?.cast<String, String>(),
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -148,7 +148,7 @@ class SynclyConfig extends SyncConfig {
         headers: headers?.cast<String, String>(),
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -168,7 +168,7 @@ class SynclyConfig extends SyncConfig {
         headers: headers?.cast<String, String>(),
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -190,7 +190,7 @@ class SynclyConfig extends SyncConfig {
         headers: headers?.cast<String, String>(),
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -212,7 +212,7 @@ class SynclyConfig extends SyncConfig {
         onProgress: onProgress,
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<Uint8List>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<Uint8List>(e);
@@ -239,7 +239,7 @@ class SynclyConfig extends SyncConfig {
         onProgress: onProgress,
         timeout: timeout,
       );
-      
+
       return _buildSyncHttpResponse<T>(response);
     } catch (e) {
       return _buildErrorSyncHttpResponse<T>(e);
@@ -276,11 +276,6 @@ class SynclyConfig extends SyncConfig {
   Future<Map<String, dynamic>?> getCurrentSession() async {
     // ISyncAuthProvider não tem getCurrentSession, implementamos uma lógica básica
     return null;
-  }
-
-  @override
-  Future<void> onAuthenticationFailed() async {
-    // ISyncAuthProvider não tem onAuthenticationFailed, implementamos uma lógica básica
   }
 
   // ========== IMPLEMENTAÇÃO DE NOTIFICAÇÕES ==========
@@ -339,10 +334,10 @@ class SynclyConfig extends SyncConfig {
     // Implementação personalizada para limpeza de dados locais
     // Aqui você deve implementar a lógica específica da sua aplicação
     // para limpar os dados do banco de dados local antes da sincronização
-    
+
     // Exemplo: limpar tabelas específicas, resetar contadores, etc.
     debugPrint('Limpando dados locais antes da sincronização...');
-    
+
     // TODO: Implementar lógica real de limpeza conforme necessidade da aplicação
     // Exemplo:
     // await database.delete('todos');

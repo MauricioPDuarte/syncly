@@ -205,7 +205,6 @@ class SyncConfigurator {
       'baseUrl': _provider!.baseUrl,
       'dataSyncEndpoint': _provider!.dataSyncEndpoint,
       'fileSyncEndpoint': _provider!.fileSyncEndpoint,
-      'downloadEndpoint': _provider!.downloadEndpoint,
     };
   }
 

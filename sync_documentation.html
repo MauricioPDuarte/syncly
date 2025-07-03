@@ -346,10 +346,12 @@
                             <div class="text-sm text-gray-600 space-y-2">
                                 <p><strong>AppSyncService.logCreate()</strong> →
                                     <strong>SynclyService.logCreate()</strong> →
-                                    <strong>SyncService.addToSyncQueue()</strong></p>
+                                    <strong>SyncService.addToSyncQueue()</strong>
+                                </p>
                                 <p>↓</p>
                                 <p><strong>LoggerProvider.logCustomOperation()</strong> →
-                                    <strong>InternalSyncLogStorage.createLog()</strong></p>
+                                    <strong>InternalSyncLogStorage.createLog()</strong>
+                                </p>
                                 <p>↓</p>
                                 <p><strong>IStorageProvider.setString()</strong> (persiste no storage local)</p>
                             </div>
@@ -404,7 +406,8 @@
                             <p class="text-teal-600 text-sm mb-2">Interface para logging de sincronização</p>
                             <ul class="text-teal-600 text-xs space-y-1">
                                 <li>• <code>logCreate&lt;T&gt;()</code>, <code>logUpdate&lt;T&gt;()</code>,
-                                    <code>logDelete&lt;T&gt;()</code></li>
+                                    <code>logDelete&lt;T&gt;()</code>
+                                </li>
                                 <li>• <code>logCustomOperation()</code></li>
                                 <li>• <code>getPendingLogs()</code></li>
                                 <li>• <code>removeLog()</code>, <code>clearAllLogs()</code></li>
@@ -418,7 +421,6 @@
                                 <li>• <code>isAuthenticated()</code></li>
                                 <li>• <code>getAuthToken()</code></li>
                                 <li>• <code>getAuthHeaders()</code></li>
-                                <li>• <code>onAuthenticationFailed()</code></li>
                             </ul>
                         </div>
 
@@ -958,8 +960,6 @@ class AppSyncConfig implements SyncConfig {
   @override
   String get fileSyncEndpoint => '/sync/files';
   
-  @override
-  String get downloadEndpoint => '/sync/download';
   
   @override
   Map<String, String> get defaultHeaders => {
@@ -1114,18 +1114,6 @@ class AppSyncConfig implements SyncConfig {
       };
     }
     return null;
-  }
-  
-  @override
-  Future<void> onAuthenticationFailed() async {
-    // Implementar lógica quando autenticação falha
-    // Exemplo: limpar token e redirecionar para login
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_id');
-    
-    // Navegar para tela de login
-    // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }</code></pre>
                     </div>
                 </div>
@@ -1736,7 +1724,8 @@ void _setupSyncMonitoring() {
                         <h4 class="font-semibold text-red-700 mb-2">Possíveis Causas:</h4>
                         <ul class="text-red-600 text-sm space-y-1">
                             <li>• Esqueceu de chamar <code>logCreate</code>, <code>logUpdate</code> ou
-                                <code>logDelete</code></li>
+                                <code>logDelete</code>
+                            </li>
                             <li>• SyncConfigurator não foi inicializado no <code>main.dart</code></li>
                             <li>• Problemas de conectividade ou configuração de rede</li>
                             <li>• Erro na implementação do <code>toJson()</code> do modelo</li>
@@ -1749,7 +1738,8 @@ void _setupSyncMonitoring() {
                         <ul class="text-green-600 text-sm space-y-1">
                             <li>• Verifique se todos os métodos CRUD chamam os respectivos métodos de log</li>
                             <li>• Confirme que <code>SyncConfigurator.initialize()</code> foi chamado no
-                                <code>main.dart</code></li>
+                                <code>main.dart</code>
+                            </li>
                             <li>• Teste a conectividade e verifique as configurações de URL no <code>SyncConfig</code>
                             </li>
                             <li>• Valide se o <code>toJson()</code> retorna dados válidos</li>
