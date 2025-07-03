@@ -5,6 +5,27 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.1] - 2024-12-19
+
+### Corrigido
+- Correção de parâmetros `isSuccess` e `error` na classe `SyncHttpResponse`
+- Substituição de `print` por `debugPrint` nos arquivos de exemplo
+- Remoção de imports desnecessários (`dart:typed_data`)
+- Implementação completa da classe `SyncConfig` com todos os métodos obrigatórios
+
+### Adicionado
+- Sistema completo de envio de erros para backend via `SyncErrorReporter`
+- Documentação detalhada do sistema de envio de erros em `sync_documentation.html`
+- Implementação de métodos HTTP (GET, POST, PUT, DELETE, PATCH, download, upload) usando Dio
+- Métodos de autenticação usando SharedPreferences
+- Sistema de notificações com callbacks configuráveis
+- Estratégias de download e limpeza de dados
+
+### Melhorado
+- Documentação atualizada com exemplos práticos de uso
+- Estrutura de configuração mais robusta e extensível
+- Tratamento de erros aprimorado com logging estruturado
+
 ## [1.0.0] - 02/06/2025
 
 ### Adicionado

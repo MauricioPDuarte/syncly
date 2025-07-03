@@ -1,0 +1,80 @@
+# Dart tool files
+.dart_tool/
+
+# Flutter/Dart build outputs
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Example app build files
+example/.dart_tool/
+example/build/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+example/android/.gradle/
+example/android/app/build/
+example/android/gradle/wrapper/gradle-wrapper.jar
+example/android/gradlew
+example/android/gradlew.bat
+example/android/local.properties
+example/ios/build/
+example/ios/Runner.xcworkspace/xcuserdata/
+example/ios/Runner.xcodeproj/xcuserdata/
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Test files
+test/
+
+# Documentation build
+doc/api/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Lock files (keep pubspec.lock for examples)
+pubspec.lock
+!example/pubspec.lock
+
+# FVM
+.fvm/
+.fvmrc
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Analysis
+.analysis_options_user.yaml
+
+# Local configuration
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+
+# Documentation
+sync_documentation.html

@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../rest_client.dart';
 
 /// Implementação do RestClient usando Dio
@@ -29,14 +29,14 @@ class DioRestClient extends RestClient {
       requestBody: true,
       responseBody: true,
       error: true,
-      logPrint: (obj) => print('[DioRestClient] $obj'),
+      logPrint: (obj) => debugPrint('[DioRestClient] $obj'),
     ));
 
     // Interceptador para tratamento de erros
     _dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) {
         // Aqui você pode adicionar lógica personalizada de tratamento de erro
-        print('[DioRestClient] Erro: ${error.message}');
+        debugPrint('[DioRestClient] Erro: ${error.message}');
         handler.next(error);
       },
     ));

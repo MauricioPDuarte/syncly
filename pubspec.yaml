@@ -1,6 +1,6 @@
 name: syncly
 description: Sistema de sincronização independente para aplicações Flutter
-version: 1.0.0
+version: 0.0.1
 maintainer: Mauricio Duarte <prussdev@gmail.com>
 
 environment:

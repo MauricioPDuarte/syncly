@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:syncly/sync.dart';
-import 'dart:typed_data';
 
 import 'package:syncly_example/core/services/sync/syncly/downloaders/todo_downloader.dart';
 import 'package:syncly_example/core/services/rest_client/rest_client.dart';
@@ -288,7 +288,7 @@ class SynclyConfig extends SyncConfig {
   @override
   Future<void> initializeNotifications() async {
     // Implementação simplificada para exemplo
-    print('Notifications initialized');
+    debugPrint('Notifications initialized');
   }
 
   @override
@@ -305,7 +305,7 @@ class SynclyConfig extends SyncConfig {
     int? notificationId,
   }) async {
     // Implementação simplificada para exemplo
-    print('Notification: $title - $message');
+    debugPrint('Notification: $title - $message');
   }
 
   @override
@@ -317,19 +317,19 @@ class SynclyConfig extends SyncConfig {
     int? notificationId,
   }) async {
     // Implementação simplificada para exemplo
-    print('Progress: $title - $progress/$maxProgress - $message');
+    debugPrint('Progress: $title - $progress/$maxProgress - $message');
   }
 
   @override
   Future<void> cancelNotification(int notificationId) async {
     // Implementação simplificada para exemplo
-    print('Cancelled notification: $notificationId');
+    debugPrint('Cancelled notification: $notificationId');
   }
 
   @override
   Future<void> cancelAllNotifications() async {
     // Implementação simplificada para exemplo
-    print('Cancelled all notifications');
+    debugPrint('Cancelled all notifications');
   }
 
   // ========== IMPLEMENTAÇÃO DE LIMPEZA DE DADOS ==========
@@ -341,7 +341,7 @@ class SynclyConfig extends SyncConfig {
     // para limpar os dados do banco de dados local antes da sincronização
     
     // Exemplo: limpar tabelas específicas, resetar contadores, etc.
-    print('Limpando dados locais antes da sincronização...');
+    debugPrint('Limpando dados locais antes da sincronização...');
     
     // TODO: Implementar lógica real de limpeza conforme necessidade da aplicação
     // Exemplo:
