@@ -18,7 +18,7 @@ class DioRestClient extends RestClient {
       sendTimeout: timeout ?? this.timeout,
       headers: {...this.defaultHeaders, ...?defaultHeaders},
     ));
-    
+
     configureInterceptors();
   }
 
@@ -59,7 +59,7 @@ class DioRestClient extends RestClient {
           receiveTimeout: timeout,
         ),
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -83,7 +83,7 @@ class DioRestClient extends RestClient {
           receiveTimeout: timeout,
         ),
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -107,7 +107,7 @@ class DioRestClient extends RestClient {
           receiveTimeout: timeout,
         ),
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -129,7 +129,7 @@ class DioRestClient extends RestClient {
           receiveTimeout: timeout,
         ),
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -153,7 +153,7 @@ class DioRestClient extends RestClient {
           receiveTimeout: timeout,
         ),
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -178,12 +178,13 @@ class DioRestClient extends RestClient {
         ),
         onReceiveProgress: onProgress,
       );
-      
+
       return {
         'data': response.data as Uint8List,
         'statusCode': response.statusCode ?? 200,
         'headers': response.headers.map,
-        'success': (response.statusCode ?? 0) >= 200 && (response.statusCode ?? 0) < 300,
+        'success': (response.statusCode ?? 0) >= 200 &&
+            (response.statusCode ?? 0) < 300,
       };
     } catch (e) {
       return _buildErrorResponse(e);
@@ -205,7 +206,7 @@ class DioRestClient extends RestClient {
         ...?fields,
         'file': await MultipartFile.fromFile(filePath, filename: fileName),
       });
-      
+
       final response = await _dio.post(
         url,
         data: formData,
@@ -216,7 +217,7 @@ class DioRestClient extends RestClient {
         ),
         onSendProgress: onProgress,
       );
-      
+
       return _buildResponse(response);
     } catch (e) {
       return _buildErrorResponse(e);
@@ -235,7 +236,8 @@ class DioRestClient extends RestClient {
       'data': response.data,
       'statusCode': response.statusCode ?? 200,
       'headers': response.headers.map,
-      'success': (response.statusCode ?? 0) >= 200 && (response.statusCode ?? 0) < 300,
+      'success':
+          (response.statusCode ?? 0) >= 200 && (response.statusCode ?? 0) < 300,
     };
   }
 
@@ -243,12 +245,12 @@ class DioRestClient extends RestClient {
   Map<String, dynamic> _buildErrorResponse(dynamic error) {
     int statusCode = 500;
     String message = error.toString();
-    
+
     if (error is DioException) {
       statusCode = error.response?.statusCode ?? 500;
       message = error.message ?? 'Erro desconhecido';
     }
-    
+
     return {
       'data': null,
       'statusCode': statusCode,

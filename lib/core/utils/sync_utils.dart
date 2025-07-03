@@ -1,6 +1,7 @@
 import 'dart:convert';
 import '../services/sync_error_manager.dart';
 import '../config/sync_constants.dart';
+import '../../sync_configurator.dart';
 import 'package:flutter/foundation.dart';
 
 /// Utilitários para o serviço de sincronização
@@ -205,5 +206,17 @@ class SyncUtils {
 
     sanitizeRecursive(sanitized);
     return sanitized;
+  }
+
+  /// Executa debugPrint apenas se os logs de debug estiverem habilitados
+  ///
+  /// [message] Mensagem a ser logada
+  /// [tag] Tag opcional para identificar a origem do log
+  static void debugLog(String message, {String? tag}) {
+    final syncConfig = SyncConfigurator.provider;
+    if (syncConfig?.enableDebugLogs == true) {
+      final formattedMessage = tag != null ? '[$tag] $message' : message;
+      debugPrint(formattedMessage);
+    }
   }
 }

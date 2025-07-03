@@ -332,6 +332,23 @@ class SynclyConfig extends SyncConfig {
     print('Cancelled all notifications');
   }
 
+  // ========== IMPLEMENTAÇÃO DE LIMPEZA DE DADOS ==========
+
+  @override
+  Future<void> clearLocalData() async {
+    // Implementação personalizada para limpeza de dados locais
+    // Aqui você deve implementar a lógica específica da sua aplicação
+    // para limpar os dados do banco de dados local antes da sincronização
+    
+    // Exemplo: limpar tabelas específicas, resetar contadores, etc.
+    print('Limpando dados locais antes da sincronização...');
+    
+    // TODO: Implementar lógica real de limpeza conforme necessidade da aplicação
+    // Exemplo:
+    // await database.delete('todos');
+    // await database.delete('sync_logs');
+  }
+
   // ========== CALLBACKS DE SINCRONIZAÇÃO ==========
 
   @override

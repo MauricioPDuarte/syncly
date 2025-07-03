@@ -7,6 +7,7 @@ import 'sync_configurator.dart';
 import 'core/enums/sync_status.dart';
 import 'core/config/sync_constants.dart';
 import 'sync_config.dart';
+import 'core/utils/sync_utils.dart';
 
 class BackgroundSyncService {
   static bool _isInitialized = false;
@@ -35,22 +36,13 @@ class BackgroundSyncService {
         }
       } catch (e) {
         // Fallback silencioso se SyncConfig não estiver disponível
-        final syncConfig = _getSyncConfig();
-        if (syncConfig != null && syncConfig.enableDebugLogs) {
-          debugPrint('Erro ao inicializar notificações: $e');
-        }
+        SyncUtils.debugLog('Erro ao inicializar notificações: $e', tag: 'BackgroundSyncService');
       }
 
       _isInitialized = true;
-      final syncConfig = _getSyncConfig();
-    if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('BackgroundSyncService inicializado com sucesso');
-      }
+      SyncUtils.debugLog('BackgroundSyncService inicializado com sucesso', tag: 'BackgroundSyncService');
     } catch (e) {
-      final syncConfig = _getSyncConfig();
-    if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao inicializar BackgroundSyncService: $e');
-      }
+      SyncUtils.debugLog('Erro ao inicializar BackgroundSyncService: $e', tag: 'BackgroundSyncService');
       rethrow;
     }
   }
@@ -79,15 +71,9 @@ class BackgroundSyncService {
       );
 
       _isInitialized = true;
-      final syncConfig = _getSyncConfig();
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Sincronização em background iniciada');
-      }
+      SyncUtils.debugLog('Sincronização em background iniciada', tag: 'BackgroundSyncService');
     } catch (e) {
-      final syncConfig = _getSyncConfig();
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao iniciar sincronização em background: $e');
-      }
+      SyncUtils.debugLog('Erro ao iniciar sincronização em background: $e', tag: 'BackgroundSyncService');
       rethrow;
     }
   }
@@ -97,9 +83,9 @@ class BackgroundSyncService {
     try {
       await Workmanager().cancelByUniqueName(SyncConstants.backgroundSyncTaskName);
       await _dismissAllNotifications();
-      debugPrint('Sincronização em background parada');
+      SyncUtils.debugLog('Sincronização em background parada', tag: 'BackgroundSyncService');
     } catch (e) {
-      debugPrint('Erro ao parar sincronização em background: $e');
+      SyncUtils.debugLog('Erro ao parar sincronização em background: $e', tag: 'BackgroundSyncService');
     }
   }
 
@@ -120,9 +106,7 @@ class BackgroundSyncService {
       // Verificar se as notificações estão habilitadas
       final areEnabled = await syncConfig.areNotificationsEnabled();
       if (!areEnabled) {
-        if (syncConfig.enableDebugLogs) {
-          debugPrint('Notificações não estão habilitadas');
-        }
+        SyncUtils.debugLog('Notificações não estão habilitadas', tag: 'BackgroundSyncService');
         return;
       }
 
@@ -142,10 +126,7 @@ class BackgroundSyncService {
         );
       }
     } catch (e) {
-      final syncConfig = _getSyncConfig();
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao exibir notificação de progresso: $e');
-      }
+      SyncUtils.debugLog('Erro ao exibir notificação de progresso: $e', tag: 'BackgroundSyncService');
     }
   }
 
@@ -164,9 +145,7 @@ class BackgroundSyncService {
       // Verificar se as notificações estão habilitadas
       final areEnabled = await syncConfig.areNotificationsEnabled();
       if (!areEnabled) {
-        if (syncConfig.enableDebugLogs) {
-          debugPrint('Notificações não estão habilitadas');
-        }
+        SyncUtils.debugLog('Notificações não estão habilitadas', tag: 'BackgroundSyncService');
         return;
       }
 
@@ -176,10 +155,7 @@ class BackgroundSyncService {
         notificationId: SyncConstants.syncNotificationId,
       );
     } catch (e) {
-      final syncConfig = _getSyncConfig();
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao mostrar notificação de resultado: $e');
-      }
+      SyncUtils.debugLog('Erro ao mostrar notificação de resultado: $e', tag: 'BackgroundSyncService');
     }
   }
 
@@ -193,10 +169,7 @@ class BackgroundSyncService {
         .cancelNotification(SyncConstants.progressNotificationId);
       }
     } catch (e) {
-      final syncConfig = _getSyncConfig();
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao remover notificações: $e');
-      }
+      SyncUtils.debugLog('Erro ao remover notificações: $e', tag: 'BackgroundSyncService');
     }
   }
 
@@ -207,7 +180,7 @@ class BackgroundSyncService {
       // no WorkManager, então assumimos que está ativa se foi iniciada
       return _isInitialized;
     } catch (e) {
-      debugPrint('Erro ao verificar status da sincronização em background: $e');
+      SyncUtils.debugLog('Erro ao verificar status da sincronização em background: $e', tag: 'BackgroundSyncService');
       return false;
     }
   }
@@ -228,9 +201,9 @@ class BackgroundSyncService {
         ),
       );
 
-      debugPrint('Sincronização imediata em background disparada');
+      SyncUtils.debugLog('Sincronização imediata em background disparada', tag: 'BackgroundSyncService');
     } catch (e) {
-      debugPrint('Erro ao disparar sincronização imediata: $e');
+      SyncUtils.debugLog('Erro ao disparar sincronização imediata: $e', tag: 'BackgroundSyncService');
     }
   }
 }
@@ -239,21 +212,21 @@ class BackgroundSyncService {
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    debugPrint('Executando tarefa em background: $task');
+    SyncUtils.debugLog('Executando tarefa em background: $task', tag: 'BackgroundSyncService');
 
     switch (task) {
       case 'background_sync_task':
       case 'immediate_sync':
         try {
           await _performBackgroundSync();
-          debugPrint('Sincronização em background concluída com sucesso');
+          SyncUtils.debugLog('Sincronização em background concluída com sucesso', tag: 'BackgroundSyncService');
           return Future.value(true);
         } catch (e) {
-          debugPrint('Erro na sincronização em background: $e');
+          SyncUtils.debugLog('Erro na sincronização em background: $e', tag: 'BackgroundSyncService');
           return Future.value(false);
         }
       default:
-        debugPrint('Tarefa desconhecida: $task');
+        SyncUtils.debugLog('Tarefa desconhecida: $task', tag: 'BackgroundSyncService');
         return Future.value(false);
     }
   });
@@ -269,35 +242,28 @@ Future<void> _performBackgroundSync() async {
   try {
     syncConfig = SyncConfigurator.provider;
   } catch (e) {
-    debugPrint('SyncConfig não disponível via SyncConfigurator: $e');
+    SyncUtils.debugLog('SyncConfig não disponível via SyncConfigurator: $e', tag: 'BackgroundSyncService');
   }
 
   try {
-    if (syncConfig != null && syncConfig.enableDebugLogs) {
-      debugPrint('Iniciando sincronização em background');
-    }
+    SyncUtils.debugLog('Iniciando sincronização em background', tag: 'BackgroundSyncService');
 
     // Verificar se há usuário autenticado antes de sincronizar
     try {
       if (syncConfig != null) {
         final isAuthenticated = await syncConfig.isAuthenticated();
         if (!isAuthenticated) {
-          if (syncConfig.enableDebugLogs) {
-            debugPrint(
-                'Usuário não autenticado - cancelando sincronização em background');
-          }
+          SyncUtils.debugLog(
+            'Usuário não autenticado - cancelando sincronização em background', tag: 'BackgroundSyncService');
           return;
         }
       } else {
         // SyncConfig não disponível - cancelando sincronização
-        debugPrint(
-            'SyncConfig não disponível - cancelando sincronização em background');
+        SyncUtils.debugLog('SyncConfig não disponível - cancelando sincronização em background', tag: 'BackgroundSyncService');
         return;
       }
     } catch (e) {
-      if (syncConfig != null && syncConfig.enableDebugLogs) {
-        debugPrint('Erro ao verificar autenticação: $e');
-      }
+      SyncUtils.debugLog('Erro ao verificar autenticação: $e', tag: 'BackgroundSyncService');
       return;
     }
 
@@ -305,8 +271,7 @@ Future<void> _performBackgroundSync() async {
     try {
       syncService = SyncConfigurator.syncService;
     } catch (e) {
-      debugPrint(
-          'Cancelando sincronização em background - SyncService não disponível');
+      SyncUtils.debugLog('Cancelando sincronização em background - SyncService não disponível', tag: 'BackgroundSyncService');
       return;
     }
 
@@ -314,9 +279,7 @@ Future<void> _performBackgroundSync() async {
     final initialPendingCount = await syncService.getPendingItemsCount();
 
     if (initialPendingCount == 0) {
-      if (syncConfig.enableDebugLogs == true) {
-        debugPrint('Nenhum item pendente para sincronizar');
-      }
+      SyncUtils.debugLog('Nenhum item pendente para sincronizar', tag: 'BackgroundSyncService');
       await BackgroundSyncService.showSyncResultNotification(
         title: 'Sincronização Concluída',
         body: 'Todos os dados estão atualizados',
@@ -334,8 +297,7 @@ Future<void> _performBackgroundSync() async {
 
     // Verificar conectividade antes de sincronizar
     if (!syncService.isOnline.value) {
-      debugPrint(
-          'Sem conexão com a internet - cancelando sincronização em background');
+      SyncUtils.debugLog('Sem conexão com a internet - cancelando sincronização em background', tag: 'BackgroundSyncService');
       await BackgroundSyncService.showSyncResultNotification(
         title: 'Sincronização Cancelada',
         body: 'Sem conexão com a internet. Tentaremos novamente mais tarde.',
@@ -345,7 +307,7 @@ Future<void> _performBackgroundSync() async {
     }
 
     // Executar sincronização forçada
-    debugPrint('Iniciando sincronização forçada em background');
+    SyncUtils.debugLog('Iniciando sincronização forçada em background', tag: 'BackgroundSyncService');
 
     // Configurar listener para mudanças no status de sincronização
     bool listenerActive = true;
@@ -366,10 +328,8 @@ Future<void> _performBackgroundSync() async {
           final finalPendingCount = syncData.pendingItems ?? 0;
           final syncedCount = initialPendingCount - finalPendingCount;
 
-          if (syncConfig?.enableDebugLogs == true) {
-            debugPrint(
-                'Sincronização em background concluída com sucesso - $syncedCount itens sincronizados, $finalPendingCount restantes');
-          }
+          SyncUtils.debugLog(
+              'Sincronização em background concluída com sucesso - $syncedCount itens sincronizados, $finalPendingCount restantes', tag: 'BackgroundSyncService');
 
           BackgroundSyncService.showSyncResultNotification(
             title: 'Sincronização Concluída',
@@ -382,10 +342,8 @@ Future<void> _performBackgroundSync() async {
           break;
         case SyncStatus.error:
         case SyncStatus.offline:
-          if (syncConfig?.enableDebugLogs == true) {
-            debugPrint(
-                'Erro na sincronização em background - Status: ${syncData.status}, Mensagem: ${syncData.message}, Itens pendentes: ${syncData.pendingItems}');
-          }
+          SyncUtils.debugLog(
+              'Erro na sincronização em background - Status: ${syncData.status}, Mensagem: ${syncData.message}, Itens pendentes: ${syncData.pendingItems}', tag: 'BackgroundSyncService');
 
           BackgroundSyncService.showSyncResultNotification(
             title: 'Erro na Sincronização',
@@ -414,13 +372,9 @@ Future<void> _performBackgroundSync() async {
       syncService.syncData.removeListener(syncListener);
     }
 
-    if (syncConfig.enableDebugLogs == true) {
-      debugPrint('Processo de sincronização em background finalizado');
-    }
+    SyncUtils.debugLog('Processo de sincronização em background finalizado', tag: 'BackgroundSyncService');
   } catch (e) {
-    if (syncConfig?.enableDebugLogs == true) {
-      debugPrint('Erro inesperado na sincronização em background: $e');
-    }
+    SyncUtils.debugLog('Erro inesperado na sincronização em background: $e', tag: 'BackgroundSyncService');
 
     // Mostrar notificação de erro
     await BackgroundSyncService.showSyncResultNotification(
@@ -437,7 +391,7 @@ Future<void> _performBackgroundSync() async {
       try {
         syncService.dispose();
       } catch (e) {
-        debugPrint('Erro ao fazer dispose do SyncService: $e');
+        SyncUtils.debugLog('Erro ao fazer dispose do SyncService: $e', tag: 'BackgroundSyncService');
       }
     }
   }

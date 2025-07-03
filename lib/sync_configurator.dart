@@ -171,7 +171,6 @@ class SyncConfigurator {
           getIt.get<ISyncConnectivityService>(),
           getIt.get<ILoggerProvider>(),
           getIt.get<ISyncErrorManager>(),
-          getIt.get<ISyncDataCleanupService>(),
           getIt.get<ISyncErrorReporter>(),
         ));
   }

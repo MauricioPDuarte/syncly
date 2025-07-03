@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import '../core/services/sync_data_cleanup_service.dart';
 import '../core/interfaces/i_download_strategy.dart';
+import '../core/utils/sync_utils.dart';
 import '../sync_config.dart';
 
 import '../sync_configurator.dart';
@@ -15,11 +14,7 @@ import '../sync_configurator.dart';
 /// - Gerenciar notificações de progresso
 /// - Executar limpeza pós-sincronização
 class SyncDownloadStrategy {
-  final ISyncDataCleanupService _dataCleanupService;
-
-  SyncDownloadStrategy(
-    this._dataCleanupService,
-  );
+  SyncDownloadStrategy();
 
   // Helper para obter o sync provider
   /// Obtém o SyncConfig via SyncConfigurator
@@ -31,15 +26,13 @@ class SyncDownloadStrategy {
   Future<void> fetchDataFromServer() async {
     final syncConfig = _getSyncConfig();
 
-    if (syncConfig?.enableDebugLogs == true) {
-      debugPrint(
-          '[SyncDownloadStrategy] === INICIANDO BUSCA DE DADOS DO SERVIDOR ===');
-    }
+    SyncUtils.debugLog('=== INICIANDO BUSCA DE DADOS DO SERVIDOR ===',
+        tag: 'SyncDownloadStrategy');
 
     try {
       // Mostrar notificação de progresso para busca de dados
       if (syncConfig?.enableNotifications == true) {
-      await syncConfig!.showProgressNotification(
+        await syncConfig!.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
@@ -62,15 +55,11 @@ class SyncDownloadStrategy {
       // Cancelar notificações
       await _cancelNotifications();
 
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] === BUSCA DE DADOS DO SERVIDOR CONCLUÍDA ===');
-      }
+      SyncUtils.debugLog('=== BUSCA DE DADOS DO SERVIDOR CONCLUÍDA ===',
+          tag: 'SyncDownloadStrategy');
     } catch (e) {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] ERRO GERAL durante busca de dados do servidor: $e');
-      }
+      SyncUtils.debugLog('ERRO GERAL durante busca de dados do servidor: $e',
+          tag: 'SyncDownloadStrategy');
 
       // Cancelar notificações em caso de erro
       await _cancelNotifications();
@@ -84,10 +73,8 @@ class SyncDownloadStrategy {
     final syncConfig = _getSyncConfig();
 
     try {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] Limpando dados antigos antes da sincronização...');
-      }
+      SyncUtils.debugLog('Limpando dados antigos antes da sincronização...',
+          tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
         await syncConfig!.showProgressNotification(
@@ -98,15 +85,13 @@ class SyncDownloadStrategy {
         );
       }
 
-      await _dataCleanupService.clearSyncData();
+      await syncConfig!.clearLocalData();
 
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint('[SyncDownloadStrategy] Dados antigos limpos com sucesso');
-      }
+      SyncUtils.debugLog('Dados antigos limpos com sucesso',
+          tag: 'SyncDownloadStrategy');
     } catch (e) {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint('[SyncDownloadStrategy] ERRO ao limpar dados antigos: $e');
-      }
+      SyncUtils.debugLog('ERRO ao limpar dados antigos: $e',
+          tag: 'SyncDownloadStrategy');
       throw Exception('Falha ao limpar dados antigos: $e');
     }
   }
@@ -116,9 +101,8 @@ class SyncDownloadStrategy {
     final syncConfig = _getSyncConfig();
 
     try {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint('[SyncDownloadStrategy] Salvando dados no banco local...');
-      }
+      SyncUtils.debugLog('Salvando dados no banco local...',
+          tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
         await syncConfig!.showProgressNotification(
@@ -132,34 +116,28 @@ class SyncDownloadStrategy {
       final results = <DownloadResult>[];
 
       for (final strategy in syncConfig?.downloadStrategies ?? []) {
-        if (syncConfig?.enableDebugLogs == true) {
-          debugPrint(
-              '[SyncDownloadStrategy] Executando estratégia: ${strategy.runtimeType}');
-        }
+        SyncUtils.debugLog('Executando estratégia: ${strategy.runtimeType}',
+            tag: 'SyncDownloadStrategy');
         final result = await strategy.downloadData();
         results.add(result);
 
         if (!result.success) {
-          if (syncConfig?.enableDebugLogs == true) {
-            debugPrint(
-                '[SyncDownloadStrategy] Estratégia ${strategy.runtimeType} falhou: ${result.message}');
-          }
+          SyncUtils.debugLog(
+              'Estratégia ${strategy.runtimeType} falhou: ${result.message}',
+              tag: 'SyncDownloadStrategy');
           throw Exception(
               'Falha na estratégia ${strategy.runtimeType}: ${result.message}');
         }
 
-        if (syncConfig?.enableDebugLogs == true) {
-          debugPrint(
-              '[SyncDownloadStrategy] Estratégia ${strategy.runtimeType} executada com sucesso: ${result.itemsDownloaded} itens');
-        }
+        SyncUtils.debugLog(
+            'Estratégia ${strategy.runtimeType} executada com sucesso: ${result.itemsDownloaded} itens',
+            tag: 'SyncDownloadStrategy');
       }
 
       return results;
     } catch (e) {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] ERRO ao executar estratégias de download: $e');
-      }
+      SyncUtils.debugLog('ERRO ao executar estratégias de download: $e',
+          tag: 'SyncDownloadStrategy');
       throw Exception('Falha ao processar dados recebidos: $e');
     }
   }
@@ -185,10 +163,8 @@ class SyncDownloadStrategy {
     final syncConfig = _getSyncConfig();
 
     try {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] Iniciando pré-cache e limpeza de imagens...');
-      }
+      SyncUtils.debugLog('Iniciando pré-cache e limpeza de imagens...',
+          tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
         await syncConfig!.showProgressNotification(
@@ -202,20 +178,17 @@ class SyncDownloadStrategy {
       // TODO: Implementar serviço interno de cache de imagens no módulo sync
       // Por enquanto, apenas logamos que o processo seria executado
       if (mediaIds.isNotEmpty) {
-        if (syncConfig?.enableDebugLogs == true) {
-          debugPrint(
-              '[SyncDownloadStrategy] ${mediaIds.length} imagens identificadas para pré-cache');
-        }
+        SyncUtils.debugLog(
+            '${mediaIds.length} imagens identificadas para pré-cache',
+            tag: 'SyncDownloadStrategy');
       } else {
-        if (syncConfig?.enableDebugLogs == true) {
-          debugPrint('[SyncDownloadStrategy] Nenhuma imagem para pré-carregar');
-        }
+        SyncUtils.debugLog('Nenhuma imagem para pré-carregar',
+            tag: 'SyncDownloadStrategy');
       }
     } catch (e) {
       // Não interromper a sincronização se o pré-cache falhar
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint('[SyncDownloadStrategy] Erro no pré-cache de imagens: $e');
-      }
+      SyncUtils.debugLog('Erro no pré-cache de imagens: $e',
+          tag: 'SyncDownloadStrategy');
       // Continuar com a sincronização
     }
   }
@@ -225,18 +198,15 @@ class SyncDownloadStrategy {
     final syncConfig = _getSyncConfig();
 
     try {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint(
-            '[SyncDownloadStrategy] Cancelando todas as notificações de sincronização...');
-      }
+      SyncUtils.debugLog('Cancelando todas as notificações de sincronização...',
+          tag: 'SyncDownloadStrategy');
 
       if (syncConfig?.enableNotifications == true) {
         await syncConfig!.cancelAllNotifications();
       }
     } catch (e) {
-      if (syncConfig?.enableDebugLogs == true) {
-        debugPrint('[SyncDownloadStrategy] Falha ao cancelar notificações: $e');
-      }
+      SyncUtils.debugLog('Falha ao cancelar notificações: $e',
+          tag: 'SyncDownloadStrategy');
       // Não é crítico, continuar
     }
   }

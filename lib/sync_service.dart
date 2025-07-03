@@ -11,7 +11,6 @@ import 'core/enums/sync_operation.dart';
 import 'core/enums/sync_status.dart';
 import 'core/interfaces/i_sync_service.dart';
 import 'core/services/sync_connectivity_service.dart';
-import 'core/services/sync_data_cleanup_service.dart';
 import 'core/services/sync_error_manager.dart';
 import 'core/services/sync_error_reporter.dart';
 import 'core/utils/sync_utils.dart';
@@ -28,7 +27,6 @@ class SyncService implements ISyncService {
   final ISyncConnectivityService _connectivityService;
   final ILoggerProvider _syncLogger;
   final ISyncErrorManager _errorManager;
-  final ISyncDataCleanupService _dataCleanupService;
   final ISyncErrorReporter _errorReporter;
 
   // --- Estratégias de Sincronização ---
@@ -66,23 +64,18 @@ class SyncService implements ISyncService {
     this._connectivityService,
     this._syncLogger,
     this._errorManager,
-    this._dataCleanupService,
     this._errorReporter,
   ) {
-    _downloadStrategy = SyncDownloadStrategy(
-      _dataCleanupService,
-    );
+    _downloadStrategy = SyncDownloadStrategy();
 
     _uploadStrategy = SyncUploadStrategy(
       _syncLogger,
       _errorManager,
     );
 
-    final syncConfig = SyncConfigurator.provider;
-    if (syncConfig?.enableDebugLogs == true) {
-      debugPrint(
-          '[SyncService] SyncService inicializado - syncInterval: ${SyncConstants.syncInterval.inSeconds}s, initialDelay: ${SyncConstants.initialSyncDelay.inSeconds}s, recoveryTimeout: ${SyncConstants.recoveryTimeout.inSeconds}s');
-    }
+    SyncUtils.debugLog(
+        'SyncService inicializado - syncInterval: ${SyncConstants.syncInterval.inSeconds}s, initialDelay: ${SyncConstants.initialSyncDelay.inSeconds}s, recoveryTimeout: ${SyncConstants.recoveryTimeout.inSeconds}s',
+        tag: 'SyncService');
 
     _initConnectivityListener();
     _checkInitialConnectivity();
@@ -268,7 +261,7 @@ class SyncService implements ISyncService {
       _recoveryTimer?.cancel();
 
       final syncConfig = SyncConfigurator.provider;
-    if (syncConfig != null && !await syncConfig.isAuthenticated()) {
+      if (syncConfig != null && !await syncConfig.isAuthenticated()) {
         _log('warning', 'Usuário não autenticado, sincronização cancelada.');
         _updateSyncStatus(
           SyncStatus.idle,
@@ -354,7 +347,7 @@ class SyncService implements ISyncService {
       _consecutiveFailures++;
 
       if (syncConfig?.enableNotifications == true) {
-      await syncConfig!.showNotification(
+        await syncConfig!.showNotification(
           title: 'Erro na Sincronização',
           message:
               'Não foi possível sincronizar os dados. Tentativa $_consecutiveFailures.',
@@ -678,22 +671,18 @@ class SyncService implements ISyncService {
   // FIX 2: Correctly handle stackTrace and error objects for logging.
   void _log(String level, String message,
       {dynamic error, StackTrace? stackTrace, Map<String, dynamic>? metadata}) {
-    final syncConfig = SyncConfigurator.provider;
-
-    if (syncConfig?.enableDebugLogs == true) {
-      // Prepare metadata with error and stacktrace strings if they exist
-      final Map<String, dynamic> fullMetadata = {...?metadata};
-      if (error != null) {
-        fullMetadata['error'] = error.toString();
-      }
-      if (stackTrace != null) {
-        fullMetadata['stackTrace'] = stackTrace.toString();
-      }
-
-      final metadataStr =
-          fullMetadata.isNotEmpty ? ' - ${fullMetadata.toString()}' : '';
-      debugPrint('[$level][SyncService] $message$metadataStr');
+    // Prepare metadata with error and stacktrace strings if they exist
+    final Map<String, dynamic> fullMetadata = {...?metadata};
+    if (error != null) {
+      fullMetadata['error'] = error.toString();
     }
+    if (stackTrace != null) {
+      fullMetadata['stackTrace'] = stackTrace.toString();
+    }
+
+    final metadataStr =
+        fullMetadata.isNotEmpty ? ' - ${fullMetadata.toString()}' : '';
+    SyncUtils.debugLog('[$level] $message$metadataStr', tag: 'SyncService');
   }
 
   // #######################################################################

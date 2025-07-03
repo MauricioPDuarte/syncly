@@ -174,6 +174,13 @@ abstract class SyncConfig {
   /// Cada estratégia define como baixar dados específicos do servidor
   List<IDownloadStrategy> get downloadStrategies;
 
+  // ========== MÉTODOS OBRIGATÓRIOS - LIMPEZA DE DADOS ==========
+
+  /// Limpar dados locais antes da sincronização
+  /// Este método deve ser implementado para limpar os dados do banco de dados local
+  /// conforme a necessidade da aplicação
+  Future<void> clearLocalData();
+
   // ========== MÉTODOS OPCIONAIS - CALLBACKS ==========
 
   /// Callback quando sincronização inicia

@@ -9,6 +9,7 @@ import '../controllers/sync_indicator_controller.dart';
 import '../utils/sync_status_helpers.dart';
 import '../utils/sync_icon_builder.dart';
 import '../utils/sync_dialogs.dart';
+import '../../utils/sync_utils.dart';
 
 /// Widget para mostrar detalhes do sync em um bottom sheet
 class SyncDetailsBottomSheet extends StatefulWidget {
@@ -42,7 +43,7 @@ class _SyncDetailsBottomSheetState extends State<SyncDetailsBottomSheet> {
       _controller = GetIt.instance.get<SyncIndicatorController>();
       _controller.addListener(_onControllerChanged);
     } catch (e) {
-      debugPrint('Serviços não disponíveis via GetIt: $e');
+      SyncUtils.debugLog('Serviços não disponíveis via GetIt: $e', tag: 'SyncDetailsBottomSheet');
       // Criar um controller padrão ou lidar com o erro
       rethrow;
     }

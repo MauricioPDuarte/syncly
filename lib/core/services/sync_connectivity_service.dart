@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import '../entities/sync_connectivity_status.dart';
 import '../enums/sync_connectivity_type.dart';
-import 'package:flutter/foundation.dart';
+import '../utils/sync_utils.dart';
 
 abstract class ISyncConnectivityService {
   Future<bool> isConnected();
@@ -65,7 +65,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
         _isConnectedController.add(status.isConnected);
       }
     } catch (e) {
-      debugPrint('Erro ao verificar conectividade: $e');
+      SyncUtils.debugLog('Erro ao verificar conectividade: $e',
+          tag: 'SyncConnectivityService');
     }
   }
 
@@ -76,7 +77,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
         timeout: const Duration(seconds: 5),
       );
     } catch (e) {
-      debugPrint('Erro ao verificar conectividade: $e');
+      SyncUtils.debugLog('Erro ao verificar conectividade: $e',
+          tag: 'SyncConnectivityService');
       return false;
     }
   }
@@ -102,7 +104,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
         signalStrength: _getSignalStrength(type),
       );
     } catch (e) {
-      debugPrint('Erro ao obter status de conectividade: $e');
+      SyncUtils.debugLog('Erro ao obter status de conectividade: $e',
+          tag: 'SyncConnectivityService');
       return const SyncConnectivityStatus(
         isConnected: false,
         type: SyncConnectivityType.none,
@@ -122,7 +125,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
       }
       return SyncConnectivityType.other;
     } catch (e) {
-      debugPrint('Erro ao detectar tipo de conexão: $e');
+      SyncUtils.debugLog('Erro ao detectar tipo de conexão: $e',
+          tag: 'SyncConnectivityService');
       return SyncConnectivityType.other;
     }
   }
@@ -182,7 +186,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
 
       return true;
     } catch (e) {
-      debugPrint('Erro ao verificar adequação para sync: $e');
+      SyncUtils.debugLog('Erro ao verificar adequação para sync: $e',
+          tag: 'SyncConnectivityService');
       return false;
     }
   }
@@ -193,7 +198,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
       final status = await getConnectivityStatus();
       return status.isWifi;
     } catch (e) {
-      debugPrint('Erro ao verificar conexão Wi-Fi: $e');
+      SyncUtils.debugLog('Erro ao verificar conexão Wi-Fi: $e',
+          tag: 'SyncConnectivityService');
       return false;
     }
   }
@@ -204,7 +210,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
       final status = await getConnectivityStatus();
       return status.isMobile;
     } catch (e) {
-      debugPrint('Erro ao verificar conexão móvel: $e');
+      SyncUtils.debugLog('Erro ao verificar conexão móvel: $e',
+          tag: 'SyncConnectivityService');
       return false;
     }
   }
@@ -234,7 +241,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
         return false;
       }
     } catch (e) {
-      debugPrint('Erro ao testar conectividade com internet: $e');
+      SyncUtils.debugLog('Erro ao testar conectividade com internet: $e',
+          tag: 'SyncConnectivityService');
       return false;
     }
   }
@@ -254,7 +262,8 @@ class SyncConnectivityService implements ISyncConnectivityService {
         'isSuitableForSync': await isSuitableForSync(),
       };
     } catch (e) {
-      debugPrint('Erro ao obter informações da rede: $e');
+      SyncUtils.debugLog('Erro ao obter informações da rede: $e',
+          tag: 'SyncConnectivityService');
       return {
         'isConnected': false,
         'type': 'none',
