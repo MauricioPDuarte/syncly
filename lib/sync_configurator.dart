@@ -31,9 +31,11 @@ class SyncConfigurator {
   ///
   /// [provider] - Implementação do SyncConfig com todas as configurações
   /// [registerInGetIt] - Se deve registrar automaticamente no GetIt (padrão: true)
+  /// [downloadStrategies] - Lista de estratégias de download (opcional, se não fornecida usa as do SyncConfig)
   static Future<void> initialize({
     required SyncConfig provider,
     bool registerInGetIt = true,
+    List<IDownloadStrategy>? downloadStrategies,
   }) async {
     if (_isInitialized) {
       throw StateError(
@@ -47,7 +49,7 @@ class SyncConfigurator {
 
     // Registra dependências no GetIt se solicitado
     if (registerInGetIt) {
-      _registerDependencies(provider);
+      _registerDependencies(provider, downloadStrategies);
     }
 
     // Inicializa o serviço interno de notificações se habilitadas
@@ -112,12 +114,12 @@ class SyncConfigurator {
   }
 
   /// Registra todas as dependências no GetIt
-  static void _registerDependencies(SyncConfig provider) {
+  static void _registerDependencies(SyncConfig provider, List<IDownloadStrategy>? downloadStrategies) {
     final getIt = GetIt.instance;
 
     // Registra as estratégias de download
     getIt.registerLazySingleton<List<IDownloadStrategy>>(
-        () => provider.downloadStrategies);
+        () => downloadStrategies ?? provider.downloadStrategies);
 
     // Registra serviços internos
     getIt.registerLazySingleton<ISyncConnectivityService>(

@@ -9,28 +9,30 @@ import 'domain/usecases/create_todo_usecase.dart';
 import 'domain/usecases/toggle_todo_usecase.dart';
 import 'domain/usecases/delete_todo_usecase.dart';
 import 'presentation/controllers/todo_controller.dart';
+import 'data/sync/todo_downloader.dart';
 
 class TodoModule extends Module {
-    @override
-      List<Module> get imports =>  [
-      CoreModule(),
-    ];
+  @override
+  List<Module> get imports => [
+        CoreModule(),
+      ];
 
   @override
   void binds(Injector i) {
+    // Sync Strategies
+    i.addLazySingleton<TodoDownloader>(TodoDownloader.new);
+
     // Datasources
     i.addLazySingleton<TodoLocalDatasource>(TodoLocalDatasource.new);
 
     // Repositories
     i.addLazySingleton<TodoRepository>(TodoRepositoryImpl.new);
 
-
     // Use cases
     i.addLazySingleton<GetAllTodosUsecase>(GetAllTodosUsecase.new);
     i.addLazySingleton<CreateTodoUsecase>(CreateTodoUsecase.new);
     i.addLazySingleton<ToggleTodoUsecase>(ToggleTodoUsecase.new);
     i.addLazySingleton<DeleteTodoUsecase>(DeleteTodoUsecase.new);
-
 
     // Controllers
     i.addLazySingleton<TodoController>(TodoController.new);

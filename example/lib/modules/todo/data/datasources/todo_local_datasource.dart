@@ -1,13 +1,16 @@
 import 'package:syncly_example/core/services/sync/sync.dart';
 import '../../../../core/services/storage/storage.dart';
 import '../../domain/entities/todo.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class TodoLocalDatasource {
   final StorageService _prefsService;
-  final AppSyncService _syncService;
+  late final AppSyncService _syncService;
   static const String _todosKey = 'todos';
 
-  TodoLocalDatasource(this._prefsService, this._syncService);
+  TodoLocalDatasource(this._prefsService) {
+    _syncService = Modular.get<AppSyncService>();
+  }
 
   Future<List<Todo>> getAllTodos() async {
     final todosJson = await _prefsService.getJsonList(_todosKey);

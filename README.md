@@ -101,9 +101,16 @@ class MeuSyncConfig extends SyncConfig {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Inicializar o sync com SyncConfigurator
-  await SyncConfigurator.initialize(
-    provider: MeuSyncConfig(),
+  // Opção 1: Inicializar usando estratégias definidas no SyncConfig
+  await SyncInitializer.initialize(MeuSyncConfig());
+  
+  // Opção 2: Passar estratégias de download diretamente (novo na v0.1.0)
+  await SyncInitializer.initialize(
+    MeuSyncConfig(),
+    downloadStrategies: [
+      MeuDownloader(),
+      OutroDownloader(),
+    ],
   );
   
   runApp(MeuApp());
@@ -310,6 +317,50 @@ class MeuSyncConfig extends SyncConfig {
   bool get enableNotifications => true;
 }
 ```
+
+### Estratégias de Download Flexíveis
+
+**🎉 Novidade na v0.1.0**: Agora você pode passar as estratégias de download diretamente no método `initialize()`!
+
+#### Opção 1: Definir no SyncConfig (padrão)
+
+```dart
+class MeuSyncConfig extends SyncConfig {
+  @override
+  List<IDownloadStrategy> get downloadStrategies => [
+    TodoDownloader(),
+    UserDownloader(),
+    FileDownloader(),
+  ];
+}
+
+// Inicializar
+await SyncInitializer.initialize(MeuSyncConfig());
+```
+
+#### Opção 2: Passar diretamente no initialize() (novo)
+
+```dart
+// Estratégias passadas diretamente - mais flexível!
+await SyncInitializer.initialize(
+  MeuSyncConfig(),
+  downloadStrategies: [
+    TodoDownloader(),
+    UserDownloader(),
+    FileDownloader(),
+  ],
+);
+```
+
+**Benefícios da nova abordagem:**
+- ✅ **Flexibilidade**: Diferentes estratégias para diferentes contextos
+- ✅ **Testabilidade**: Fácil de mockar estratégias em testes
+- ✅ **Modularidade**: Estratégias podem ser definidas em módulos separados
+- ✅ **Compatibilidade**: Funciona com a abordagem anterior
+
+**Quando usar cada opção:**
+- **SyncConfig**: Quando as estratégias são fixas para toda a aplicação
+- **initialize()**: Quando você precisa de flexibilidade ou estratégias dinâmicas
 
 ## Arquitetura
 

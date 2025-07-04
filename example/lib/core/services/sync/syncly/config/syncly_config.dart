@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:syncly/sync.dart';
 
-import 'package:syncly_example/core/services/sync/syncly/downloaders/todo_downloader.dart';
 import 'package:syncly_example/core/services/rest_client/rest_client.dart';
 
 /// Provider de sincronização personalizado para o Syncly Example
@@ -11,29 +10,12 @@ import 'package:syncly_example/core/services/rest_client/rest_client.dart';
 /// migrando do sistema antigo de adapters para o novo sistema unificado.
 class SynclyConfig extends SyncConfig {
   // Adapters reutilizados do sistema antigo
-  late final List<IDownloadStrategy> _downloadStrategies;
   RestClient? _restClient;
-
-  SynclyConfig() {
-    _initializeProviders();
-  }
-
-  void _initializeProviders() {
-    // Inicializa as estratégias de download
-    _downloadStrategies = [TodoDownloader()];
-  }
 
   /// Obtém o RestClient de forma lazy
   RestClient get restClient {
     _restClient ??= Modular.get<RestClient>();
     return _restClient!;
-  }
-
-  /// Método simplificado para inicializar o sistema de sincronização
-  /// Usa o novo SyncConfig centralizado
-  static Future<void> initializeSync() async {
-    final provider = Modular.get<SynclyConfig>();
-    await SyncInitializer.initialize(provider);
   }
 
   // ========== CONFIGURAÇÕES BÁSICAS ==========
@@ -70,7 +52,7 @@ class SynclyConfig extends SyncConfig {
   // ========== ESTRATÉGIAS DE DOWNLOAD ==========
 
   @override
-  List<IDownloadStrategy> get downloadStrategies => _downloadStrategies;
+  List<IDownloadStrategy> get downloadStrategies => [];
 
   // ========== TEMA ==========
 

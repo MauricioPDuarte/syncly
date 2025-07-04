@@ -5,13 +5,28 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - 04/06/2025
+## [1.1.1] - 05/06/2025
+
+### 🔧 Correções
+- **Inicialização do SyncInitializer**: Corrigido erro "Bad state: SyncInitializer não foi inicializado" que ocorria quando serviços tentavam acessar o `SyncInitializer` antes de sua inicialização completa
+- **Injeção de Dependência Lazy**: Implementada inicialização lazy no `SynclyService` para evitar chamadas prematuras ao `ISyncService.getInstance()`
+- **TodoLocalDatasource**: Modificado para usar `Modular.get<AppSyncService>()` de forma lazy, evitando dependências circulares durante a inicialização
+- **Ordem de Inicialização**: Garantida a ordem correta de inicialização dos serviços, com o `SyncInitializer` sendo inicializado antes de qualquer acesso aos serviços de sincronização
+
+### 🛠️ Melhorado
+- **Estabilidade**: Eliminadas condições de corrida durante a inicialização da aplicação
+- **Arquitetura**: Melhorada a gestão de dependências para evitar inicializações prematuras
+- **Robustez**: Sistema mais resiliente a problemas de ordem de inicialização
+
+## [0.1.0] - 04/06/2025
 
 ### 🚀 Adicionado
 - **Sistema de Notificações Interno**: Novo `SyncNotificationService` centraliza toda a lógica de notificações
 - **Configuração Simplificada**: Desenvolvedores agora só precisam definir `enableNotifications = true`
 - **Padrão Singleton**: Garantia de uma única instância do serviço de notificações
 - **Logs de Desenvolvimento**: Sistema de logs detalhados para facilitar debug e desenvolvimento
+- **Estratégias de Download Flexíveis**: Agora é possível passar estratégias de download diretamente no método `SyncInitializer.initialize()`
+- **Parâmetro `downloadStrategies`**: Novo parâmetro opcional no `initialize()` para maior flexibilidade
 
 ### 🔄 Modificado
 - **BREAKING CHANGE**: Removidos métodos de notificação obrigatórios do `SyncConfig`
@@ -29,6 +44,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Manutenibilidade**: Lógica de notificações centralizada em um local
 - **Flexibilidade**: Fácil extensão e customização do sistema de notificações
 - **Compatibilidade**: Propriedade `enableNotifications` mantida para compatibilidade
+- **Testabilidade**: Estratégias de download podem ser facilmente mockadas em testes
+- **Modularidade**: Estratégias podem ser definidas em módulos separados e reutilizadas
 
 ### 📚 Documentação
 - Atualizada documentação HTML com novo sistema de notificações

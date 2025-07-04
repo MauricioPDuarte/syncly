@@ -9,19 +9,26 @@ import 'package:flutter/foundation.dart';
 /// e o sistema de sincronização interno, fornecendo uma camada
 /// de abstração limpa e desacoplada.
 class SynclyService implements AppSyncService {
-  late final ISyncService _syncService;
-  late final ValueNotifier<AppSyncData> _appSyncData;
+  ISyncService? _syncService;
+  ValueNotifier<AppSyncData>? _appSyncData;
+  bool _isInitialized = false;
 
-  SynclyService() {
-    _syncService = ISyncService.getInstance();
-    _appSyncData = ValueNotifier(_convertToAppSyncData(_syncService.syncData.value));
-    
-    // Escutar mudanças no syncData original e converter para AppSyncData
-    _syncService.syncData.addListener(_onSyncDataChanged);
+  SynclyService();
+
+  ISyncService get _service {
+    if (!_isInitialized) {
+      _syncService = ISyncService.getInstance();
+      _appSyncData = ValueNotifier(_convertToAppSyncData(_syncService!.syncData.value));
+      
+      // Escutar mudanças no syncData original e converter para AppSyncData
+      _syncService!.syncData.addListener(_onSyncDataChanged);
+      _isInitialized = true;
+    }
+    return _syncService!;
   }
 
   void _onSyncDataChanged() {
-    _appSyncData.value = _convertToAppSyncData(_syncService.syncData.value);
+    _appSyncData!.value = _convertToAppSyncData(_syncService!.syncData.value);
   }
 
   /// Converte SyncData para AppSyncData
@@ -56,57 +63,57 @@ class SynclyService implements AppSyncService {
 
   @override
   Future<void> forceSync() {
-    return _syncService.forceSync();
+    return _service.forceSync();
   }
 
   @override
   Future<void> stopSync() {
-    return _syncService.stopSync();
+    return _service.stopSync();
   }
 
   @override
   Future<void> stopBackgroundSync() {
-    return _syncService.stopBackgroundSync();
+    return _service.stopBackgroundSync();
   }
 
   @override
   Future<void> startSync() {
-    return _syncService.startSync();
+    return _service.startSync();
   }
 
   @override
   Future<void> startBackgroundSync() {
-    return _syncService.startBackgroundSync();
+    return _service.startBackgroundSync();
   }
 
   @override
   bool get isOnline {
-    return _syncService.isOnline.value;
+    return _service.isOnline.value;
   }
 
   @override
   bool get isSyncing {
-    return _syncService.syncData.value.status.name == 'syncing';
+    return _service.syncData.value.status.name == 'syncing';
   }
 
   @override
   ValueNotifier<AppSyncData> get syncData {
-    return _appSyncData;
+    return _appSyncData!;
   }
 
   @override
   Future<int> getPendingItemsCount() {
-    return _syncService.getPendingItemsCount();
+    return _service.getPendingItemsCount();
   }
 
   @override
   Future<void> resetSyncState() {
-    return _syncService.resetSyncState();
+    return _service.resetSyncState();
   }
 
   @override
   Future<void> logCreate({required String entityType, required String entityId, required Map<String, dynamic> data,}) {
-    return _syncService.addToSyncQueue(
+    return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
       operation: SyncOperation.create,
@@ -116,7 +123,7 @@ class SynclyService implements AppSyncService {
 
   @override
   Future<void> logUpdate({required String entityType, required String entityId, required Map<String, dynamic> data}) {
-    return _syncService.addToSyncQueue(
+    return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
       operation: SyncOperation.update,
@@ -126,7 +133,7 @@ class SynclyService implements AppSyncService {
 
   @override
   Future<void> logDelete({required String entityType, required String entityId}) {
-    return _syncService.addToSyncQueue(
+    return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
       operation: SyncOperation.delete,

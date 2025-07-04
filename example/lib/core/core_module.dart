@@ -12,8 +12,8 @@ class CoreModule extends Module {
     // Rest client
     i.addSingleton<RestClient>(DioRestClient.new);
     
-    // App sync service
-    i.addSingleton<AppSyncService>(SynclyService.new);
+    // App sync service (lazy para evitar inicialização prematura)
+    i.addLazySingleton<AppSyncService>(SynclyService.new);
 
   }
 }

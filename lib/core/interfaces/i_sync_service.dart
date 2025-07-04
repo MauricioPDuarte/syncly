@@ -9,12 +9,13 @@ import '../../sync_initializer.dart';
 /// Gerencia o estado de conectividade, fila de sincronização e recuperação de erros.
 abstract class ISyncService {
   /// Obtém a instância do serviço de sincronização
-  /// 
+  ///
   /// Retorna a instância configurada através do SyncInitializer.
   /// Lança uma exceção se o SyncInitializer não foi inicializado.
   static ISyncService getInstance() {
     return SyncInitializer.syncService;
   }
+
   ValueNotifier<SyncData> get syncData;
   ValueNotifier<bool> get isOnline;
   Future<void> startSync();
@@ -27,9 +28,9 @@ abstract class ISyncService {
     required Map<String, dynamic> data,
     bool isFileToUpload = false,
   });
-  
+
   // ========== LOGGING DE SINCRONIZAÇÃO ==========
-  
+
   /// Registra log de criação de entidade
   Future<void> logCreate({
     required String entityType,
@@ -37,7 +38,7 @@ abstract class ISyncService {
     required Map<String, dynamic> data,
     bool isFileToUpload = false,
   });
-  
+
   /// Registra log de atualização de entidade
   Future<void> logUpdate({
     required String entityType,
@@ -45,14 +46,14 @@ abstract class ISyncService {
     required Map<String, dynamic> data,
     bool isFileToUpload = false,
   });
-  
+
   /// Registra log de exclusão de entidade
   Future<void> logDelete({
     required String entityType,
     required String entityId,
     required Map<String, dynamic> data,
   });
-  
+
   /// Registra operação customizada
   Future<void> logCustomOperation({
     required String entityType,
@@ -61,7 +62,7 @@ abstract class ISyncService {
     required Map<String, dynamic> data,
     bool isFileToUpload = false,
   });
-  
+
   Future<int> getPendingItemsCount();
   Future<void> enterOfflineMode();
   Future<void> clearCorruptedData();

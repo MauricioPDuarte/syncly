@@ -1,3 +1,4 @@
+import 'core/interfaces/i_download_strategy.dart';
 import 'core/interfaces/i_logger_debug_provider.dart';
 import 'core/interfaces/i_storage_provider.dart';
 import 'core/interfaces/i_sync_service.dart';
@@ -19,7 +20,13 @@ class SyncInitializer {
   static ISyncLoggerDebugProvider get logger => _defaultLogger;
 
   /// Inicializa o sistema de sincronização com um SyncConfig
-  static Future<void> initialize(SyncConfig provider) async {
+  /// 
+  /// [provider] - Configuração do sistema de sincronização
+  /// [downloadStrategies] - Lista de estratégias de download (opcional, se não fornecida usa as do SyncConfig)
+  static Future<void> initialize(
+    SyncConfig provider, {
+    List<IDownloadStrategy>? downloadStrategies,
+  }) async {
     if (_isInitialized) {
       _defaultLogger.info('SyncInitializer já foi inicializado',
           category: 'SyncInitializer');
@@ -38,7 +45,7 @@ class SyncInitializer {
       }
 
       // Inicializa o SyncConfigurator com o provider
-      SyncConfigurator.initialize(provider: provider);
+      SyncConfigurator.initialize(provider: provider, downloadStrategies: downloadStrategies);
       _defaultLogger.info('SyncConfigurator inicializado com sucesso',
           category: 'SyncInitializer');
 

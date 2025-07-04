@@ -499,7 +499,18 @@ class MySyncConfig extends SyncConfig {
 
 // 2. Inicializar o sistema
 final config = MySyncConfig();
-await SyncConfigurator.initialize(config);
+
+// Opção 1: Usar estratégias definidas no SyncConfig (padrão)
+await SyncInitializer.initialize(config);
+
+// Opção 2: Passar estratégias diretamente (novo na v0.1.0)
+await SyncInitializer.initialize(
+  config,
+  downloadStrategies: [
+    MyDownloader(),
+    AnotherDownloader(),
+  ],
+);
 
 // 3. Acessar o serviço
 final syncService = SyncConfigurator.syncService;</code></pre>
@@ -573,6 +584,58 @@ final syncService = SyncConfigurator.syncService;</code></pre>
     }
   }
 }</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download Flexíveis (v0.1.0)</h4>
+                            <p class="text-green-600 text-sm mb-2">Nova funcionalidade: passe estratégias diretamente no initialize():</p>
+                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
+                                <pre><code>// Opção 1: Estratégias definidas no SyncConfig (padrão)
+class MySyncConfig extends SyncConfig {
+  @override
+  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
+    TodoDownloader(),
+    UserDownloader(),
+  ];
+}
+
+await SyncInitializer.initialize(MySyncConfig());
+
+// Opção 2: Estratégias passadas diretamente (flexível)
+await SyncInitializer.initialize(
+  MySyncConfig(),
+  downloadStrategies: [
+    TodoDownloader(),
+    UserDownloader(),
+    FileDownloader(), // Estratégia adicional
+  ],
+);
+
+// Exemplo prático: Diferentes contextos
+// Desenvolvimento
+await SyncInitializer.initialize(
+  config,
+  downloadStrategies: [MockDownloader()], // Mock para testes
+);
+
+// Produção
+await SyncInitializer.initialize(
+  config,
+  downloadStrategies: [
+    TodoDownloader(),
+    UserDownloader(),
+    FileDownloader(),
+    AnalyticsDownloader(),
+  ],
+);
+
+// Benefícios:
+// ✅ Flexibilidade para diferentes contextos (dev, prod, test)
+// ✅ Fácil para testes unitários (mock de estratégias)
+// ✅ Modularidade e reutilização de código
+// ✅ Compatibilidade total com versões anteriores
+// ✅ Configuração dinâmica baseada em condições</code></pre>
                             </div>
                         </div>
                     </div>
