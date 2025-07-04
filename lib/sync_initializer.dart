@@ -8,6 +8,9 @@ import 'sync_config.dart';
 import 'sync_configurator.dart';
 import 'package:get_it/get_it.dart';
 
+/// Typedef para resolver estratégias de download dinamicamente
+typedef StrategyResolver = List<IDownloadStrategy> Function();
+
 /// Classe responsável por inicializar os serviços de sincronização usando SyncConfig
 class SyncInitializer {
   static bool _isInitialized = false;
@@ -23,9 +26,11 @@ class SyncInitializer {
   /// 
   /// [provider] - Configuração do sistema de sincronização
   /// [downloadStrategies] - Lista de estratégias de download (opcional, se não fornecida usa as do SyncConfig)
+  /// [strategyResolver] - Callback para resolver estratégias dinamicamente (alternativa a downloadStrategies)
   static Future<void> initialize(
     SyncConfig provider, {
     List<IDownloadStrategy>? downloadStrategies,
+    StrategyResolver? strategyResolver,
   }) async {
     if (_isInitialized) {
       _defaultLogger.info('SyncInitializer já foi inicializado',
@@ -45,7 +50,11 @@ class SyncInitializer {
       }
 
       // Inicializa o SyncConfigurator com o provider
-      SyncConfigurator.initialize(provider: provider, downloadStrategies: downloadStrategies);
+      SyncConfigurator.initialize(
+        provider: provider, 
+        downloadStrategies: downloadStrategies,
+        strategyResolver: strategyResolver,
+      );
       _defaultLogger.info('SyncConfigurator inicializado com sucesso',
           category: 'SyncInitializer');
 

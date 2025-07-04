@@ -19,6 +19,9 @@ import 'core/providers/default_sync_logger_provider.dart';
 import 'core/presentation/controllers/sync_indicator_controller.dart';
 import 'core/services/sync_notification_service.dart';
 
+/// Typedef para resolver estratégias de download dinamicamente
+typedef StrategyResolver = List<IDownloadStrategy> Function();
+
 /// Configurador principal do sistema de sincronização
 ///
 /// Esta classe simplifica a configuração do sync, permitindo que o usuário
@@ -32,10 +35,12 @@ class SyncConfigurator {
   /// [provider] - Implementação do SyncConfig com todas as configurações
   /// [registerInGetIt] - Se deve registrar automaticamente no GetIt (padrão: true)
   /// [downloadStrategies] - Lista de estratégias de download (opcional, se não fornecida usa as do SyncConfig)
+  /// [strategyResolver] - Callback para resolver estratégias dinamicamente (alternativa a downloadStrategies)
   static Future<void> initialize({
     required SyncConfig provider,
     bool registerInGetIt = true,
     List<IDownloadStrategy>? downloadStrategies,
+    StrategyResolver? strategyResolver,
   }) async {
     if (_isInitialized) {
       throw StateError(
@@ -49,7 +54,7 @@ class SyncConfigurator {
 
     // Registra dependências no GetIt se solicitado
     if (registerInGetIt) {
-      _registerDependencies(provider, downloadStrategies);
+      _registerDependencies(provider, downloadStrategies, strategyResolver);
     }
 
     // Inicializa o serviço interno de notificações se habilitadas
@@ -115,12 +120,18 @@ class SyncConfigurator {
 
   /// Registra todas as dependências no GetIt
   static void _registerDependencies(
-      SyncConfig provider, List<IDownloadStrategy>? downloadStrategies) {
+      SyncConfig provider, 
+      List<IDownloadStrategy>? downloadStrategies,
+      StrategyResolver? strategyResolver) {
     final getIt = GetIt.instance;
 
     // Registra as estratégias de download
-    getIt.registerLazySingleton<List<IDownloadStrategy>>(
-        () => downloadStrategies ?? []);
+    getIt.registerLazySingleton<List<IDownloadStrategy>>(() {
+      if (strategyResolver != null) {
+        return strategyResolver();
+      }
+      return downloadStrategies ?? [];
+    });
 
     // Registra serviços internos
     getIt.registerLazySingleton<ISyncConnectivityService>(

@@ -10,17 +10,25 @@ import 'package:syncly_example/core/services/rest_client/rest_client.dart';
 /// - Buscar Todos do servidor
 /// - Processar e salvar os dados no banco local
 class TodoDownloader implements IDownloadStrategy {
-  late final RestClient _restClient;
+  RestClient? _restClient;
 
-  TodoDownloader() {
-    // Obter RestClient do container de injeção de dependência
-    _restClient = Modular.get<RestClient>();
+  TodoDownloader();
+
+  RestClient get restClient {
+    _restClient ??= Modular.get<RestClient>();
+    return _restClient!;
   }
 
   @override
   Future<DownloadResult> downloadData() async {
     try {
       debugPrint('Buscando todos atualizados...');
+
+      // Acessar o RestClient apenas quando necessário
+      final client = restClient;
+
+      print('AQUI');
+      print(client.timeout);
 
       // Simular download de dados do servidor
       await Future.delayed(const Duration(seconds: 1));
