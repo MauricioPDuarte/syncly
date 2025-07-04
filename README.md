@@ -104,12 +104,21 @@ void main() async {
   // Opção 1: Inicializar usando estratégias definidas no SyncConfig
   await SyncInitializer.initialize(MeuSyncConfig());
   
-  // Opção 2: Passar estratégias de download diretamente (novo na v0.1.0)
+  // Opção 2: Passar estratégias de download diretamente
   await SyncInitializer.initialize(
     MeuSyncConfig(),
     downloadStrategies: [
       MeuDownloader(),
       OutroDownloader(),
+    ],
+  );
+  
+  // Opção 3: Usar StrategyResolver para integração com DI (novo na v1.1.4)
+  await SyncInitializer.initialize(
+    MeuSyncConfig(),
+    strategyResolver: () => [
+      Modular.get<MeuDownloader>(),
+      GetIt.instance.get<OutroDownloader>(),
     ],
   );
   
@@ -338,7 +347,7 @@ class MeuSyncConfig extends SyncConfig {
 await SyncInitializer.initialize(MeuSyncConfig());
 ```
 
-#### Opção 2: Passar diretamente no initialize() (novo)
+#### Opção 2: Passar diretamente no initialize()
 
 ```dart
 // Estratégias passadas diretamente - mais flexível!
@@ -352,8 +361,53 @@ await SyncInitializer.initialize(
 );
 ```
 
+#### Opção 3: Integração com Sistemas de DI (novo na v1.1.4)
+
+**🎉 Novidade**: Agora você pode integrar perfeitamente com sistemas de injeção de dependência como Modular, GetIt, etc.!
+
+```dart
+// Com Flutter Modular
+await SyncInitializer.initialize(
+  MeuSyncConfig(),
+  strategyResolver: () => [
+    Modular.get<TodoDownloader>(),
+    Modular.get<UserDownloader>(),
+  ],
+);
+
+// Com GetIt
+await SyncInitializer.initialize(
+  MeuSyncConfig(),
+  strategyResolver: () => [
+    GetIt.instance.get<TodoDownloader>(),
+    GetIt.instance.get<UserDownloader>(),
+  ],
+);
+
+// Misto - diferentes sistemas de DI
+await SyncInitializer.initialize(
+  MeuSyncConfig(),
+  strategyResolver: () => [
+    Modular.get<TodoDownloader>(),
+    GetIt.instance.get<UserDownloader>(),
+    ServiceLocator.get<FileDownloader>(),
+  ],
+);
+```
+
+**Benefícios do StrategyResolver:**
+- ✅ **Lazy Loading**: Estratégias resolvidas apenas quando necessário
+- ✅ **Flexibilidade**: Funciona com qualquer sistema de DI
+- ✅ **Ordem de Inicialização**: Resolve problemas de dependências não registradas
+- ✅ **Compatibilidade**: Mantém suporte às opções anteriores
+
+**Quando usar cada opção:**
+ - **Opção 1**: Para projetos simples sem DI complexo
+ - **Opção 2**: Para controle manual das instâncias
+ - **Opção 3**: Para projetos com sistemas de DI estabelecidos
+
 **Benefícios da nova abordagem:**
-- ✅ **Flexibilidade**: Diferentes estratégias para diferentes contextos
+ - ✅ **Flexibilidade**: Diferentes estratégias para diferentes contextos
 - ✅ **Testabilidade**: Fácil de mockar estratégias em testes
 - ✅ **Modularidade**: Estratégias podem ser definidas em módulos separados
 - ✅ **Compatibilidade**: Funciona com a abordagem anterior

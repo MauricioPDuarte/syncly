@@ -503,12 +503,21 @@ final config = MySyncConfig();
 // Opção 1: Usar estratégias definidas no SyncConfig (padrão)
 await SyncInitializer.initialize(config);
 
-// Opção 2: Passar estratégias diretamente (novo na v0.1.0)
+// Opção 2: Passar estratégias diretamente
 await SyncInitializer.initialize(
   config,
   downloadStrategies: [
     MyDownloader(),
     AnotherDownloader(),
+  ],
+);
+
+// Opção 3: StrategyResolver para integração com DI (v1.1.4)
+await SyncInitializer.initialize(
+  config,
+  strategyResolver: () =&gt; [
+    Modular.get&lt;MyDownloader&gt;(),
+    GetIt.instance.get&lt;AnotherDownloader&gt;(),
   ],
 );
 
@@ -588,8 +597,8 @@ final syncService = SyncConfigurator.syncService;</code></pre>
                         </div>
 
                         <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download Flexíveis (v0.1.0)</h4>
-                            <p class="text-green-600 text-sm mb-2">Nova funcionalidade: passe estratégias diretamente no initialize():</p>
+                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download Flexíveis</h4>
+                            <p class="text-green-600 text-sm mb-2">Múltiplas opções para configurar estratégias de download:</p>
                             <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
                                 <pre><code>// Opção 1: Estratégias definidas no SyncConfig (padrão)
 class MySyncConfig extends SyncConfig {
@@ -602,7 +611,7 @@ class MySyncConfig extends SyncConfig {
 
 await SyncInitializer.initialize(MySyncConfig());
 
-// Opção 2: Estratégias passadas diretamente (flexível)
+// Opção 2: Estratégias passadas diretamente
 await SyncInitializer.initialize(
   MySyncConfig(),
   downloadStrategies: [
@@ -612,30 +621,48 @@ await SyncInitializer.initialize(
   ],
 );
 
-// Exemplo prático: Diferentes contextos
-// Desenvolvimento
+// Opção 3: StrategyResolver para integração com DI (v1.1.4)
+// Com Flutter Modular
 await SyncInitializer.initialize(
-  config,
-  downloadStrategies: [MockDownloader()], // Mock para testes
+  MySyncConfig(),
+  strategyResolver: () =&gt; [
+    Modular.get&lt;TodoDownloader&gt;(),
+    Modular.get&lt;UserDownloader&gt;(),
+  ],
 );
 
-// Produção
+// Com GetIt
+await SyncInitializer.initialize(
+  MySyncConfig(),
+  strategyResolver: () =&gt; [
+    GetIt.instance.get&lt;TodoDownloader&gt;(),
+    GetIt.instance.get&lt;UserDownloader&gt;(),
+  ],
+);
+
+// Exemplo prático: Diferentes contextos
+// Desenvolvimento com mocks
 await SyncInitializer.initialize(
   config,
-  downloadStrategies: [
-    TodoDownloader(),
-    UserDownloader(),
-    FileDownloader(),
-    AnalyticsDownloader(),
+  downloadStrategies: [MockDownloader()],
+);
+
+// Produção com DI
+await SyncInitializer.initialize(
+  config,
+  strategyResolver: () =&gt; [
+    Modular.get&lt;TodoDownloader&gt;(),
+    Modular.get&lt;UserDownloader&gt;(),
+    Modular.get&lt;FileDownloader&gt;(),
   ],
 );
 
 // Benefícios:
-// ✅ Flexibilidade para diferentes contextos (dev, prod, test)
+// ✅ Flexibilidade para diferentes contextos e sistemas de DI
+// ✅ Lazy loading - resolve dependências quando necessário
 // ✅ Fácil para testes unitários (mock de estratégias)
-// ✅ Modularidade e reutilização de código
-// ✅ Compatibilidade total com versões anteriores
-// ✅ Configuração dinâmica baseada em condições</code></pre>
+// ✅ Resolve problemas de ordem de inicialização
+// ✅ Compatibilidade total com versões anteriores</code></pre>
                             </div>
                         </div>
                     </div>

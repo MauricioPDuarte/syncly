@@ -5,6 +5,37 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 03/07/2025
+
+### 🚀 Adicionado
+- **StrategyResolver**: Nova funcionalidade para integração com sistemas de injeção de dependência
+- **Suporte a Modular**: Integração nativa com Flutter Modular via `strategyResolver`
+- **Suporte a GetIt**: Integração nativa com GetIt via `strategyResolver`
+- **Lazy Loading**: Estratégias de download são resolvidas apenas quando necessário
+- **Typedef StrategyResolver**: Novo tipo `StrategyResolver = List<IDownloadStrategy> Function()` para callbacks de resolução
+
+### 🔄 Modificado
+- **SyncInitializer.initialize()**: Adicionado parâmetro opcional `strategyResolver`
+- **SyncConfigurator.initialize()**: Adicionado suporte ao `StrategyResolver`
+- **Registro de Dependências**: Modificado para usar callback de resolução quando fornecido
+
+### 🛠️ Melhorado
+- **Ordem de Inicialização**: Resolve problemas de dependências não registradas durante inicialização
+- **Flexibilidade**: Funciona com qualquer sistema de injeção de dependência
+- **Compatibilidade**: Mantém total compatibilidade com versões anteriores
+- **Arquitetura**: Melhor separação entre inicialização do Syncly e sistemas de DI
+
+### 📚 Documentação
+- Atualizado README.md com exemplos de uso do `StrategyResolver`
+- Atualizada documentação HTML com nova funcionalidade
+- Adicionados exemplos de integração com Modular e GetIt
+- Documentadas as três opções de configuração de estratégias
+
+### 🔧 Correções
+- **TodoDownloader**: Implementado lazy loading para `RestClient` via getter
+- **Exemplo**: Removida inicialização duplicada do `SyncInitializer` no `AppWidget`
+- **Dependências**: Resolvidos problemas de ordem de inicialização no exemplo
+
 ## [1.1.1] - 05/06/2025
 
 ### 🔧 Correções
