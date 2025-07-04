@@ -125,16 +125,13 @@ abstract class SyncConfig {
   // ========== CONFIGURAÇÕES DE NOTIFICAÇÕES ==========
 
   /// Habilitar notificações do sistema de sincronização
-  /// 
+  ///
   /// Quando habilitado, o Syncly mostrará notificações sobre o progresso
   /// da sincronização, erros e status de conectividade usando seu serviço interno.
   bool get enableNotifications => true;
 
   // ========== MÉTODOS OBRIGATÓRIOS - ESTRATÉGIAS DE DOWNLOAD ==========
-
-  /// Lista de estratégias de download personalizadas
-  /// Cada estratégia define como baixar dados específicos do servidor
-  List<IDownloadStrategy> get downloadStrategies;
+  // REMOVIDO: downloadStrategies agora são passadas diretamente no SyncInitializer.initialize()
 
   // ========== MÉTODOS OBRIGATÓRIOS - LIMPEZA DE DADOS ==========
 

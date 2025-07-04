@@ -114,12 +114,13 @@ class SyncConfigurator {
   }
 
   /// Registra todas as dependências no GetIt
-  static void _registerDependencies(SyncConfig provider, List<IDownloadStrategy>? downloadStrategies) {
+  static void _registerDependencies(
+      SyncConfig provider, List<IDownloadStrategy>? downloadStrategies) {
     final getIt = GetIt.instance;
 
     // Registra as estratégias de download
     getIt.registerLazySingleton<List<IDownloadStrategy>>(
-        () => downloadStrategies ?? provider.downloadStrategies);
+        () => downloadStrategies ?? []);
 
     // Registra serviços internos
     getIt.registerLazySingleton<ISyncConnectivityService>(
@@ -242,9 +243,7 @@ class SyncConfigurator {
       errors.add('maxFileBatchSize deve ser maior que 0.');
     }
 
-    if (_provider!.downloadStrategies.isEmpty) {
-      errors.add('Pelo menos uma estratégia de download deve ser fornecida.');
-    }
+    // REMOVIDO: Validação de downloadStrategies (agora vem do SyncInitializer)
 
     return errors;
   }

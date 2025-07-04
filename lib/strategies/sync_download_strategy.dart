@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:get_it/get_it.dart';
 import '../core/interfaces/i_download_strategy.dart';
 import '../core/services/sync_notification_service.dart';
 import '../core/utils/sync_utils.dart';
@@ -115,7 +116,7 @@ class SyncDownloadStrategy {
 
       final results = <DownloadResult>[];
 
-      for (final strategy in syncConfig?.downloadStrategies ?? []) {
+      for (final strategy in GetIt.instance.get<List<IDownloadStrategy>>()) {
         SyncUtils.debugLog('Executando estratégia: ${strategy.runtimeType}',
             tag: 'SyncDownloadStrategy');
         final result = await strategy.downloadData();
