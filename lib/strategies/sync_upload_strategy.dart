@@ -233,35 +233,14 @@ class SyncUploadStrategy {
       }
     }
 
-    // Adicionar metadados ao FormData
+    // Adicionar apenas fileIds ao FormData
     formData.fields.add(MapEntry('fileIds', jsonEncode(fileIds)));
-    formData.fields.add(MapEntry('logs', jsonEncode(_createLogsMetadata(batch))));
 
     final syncConfig = _getSyncConfig();
     return await syncConfig.httpPost(syncConfig.fileSyncEndpoint, data: formData);
   }
 
-  /// Cria metadados dos logs sem base64Content
-  List<Map<String, dynamic>> _createLogsMetadata(List<SyncLog> batch) {
-    return batch.map((log) {
-      Map<String, dynamic> media;
-      try {
-        media = log.dataJson.isEmpty ? {} : _parseLogData(log);
-      } catch (e) {
-        media = {}; // Usar mapa vazio em caso de erro
-      }
 
-      // Remover base64Content para evitar duplicação
-      media.remove('base64Content');
-
-      return {
-        'entityType': log.entityType,
-        'operation': log.operation.value,
-        'data': media,
-        'createdAt': log.createdAt.toIso8601String(),
-      };
-    }).toList();
-  }
 
   /// Envia lote de dados regulares usando JSON
   Future<SyncHttpResponse> _sendDataBatch(
