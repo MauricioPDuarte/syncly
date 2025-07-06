@@ -19,7 +19,7 @@ import '../sync_config.dart';
 /// - Processar uploads de arquivos com FormData
 class SyncUploadStrategy {
   static const String _tag = 'SyncUploadStrategy';
-  
+
   final ILoggerProvider _syncLogger;
   final ISyncErrorManager _errorManager;
 
@@ -40,7 +40,7 @@ class SyncUploadStrategy {
   /// Executa o upload de dados para o servidor
   Future<void> syncUploadData() async {
     try {
-      final allPendingLogs = await _syncLogger.getPendingLogs();
+      List<SyncLog> allPendingLogs = await _syncLogger.getPendingLogs();
 
       if (allPendingLogs.isEmpty) {
         SyncUtils.debugLog('Nenhum dado pendente para upload', tag: _tag);
@@ -73,10 +73,10 @@ class SyncUploadStrategy {
   (List<SyncLog>, List<SyncLog>) _separateLogsByType(List<SyncLog> logs) {
     final fileLogs = logs.where((log) => log.isFileToUpload).toList();
     final dataLogs = logs.where((log) => !log.isFileToUpload).toList();
-    
+
     // Ordenar dados por data de criação
     dataLogs.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    
+
     return (fileLogs, dataLogs);
   }
 
@@ -97,13 +97,15 @@ class SyncUploadStrategy {
         await Future.delayed(Duration.zero); // Yield para outras operações
       } catch (e) {
         await _handleBatchError(batch, e, type, batchIndex + 1, totalBatches);
-        throw Exception('Falha no lote de ${type.displayName} ${batchIndex + 1}: $e');
+        throw Exception(
+            'Falha no lote de ${type.displayName} ${batchIndex + 1}: $e');
       }
     }
   }
 
   /// Cria um lote de logs baseado no índice e tamanho
-  List<SyncLog> _createBatch(List<SyncLog> logs, int batchIndex, int batchSize) {
+  List<SyncLog> _createBatch(
+      List<SyncLog> logs, int batchIndex, int batchSize) {
     final startIndex = batchIndex * batchSize;
     final endIndex = (startIndex + batchSize < logs.length)
         ? startIndex + batchSize
@@ -163,7 +165,7 @@ class SyncUploadStrategy {
     if (log.dataJson.isEmpty) {
       throw Exception('dataJson está vazio para log ${log.syncId}');
     }
-    
+
     try {
       return jsonDecode(log.dataJson) as Map<String, dynamic>;
     } catch (e) {
@@ -176,13 +178,14 @@ class SyncUploadStrategy {
     if (!media.containsKey('mimeType') || media['mimeType'] == null) {
       return ('jpg', 'image/jpeg');
     }
-    
+
     final mimeType = media['mimeType'].toString();
     if (mimeType.contains('png')) return ('png', 'image/png');
     if (mimeType.contains('pdf')) return ('pdf', 'application/pdf');
     if (mimeType.contains('mp4')) return ('mp4', 'video/mp4');
-    if (mimeType.contains('jpeg') || mimeType.contains('jpg')) return ('jpg', 'image/jpeg');
-    
+    if (mimeType.contains('jpeg') || mimeType.contains('jpg'))
+      return ('jpg', 'image/jpeg');
+
     return ('jpg', mimeType); // Usar mimeType original como fallback
   }
 
@@ -196,7 +199,7 @@ class SyncUploadStrategy {
     if (base64Data.contains(',')) {
       base64Data = base64Data.split(',').last;
     }
-    
+
     final bytes = base64Decode(base64Data);
     return MultipartFile.fromBytes(
       bytes,
@@ -218,14 +221,16 @@ class SyncUploadStrategy {
       // Extrair e validar base64Content
       final base64Data = media['base64Content']?.toString();
       if (base64Data == null || base64Data.isEmpty) {
-        throw Exception('Campo base64Content não encontrado para ${log.entityId}');
+        throw Exception(
+            'Campo base64Content não encontrado para ${log.entityId}');
       }
 
       final (extension, contentType) = _getFileTypeInfo(media);
       final fileName = 'file_${log.entityId}_$i.$extension';
-      
+
       try {
-        final multipartFile = _createMultipartFile(base64Data, fileName, contentType);
+        final multipartFile =
+            _createMultipartFile(base64Data, fileName, contentType);
         formData.files.add(MapEntry('files', multipartFile));
         fileIds.add(log.entityId);
       } catch (e) {
@@ -237,10 +242,9 @@ class SyncUploadStrategy {
     formData.fields.add(MapEntry('fileIds', jsonEncode(fileIds)));
 
     final syncConfig = _getSyncConfig();
-    return await syncConfig.httpPost(syncConfig.fileSyncEndpoint, data: formData);
+    return await syncConfig.httpPost(syncConfig.fileSyncEndpoint,
+        data: formData);
   }
-
-
 
   /// Envia lote de dados regulares usando JSON
   Future<SyncHttpResponse> _sendDataBatch(
@@ -253,7 +257,8 @@ class SyncUploadStrategy {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    return await syncConfig.httpPost(syncConfig.dataSyncEndpoint, data: batchData);
+    return await syncConfig.httpPost(syncConfig.dataSyncEndpoint,
+        data: batchData);
   }
 
   /// Cria entrada de log para envio de dados
@@ -278,7 +283,7 @@ class SyncUploadStrategy {
       'entityType': log.entityType,
       'entityId': log.entityId,
       'operation': log.operation.value,
-      'data': data,
+      'data': jsonEncode(data),
       'createdAt': log.createdAt.toIso8601String(),
     };
   }
@@ -315,7 +320,7 @@ class SyncUploadStrategy {
   /// Sanitiza dados removendo base64Content para logs de erro
   String _sanitizeDataForError(String dataJson) {
     if (dataJson.isEmpty) return '{}';
-    
+
     try {
       final data = jsonDecode(dataJson) as Map<String, dynamic>;
       data.remove('base64Content');
