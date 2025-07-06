@@ -12,7 +12,7 @@ class SyncErrorReportConfig {
     this.maxRetries = 3,
     this.retryDelay = const Duration(seconds: 5),
     this.batchSize = 10,
-    this.includeStackTrace = true,
-    this.includeMetadata = true,
+    this.includeStackTrace = false,
+    this.includeMetadata = false,
   });
 }

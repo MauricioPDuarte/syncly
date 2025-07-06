@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../entities/sync_error.dart';
 import '../entities/sync_error_report_config.dart';
 import '../entities/sync_error_report_result.dart';
@@ -242,52 +240,16 @@ class SyncErrorReporter implements ISyncErrorReporter {
     };
   }
 
-  /// Cria uma entrada de erro sanitizada
+  /// Cria uma entrada de erro simplificada para mobile
   Map<String, dynamic> _createErrorEntry(SyncError error) {
-    final sanitizedMetadata = _sanitizeErrorMetadata(error.metadata);
-
     return {
       'id': error.id,
       'message': error.message,
-      if (_config.includeStackTrace && error.stackTrace != null)
-        'stackTrace': error.stackTrace,
-      if (sanitizedMetadata != null) 'metadata': sanitizedMetadata,
       'timestamp': error.timestamp.toIso8601String(),
       'category': error.category,
       'entityType': error.entityType,
       'entityId': error.entityId,
     };
-  }
-
-  /// Sanitiza metadados do erro removendo dados sensíveis
-  Map<String, dynamic>? _sanitizeErrorMetadata(Map<String, dynamic>? metadata) {
-    if (!_config.includeMetadata || metadata == null) return null;
-
-    final sanitized = Map<String, dynamic>.from(metadata);
-    sanitized.remove('base64Content');
-
-    // Sanitizar originalData se contém JSON
-    if (sanitized.containsKey('originalData')) {
-      sanitized['originalData'] =
-          _sanitizeOriginalData(sanitized['originalData']);
-    }
-
-    return sanitized;
-  }
-
-  /// Sanitiza originalData removendo base64Content
-  String _sanitizeOriginalData(dynamic originalData) {
-    if (originalData is! String || originalData.isEmpty) {
-      return originalData?.toString() ?? '';
-    }
-
-    try {
-      final parsedData = jsonDecode(originalData) as Map<String, dynamic>;
-      parsedData.remove('base64Content');
-      return jsonEncode(parsedData);
-    } catch (e) {
-      return originalData;
-    }
   }
 
   List<List<T>> _createBatches<T>(List<T> items, int batchSize) {
