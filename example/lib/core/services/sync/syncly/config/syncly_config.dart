@@ -52,11 +52,6 @@ class SynclyConfig extends SyncConfig {
   // ========== ESTRATÉGIAS DE DOWNLOAD ==========
 
   @override
-  List<IDownloadStrategy> get downloadStrategies => [];
-
-  // ========== TEMA ==========
-
-  @override
   SyncTheme? get theme => null; // Usa o tema padrão
 
   // ========== CONFIGURAÇÕES DE ROTAS ==========
@@ -257,11 +252,6 @@ class SynclyConfig extends SyncConfig {
 
     // Exemplo: limpar tabelas específicas, resetar contadores, etc.
     debugPrint('Limpando dados locais antes da sincronização...');
-
-    // TODO: Implementar lógica real de limpeza conforme necessidade da aplicação
-    // Exemplo:
-    // await database.delete('todos');
-    // await database.delete('sync_logs');
   }
 
   // ========== CALLBACKS DE SINCRONIZAÇÃO ==========

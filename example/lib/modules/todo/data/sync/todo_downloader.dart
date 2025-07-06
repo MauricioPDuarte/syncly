@@ -27,7 +27,6 @@ class TodoDownloader implements IDownloadStrategy {
       // Acessar o RestClient apenas quando necessário
       final client = restClient;
 
-      print('AQUI');
       print(client.timeout);
 
       // Simular download de dados do servidor

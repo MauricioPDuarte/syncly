@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:syncly/core/interfaces/i_sync_error_reporter.dart';
+
 import 'core/interfaces/i_logger_provider.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,7 +14,6 @@ import 'core/enums/sync_status.dart';
 import 'core/interfaces/i_sync_service.dart';
 import 'core/services/sync_connectivity_service.dart';
 import 'core/services/sync_error_manager.dart';
-import 'core/services/sync_error_reporter.dart';
 import 'core/services/sync_notification_service.dart';
 import 'core/utils/sync_utils.dart';
 import 'strategies/sync_download_strategy.dart';

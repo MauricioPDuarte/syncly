@@ -18,6 +18,8 @@ import '../sync_config.dart';
 /// - Gerenciar retry e logs de erro
 /// - Processar uploads de arquivos com FormData
 class SyncUploadStrategy {
+  static const String _tag = 'SyncUploadStrategy';
+  
   final ILoggerProvider _syncLogger;
   final ISyncErrorManager _errorManager;
 
@@ -27,183 +29,180 @@ class SyncUploadStrategy {
   );
 
   /// Obtém o SyncConfig via SyncConfigurator
-  SyncConfig? _getSyncConfig() {
-    return SyncConfigurator.provider;
+  SyncConfig _getSyncConfig() {
+    final config = SyncConfigurator.provider;
+    if (config == null) {
+      throw Exception('SyncConfig não está disponível');
+    }
+    return config;
   }
 
   /// Executa o upload de dados para o servidor
   Future<void> syncUploadData() async {
     try {
-      // Obter todos os logs pendentes ordenados por data de criação
       final allPendingLogs = await _syncLogger.getPendingLogs();
 
       if (allPendingLogs.isEmpty) {
-        SyncUtils.debugLog('Nenhum dado pendente para upload',
-            tag: 'SyncUploadStrategy');
+        SyncUtils.debugLog('Nenhum dado pendente para upload', tag: _tag);
         return;
       }
 
       SyncUtils.debugLog(
-          'Enviando ${allPendingLogs.length} itens pendentes para o servidor',
-          tag: 'SyncUploadStrategy');
+          'Iniciando upload de ${allPendingLogs.length} itens pendentes',
+          tag: _tag);
 
-      // Separar arquivos dos dados
-      final fileLogs =
-          allPendingLogs.where((log) => log.isFileToUpload).toList();
-      final dataLogs =
-          allPendingLogs.where((log) => !log.isFileToUpload).toList();
+      final (fileLogs, dataLogs) = _separateLogsByType(allPendingLogs);
 
-      // Debug: verificar tipos de entidades nos logs de arquivo
-      final mediaLogs =
-          fileLogs.where((log) => log.entityType == 'MEDIA').toList();
-      SyncUtils.debugLog('📁 Total de logs de arquivo: ${fileLogs.length}',
-          tag: 'SyncUploadStrategy');
-      SyncUtils.debugLog('🖼️ Logs de media encontrados: ${mediaLogs.length}',
-          tag: 'SyncUploadStrategy');
-      for (final mediaLog in mediaLogs) {
-        SyncUtils.debugLog(
-            '   - Media ID: ${mediaLog.entityId}, Operation: ${mediaLog.operation.value}',
-            tag: 'SyncUploadStrategy');
-      }
-
-      // Ordenar dados por data de criação
-      dataLogs.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-      SyncUtils.debugLog('Arquivos para upload: ${fileLogs.length}',
-          tag: 'SyncUploadStrategy');
-      SyncUtils.debugLog('Dados para upload: ${dataLogs.length}',
-          tag: 'SyncUploadStrategy');
-
-      // FASE 1: Processar arquivos em lotes
+      // Processar arquivos primeiro, depois dados
       if (fileLogs.isNotEmpty) {
-        SyncUtils.debugLog('=== INICIANDO UPLOAD DE ARQUIVOS ===',
-            tag: 'SyncUploadStrategy');
         await _processBatches(fileLogs, SyncBatchType.files);
-        SyncUtils.debugLog('=== UPLOAD DE ARQUIVOS CONCLUÍDO ===',
-            tag: 'SyncUploadStrategy');
       }
 
-      // FASE 2: Processar dados em lotes (ordenados por data de criação)
       if (dataLogs.isNotEmpty) {
-        SyncUtils.debugLog('=== INICIANDO UPLOAD DE DADOS ===',
-            tag: 'SyncUploadStrategy');
         await _processBatches(dataLogs, SyncBatchType.data);
-        SyncUtils.debugLog('=== UPLOAD DE DADOS CONCLUÍDO ===',
-            tag: 'SyncUploadStrategy');
       }
 
-      SyncUtils.debugLog('Todos os lotes foram processados com sucesso',
-          tag: 'SyncUploadStrategy');
+      SyncUtils.debugLog('Upload concluído com sucesso', tag: _tag);
     } catch (e) {
-      SyncUtils.debugLog('Erro geral no upload de dados: $e',
-          tag: 'SyncUploadStrategy');
+      SyncUtils.debugLog('Erro no upload: $e', tag: _tag);
       rethrow;
     }
+  }
+
+  /// Separa logs por tipo (arquivos vs dados) e ordena dados por data
+  (List<SyncLog>, List<SyncLog>) _separateLogsByType(List<SyncLog> logs) {
+    final fileLogs = logs.where((log) => log.isFileToUpload).toList();
+    final dataLogs = logs.where((log) => !log.isFileToUpload).toList();
+    
+    // Ordenar dados por data de criação
+    dataLogs.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    
+    return (fileLogs, dataLogs);
   }
 
   /// Processa lotes de logs de sincronização
   Future<void> _processBatches(List<SyncLog> logs, SyncBatchType type) async {
     final syncConfig = _getSyncConfig();
-    if (syncConfig == null) {
-      throw Exception('SyncConfig não está disponível');
-    }
-    
-    // Usar configurações de lote do SyncConfig
-    final int batchSize = type == SyncBatchType.files 
-        ? syncConfig.maxFileBatchSize 
+    final batchSize = type == SyncBatchType.files
+        ? syncConfig.maxFileBatchSize
         : syncConfig.maxDataBatchSize;
-    final int totalBatches = (logs.length / batchSize).ceil();
+    final totalBatches = (logs.length / batchSize).ceil();
 
     for (int batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
-      final int startIndex = batchIndex * batchSize;
-      final int endIndex = (startIndex + batchSize < logs.length)
-          ? startIndex + batchSize
-          : logs.length;
-
-      final List<SyncLog> batch = logs.sublist(startIndex, endIndex);
-
-      SyncUtils.debugLog(
-          'Processando lote de ${type.displayName} ${batchIndex + 1}/$totalBatches com ${batch.length} itens',
-          tag: 'SyncUploadStrategy');
+      final batch = _createBatch(logs, batchIndex, batchSize);
 
       try {
-        // Enviar lote completo para o backend
         await _sendBatchToBackend(batch, type);
-
-        // Remover todos os logs do lote após resposta bem-sucedida do back-end
-        for (final log in batch) {
-          await _syncLogger.removeLog(log.syncId);
-          SyncUtils.debugLog(
-              'Log removido após resposta bem-sucedida: ${log.entityType}/${log.operation}',
-              tag: 'SyncUploadStrategy');
-        }
-
-        // Yield para permitir que outras operações sejam executadas
-        await Future.delayed(Duration.zero);
-
-        SyncUtils.debugLog(
-            'Lote de ${type.displayName} ${batchIndex + 1}/$totalBatches processado com sucesso',
-            tag: 'SyncUploadStrategy');
+        await _removeBatchLogs(batch);
+        await Future.delayed(Duration.zero); // Yield para outras operações
       } catch (e) {
-        // Se algum item do lote falhar, registrar erro e parar o processo
-        SyncUtils.debugLog(
-            'Erro no lote de ${type.displayName} ${batchIndex + 1}/$totalBatches: $e',
-            tag: 'SyncUploadStrategy');
-
-        // Registrar erro para todos os logs do lote atual
-        for (final log in batch) {
-          await _registerErrorLog(
-            log: log,
-            error: e,
-            context: {
-              'batchType': type.displayName,
-              'batchIndex': batchIndex + 1,
-              'totalBatches': totalBatches,
-              'batchSize': batch.length,
-              'timestamp': DateTime.now().toIso8601String(),
-            },
-          );
-        }
-
-        // Parar o processo - não processar próximos lotes
-        throw Exception(
-            'Falha no lote de ${type.displayName} ${batchIndex + 1}: $e');
+        await _handleBatchError(batch, e, type, batchIndex + 1, totalBatches);
+        throw Exception('Falha no lote de ${type.displayName} ${batchIndex + 1}: $e');
       }
     }
   }
 
+  /// Cria um lote de logs baseado no índice e tamanho
+  List<SyncLog> _createBatch(List<SyncLog> logs, int batchIndex, int batchSize) {
+    final startIndex = batchIndex * batchSize;
+    final endIndex = (startIndex + batchSize < logs.length)
+        ? startIndex + batchSize
+        : logs.length;
+    return logs.sublist(startIndex, endIndex);
+  }
+
+  /// Remove todos os logs de um lote após sucesso
+  Future<void> _removeBatchLogs(List<SyncLog> batch) async {
+    for (final log in batch) {
+      await _syncLogger.removeLog(log.syncId);
+    }
+  }
+
+  /// Trata erros de lote registrando para todos os logs
+  Future<void> _handleBatchError(
+    List<SyncLog> batch,
+    dynamic error,
+    SyncBatchType type,
+    int batchNumber,
+    int totalBatches,
+  ) async {
+    SyncUtils.debugLog(
+        'Erro no lote ${type.displayName} $batchNumber/$totalBatches: $error',
+        tag: _tag);
+
+    for (final log in batch) {
+      await _registerErrorLog(
+        log: log,
+        error: error,
+        context: {
+          'batchType': type.displayName,
+          'batchIndex': batchNumber,
+          'totalBatches': totalBatches,
+          'batchSize': batch.length,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    }
+  }
+
   /// Envia um lote de logs para o backend
-  ///
-  /// Faz a chamada real para a API de sincronização
   Future<void> _sendBatchToBackend(
       List<SyncLog> batch, SyncBatchType type) async {
-    try {
-      SyncUtils.debugLog(
-          '📤 Enviando lote de ${type.displayName} com ${batch.length} itens para o backend',
-          tag: 'SyncUploadStrategy');
+    final response = type == SyncBatchType.files
+        ? await _sendFileBatch(batch)
+        : await _sendDataBatch(batch, type);
 
-      SyncHttpResponse response;
-
-      if (type == SyncBatchType.files) {
-        // Para arquivos, usar FormData
-        response = await _sendFileBatch(batch);
-      } else {
-        // Para dados regulares, usar JSON
-        response = await _sendDataBatch(batch, type);
-      }
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Erro no servidor: ${response.statusCode} - ${response.data}');
-      }
-
-      SyncUtils.debugLog('✅ Lote de ${type.displayName} enviado com sucesso',
-          tag: 'SyncUploadStrategy');
-    } catch (e) {
-      SyncUtils.debugLog('❌ Erro ao enviar lote de ${type.displayName}: $e',
-          tag: 'SyncUploadStrategy');
-      rethrow;
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Erro no servidor: ${response.statusCode} - ${response.data}');
     }
+  }
+
+  /// Parse seguro de JSON de um log
+  Map<String, dynamic> _parseLogData(SyncLog log) {
+    if (log.dataJson.isEmpty) {
+      throw Exception('dataJson está vazio para log ${log.syncId}');
+    }
+    
+    try {
+      return jsonDecode(log.dataJson) as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Erro ao processar dados do log ${log.syncId}: $e');
+    }
+  }
+
+  /// Determina extensão e tipo de conteúdo baseado no mimeType
+  (String, String) _getFileTypeInfo(Map<String, dynamic> media) {
+    if (!media.containsKey('mimeType') || media['mimeType'] == null) {
+      return ('jpg', 'image/jpeg');
+    }
+    
+    final mimeType = media['mimeType'].toString();
+    if (mimeType.contains('png')) return ('png', 'image/png');
+    if (mimeType.contains('pdf')) return ('pdf', 'application/pdf');
+    if (mimeType.contains('mp4')) return ('mp4', 'video/mp4');
+    if (mimeType.contains('jpeg') || mimeType.contains('jpg')) return ('jpg', 'image/jpeg');
+    
+    return ('jpg', mimeType); // Usar mimeType original como fallback
+  }
+
+  /// Processa base64 e cria MultipartFile
+  MultipartFile _createMultipartFile(
+    String base64Data,
+    String fileName,
+    String contentType,
+  ) {
+    // Remover prefixo data:image/jpeg;base64, se existir
+    if (base64Data.contains(',')) {
+      base64Data = base64Data.split(',').last;
+    }
+    
+    final bytes = base64Decode(base64Data);
+    return MultipartFile.fromBytes(
+      bytes,
+      filename: fileName,
+      contentType: DioMediaType.parse(contentType),
+    );
   }
 
   /// Envia lote de arquivos usando FormData
@@ -214,85 +213,45 @@ class SyncUploadStrategy {
     // Processar cada arquivo do lote
     for (int i = 0; i < batch.length; i++) {
       final log = batch[i];
-      final media = jsonDecode(log.dataJson) as Map<String, dynamic>;
+      final media = _parseLogData(log);
 
-      // Extrair base64Content do campo Media
-      var base64Data = media['base64Content'] as String;
+      // Extrair e validar base64Content
+      final base64Data = media['base64Content']?.toString();
+      if (base64Data == null || base64Data.isEmpty) {
+        throw Exception('Campo base64Content não encontrado para ${log.entityId}');
+      }
 
-      if (base64Data.isNotEmpty) {
-        // Remover prefixo data:image/jpeg;base64, se existir
-        if (base64Data.contains(',')) {
-          base64Data = base64Data.split(',').last;
-        }
-
-        try {
-          // Converter base64 para bytes
-          final bytes = base64Decode(base64Data);
-
-          // Determinar extensão do arquivo e contentType baseado no tipo de mídia
-          String extension = 'jpg';
-          String contentType = 'image/jpeg';
-          if (media.containsKey('mimeType')) {
-            final mimeType = media['mimeType'] as String;
-            if (mimeType.contains('png')) {
-              extension = 'png';
-              contentType = 'image/png';
-            } else if (mimeType.contains('pdf')) {
-              extension = 'pdf';
-              contentType = 'application/pdf';
-            } else if (mimeType.contains('mp4')) {
-              extension = 'mp4';
-              contentType = 'video/mp4';
-            } else if (mimeType.contains('jpeg') || mimeType.contains('jpg')) {
-              extension = 'jpg';
-              contentType = 'image/jpeg';
-            } else {
-              // Usar o mimeType original se disponível
-              contentType = mimeType;
-            }
-          }
-
-          // Criar nome do arquivo
-          final fileName = 'file_${log.entityId}_$i.$extension';
-
-          // Adicionar arquivo ao FormData com contentType correto
-          formData.files.add(MapEntry(
-            'files',
-            MultipartFile.fromBytes(
-              bytes,
-              filename: fileName,
-              contentType: DioMediaType.parse(contentType),
-            ),
-          ));
-
-          // Adicionar ID do arquivo na ordem correta
-          fileIds.add(log.entityId);
-
-          SyncUtils.debugLog(
-              '📎 Arquivo adicionado: $fileName (${bytes.length} bytes)',
-              tag: 'SyncUploadStrategy');
-        } catch (e) {
-          SyncUtils.debugLog(
-              '❌ Erro ao processar base64 do arquivo ${log.entityId}: $e',
-              tag: 'SyncUploadStrategy');
-          throw Exception('Erro ao processar arquivo ${log.entityId}: $e');
-        }
-      } else {
-        SyncUtils.debugLog(
-            '⚠️ Arquivo ${log.entityId} não contém dados base64 válidos',
-            tag: 'SyncUploadStrategy');
-        throw Exception(
-            'Arquivo ${log.entityId} não contém dados base64 válidos');
+      final (extension, contentType) = _getFileTypeInfo(media);
+      final fileName = 'file_${log.entityId}_$i.$extension';
+      
+      try {
+        final multipartFile = _createMultipartFile(base64Data, fileName, contentType);
+        formData.files.add(MapEntry('files', multipartFile));
+        fileIds.add(log.entityId);
+      } catch (e) {
+        throw Exception('Erro ao processar arquivo ${log.entityId}: $e');
       }
     }
 
-    // Adicionar array de IDs dos arquivos na ordem correta
+    // Adicionar metadados ao FormData
     formData.fields.add(MapEntry('fileIds', jsonEncode(fileIds)));
+    formData.fields.add(MapEntry('logs', jsonEncode(_createLogsMetadata(batch))));
 
-    // Adicionar informações dos logs (sem o conteúdo base64)
-    final logsMetadata = batch.map((log) {
-      final media = jsonDecode(log.dataJson) as Map<String, dynamic>;
-      // Remover campo base64Content para evitar duplicação
+    final syncConfig = _getSyncConfig();
+    return await syncConfig.httpPost(syncConfig.fileSyncEndpoint, data: formData);
+  }
+
+  /// Cria metadados dos logs sem base64Content
+  List<Map<String, dynamic>> _createLogsMetadata(List<SyncLog> batch) {
+    return batch.map((log) {
+      Map<String, dynamic> media;
+      try {
+        media = log.dataJson.isEmpty ? {} : _parseLogData(log);
+      } catch (e) {
+        media = {}; // Usar mapa vazio em caso de erro
+      }
+
+      // Remover base64Content para evitar duplicação
       media.remove('base64Content');
 
       return {
@@ -302,22 +261,6 @@ class SyncUploadStrategy {
         'createdAt': log.createdAt.toIso8601String(),
       };
     }).toList();
-
-    formData.fields.add(MapEntry('logs', jsonEncode(logsMetadata)));
-
-    SyncUtils.debugLog(
-        '📤 Enviando FormData com ${formData.files.length} arquivos e ${fileIds.length} IDs',
-        tag: 'SyncUploadStrategy');
-
-    // Obter URL do endpoint de arquivos do provider
-    final provider = _getSyncConfig();
-    if (provider == null) {
-      throw Exception('SyncConfig não está disponível');
-    }
-
-    final fileSyncUrl = provider.fileSyncEndpoint;
-
-    return await provider.httpPost(fileSyncUrl, data: formData);
   }
 
   /// Envia lote de dados regulares usando JSON
@@ -327,27 +270,38 @@ class SyncUploadStrategy {
 
     final batchData = {
       'type': type.displayName,
-      'logs': batch
-          .map((log) => {
-                'syncId': log.syncId,
-                'entityType': log.entityType,
-                'entityId': log.entityId,
-                'operation': log.operation.value,
-                'data': log.dataJson,
-                'createdAt': log.createdAt.toIso8601String(),
-              })
-          .toList(),
+      'logs': batch.map((log) => _createDataLogEntry(log)).toList(),
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    if (syncConfig == null) {
-      throw Exception('SyncConfig não está disponível');
+    return await syncConfig.httpPost(syncConfig.dataSyncEndpoint, data: batchData);
+  }
+
+  /// Cria entrada de log para envio de dados
+  Map<String, dynamic> _createDataLogEntry(SyncLog log) {
+    dynamic data;
+    try {
+      if (log.dataJson.isEmpty) {
+        data = {};
+      } else {
+        data = _parseLogData(log);
+        // Remover base64Content para evitar envio desnecessário
+        if (data is Map<String, dynamic>) {
+          data.remove('base64Content');
+        }
+      }
+    } catch (e) {
+      data = {}; // Usar objeto vazio em caso de erro
     }
 
-    // Obter URL do endpoint de dados do provider
-    final dataSyncUrl = syncConfig.dataSyncEndpoint;
-
-    return await syncConfig.httpPost(dataSyncUrl, data: batchData);
+    return {
+      'syncId': log.syncId,
+      'entityType': log.entityType,
+      'entityId': log.entityId,
+      'operation': log.operation.value,
+      'data': data,
+      'createdAt': log.createdAt.toIso8601String(),
+    };
   }
 
   /// Registra um log de erro para um log de sincronização específico
@@ -357,29 +311,38 @@ class SyncUploadStrategy {
     required Map<String, dynamic> context,
   }) async {
     try {
-      // Usar o SyncErrorManager para registrar o erro
+      final sanitizedDataJson = _sanitizeDataForError(log.dataJson);
+
       await _errorManager.logError(
         message: error.toString(),
         stackTrace: error is Exception ? error.toString() : null,
         metadata: {
           'syncLogId': log.syncId,
-          'originalData': log.dataJson,
+          'originalData': sanitizedDataJson,
           'context': context,
         },
-        category: 'SyncUploadStrategy',
+        category: _tag,
         entityType: log.entityType,
         entityId: log.entityId,
       );
 
-      // Incrementar contador de tentativas e definir último erro
       await _syncLogger.incrementRetryCount(log.syncId);
       await _syncLogger.setLastError(log.syncId, error.toString());
-
-      SyncUtils.debugLog('Erro registrado para log ${log.syncId}: $error',
-          tag: 'SyncUploadStrategy');
     } catch (e) {
-      SyncUtils.debugLog('❌ Erro ao registrar log de erro: $e',
-          tag: 'SyncUploadStrategy');
+      SyncUtils.debugLog('Erro ao registrar log de erro: $e', tag: _tag);
+    }
+  }
+
+  /// Sanitiza dados removendo base64Content para logs de erro
+  String _sanitizeDataForError(String dataJson) {
+    if (dataJson.isEmpty) return '{}';
+    
+    try {
+      final data = jsonDecode(dataJson) as Map<String, dynamic>;
+      data.remove('base64Content');
+      return jsonEncode(data);
+    } catch (e) {
+      return '{"error": "Dados não puderam ser processados"}';
     }
   }
 }

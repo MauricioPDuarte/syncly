@@ -1,29 +1,29 @@
 /// Sistema de Sincronização Syncly
-/// 
+///
 /// Sistema centralizado e simplificado para sincronização de dados.
-/// 
+///
 /// ## Uso Básico
-/// 
+///
 /// 1. Implemente uma classe que estende [SyncConfig]
 /// 2. Inicialize com [SyncConfigurator.initialize]
 /// 3. Use [SyncConfigurator.syncService] para acessar funcionalidades
-/// 
+///
 /// ```dart
 /// // 1. Implementar provider
 /// class MySyncConfig extends SyncConfig {
 ///   // implementar métodos obrigatórios
 /// }
-/// 
+///
 /// // 2. Inicializar
 /// await SyncConfigurator.initialize(
 ///   provider: MySyncConfig(),
 /// );
-/// 
+///
 /// // 3. Usar
 /// final syncService = SyncConfigurator.syncService;
 /// await syncService.startSync();
 /// ```
-/// 
+///
 /// Veja [README.md] para documentação completa.
 library sync;
 
@@ -44,7 +44,8 @@ export 'sync_initializer.dart' show SyncInitializer;
 export 'core/interfaces/i_sync_service.dart' show ISyncService;
 
 /// Interface para estratégias de download personalizadas
-export 'core/interfaces/i_download_strategy.dart' show IDownloadStrategy, DownloadResult;
+export 'core/interfaces/i_download_strategy.dart'
+    show IDownloadStrategy, DownloadResult;
 
 // ========== ENTIDADES E MODELOS ==========
 
@@ -59,7 +60,6 @@ export 'core/enums/sync_operation.dart' show SyncOperation;
 export 'core/enums/sync_status.dart' show SyncStatus;
 
 /// Contratos e interfaces de modelo
-
 
 /// Interfaces de storage
 export 'core/interfaces/i_storage_provider.dart' show IStorageProvider;
@@ -81,7 +81,8 @@ export 'core/utils/sync_utils.dart' show SyncUtils;
 export 'core/presentation/widgets/sync_indicator.dart' show SyncIndicator;
 
 /// Bottom sheet com detalhes de sincronização
-export 'core/presentation/widgets/sync_details_bottom_sheet.dart' show SyncDetailsBottomSheet;
+export 'core/presentation/widgets/sync_details_bottom_sheet.dart'
+    show SyncDetailsBottomSheet;
 
 // ========== CONSTANTES E CONFIGURAÇÕES ==========
 

@@ -29,7 +29,7 @@ class SyncLogManager implements ISyncLogManager {
         entityType: log.entityType,
         entityId: log.entityId,
         operation: log.operation,
-        dataJson: jsonEncode(log.dataJson),
+        dataJson: log.dataJson,
         isFileToUpload: log.isFileToUpload,
         isSynced: false,
         retryCount: 0,

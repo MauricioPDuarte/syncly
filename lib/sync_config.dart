@@ -1,6 +1,7 @@
+import 'package:syncly/core/entities/sync_error_report_config.dart';
+
 import 'core/theme/sync_theme.dart';
 import 'core/entities/sync_http_response.dart';
-import 'core/services/sync_error_reporter.dart';
 import 'dart:typed_data';
 
 /// Configuração centralizada para o sistema de sincronização
