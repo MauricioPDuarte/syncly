@@ -13,23 +13,32 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Suporte a GetIt**: Integração nativa com GetIt via `strategyResolver`
 - **Lazy Loading**: Estratégias de download são resolvidas apenas quando necessário
 - **Typedef StrategyResolver**: Novo tipo `StrategyResolver = List<IDownloadStrategy> Function()` para callbacks de resolução
+- **Endpoint de Erros Configurável**: Adicionado `errorReportingEndpoint` ao `SyncConfig` para configuração personalizada
+- **Getter errorReportConfig**: Novo método getter no `SyncConfig` para configuração completa do sistema de envio de erros
 
 ### 🔄 Modificado
 - **SyncInitializer.initialize()**: Adicionado parâmetro opcional `strategyResolver`
 - **SyncConfigurator.initialize()**: Adicionado suporte ao `StrategyResolver`
 - **Registro de Dependências**: Modificado para usar callback de resolução quando fornecido
+- **SyncConfigurator**: Atualizado para usar `errorReportConfig` completo do provider ao invés de endpoint fixo
+- **SyncConfig**: Adicionado import de `SyncErrorReportConfig` para suporte ao novo getter
 
 ### 🛠️ Melhorado
 - **Ordem de Inicialização**: Resolve problemas de dependências não registradas durante inicialização
 - **Flexibilidade**: Funciona com qualquer sistema de injeção de dependência
 - **Compatibilidade**: Mantém total compatibilidade com versões anteriores
 - **Arquitetura**: Melhor separação entre inicialização do Syncly e sistemas de DI
+- **Configuração de Erros**: Sistema de envio de erros agora totalmente configurável via `SyncConfig`
+- **Flexibilidade de Endpoints**: Endpoints de erro podem ser personalizados por projeto
 
 ### 📚 Documentação
 - Atualizado README.md com exemplos de uso do `StrategyResolver`
 - Atualizada documentação HTML com nova funcionalidade
 - Adicionados exemplos de integração com Modular e GetIt
 - Documentadas as três opções de configuração de estratégias
+- Adicionada seção "Configuração de Endpoints" no README.md
+- Atualizada documentação HTML com exemplos de configuração de `errorReportingEndpoint`
+- Documentado o novo getter `errorReportConfig` no `SyncConfig`
 
 ### 🔧 Correções
 - **TodoDownloader**: Implementado lazy loading para `RestClient` via getter

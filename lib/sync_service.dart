@@ -192,6 +192,7 @@ class SyncService implements ISyncService {
       _currentSyncOperation = null;
 
       await _syncLogger.clearAllLogs();
+      await _errorManager.clearAllErrors();
       _updateSyncStatus(
         SyncStatus.idle,
         'Estado de sincronização resetado.',

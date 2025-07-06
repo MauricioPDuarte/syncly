@@ -1,6 +1,6 @@
-import 'core/interfaces/i_download_strategy.dart';
 import 'core/theme/sync_theme.dart';
 import 'core/entities/sync_http_response.dart';
+import 'core/services/sync_error_reporter.dart';
 import 'dart:typed_data';
 
 /// Configuração centralizada para o sistema de sincronização
@@ -159,14 +159,19 @@ abstract class SyncConfig {
 
   // ========== MÉTODOS OPCIONAIS - CONFIGURAÇÕES AVANÇADAS ==========
 
-  /// URL base para endpoints de sincronização
-  String? get baseUrl => null;
-
   /// Endpoint para sincronização de dados
   String get dataSyncEndpoint => '/sync/batch';
 
   /// Endpoint para sincronização de arquivos
   String get fileSyncEndpoint => '/sync/files';
+
+  /// Endpoint para envio de erros
+  String get errorReportingEndpoint => '/errors';
+
+  /// Configuração completa para envio de erros
+  SyncErrorReportConfig get errorReportConfig => SyncErrorReportConfig(
+        endpoint: errorReportingEndpoint,
+      );
 
   /// Headers padrão para todas as requisições
   Map<String, String> get defaultHeaders => {

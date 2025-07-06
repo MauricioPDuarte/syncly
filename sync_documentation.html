@@ -420,7 +420,6 @@
                             <ul class="text-pink-600 text-xs space-y-1">
                                 <li>• <code>isAuthenticated()</code></li>
                                 <li>• <code>getAuthToken()</code></li>
-                                <li>• <code>getAuthHeaders()</code></li>
                             </ul>
                         </div>
 
@@ -598,7 +597,8 @@ final syncService = SyncConfigurator.syncService;</code></pre>
 
                         <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
                             <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download Flexíveis</h4>
-                            <p class="text-green-600 text-sm mb-2">Múltiplas opções para configurar estratégias de download:</p>
+                            <p class="text-green-600 text-sm mb-2">Múltiplas opções para configurar estratégias de
+                                download:</p>
                             <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
                                 <pre><code>// Opção 1: Estratégias definidas no SyncConfig (padrão)
 class MySyncConfig extends SyncConfig {
@@ -1165,24 +1165,9 @@ class AppSyncConfig implements SyncConfig {
     return token != null && token.isNotEmpty;
   }
   
-  @override
-  Future<String?> getAuthToken() async {
-    // Implementar lógica para obter token
-    // Exemplo usando SharedPreferences:
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
-  }
+
   
-  @override
-  Future<Map<String, String>> getAuthHeaders() async {
-    final token = await getAuthToken();
-    if (token != null) {
-      return {
-        'Authorization': 'Bearer $token',
-      };
-    }
-    return {};
-  }
+
   
   @override
   Future<String?> getCurrentUserId() async {
@@ -1202,13 +1187,15 @@ class AppSyncConfig implements SyncConfig {
                     <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mb-4">
                         <h4 class="font-semibold text-green-700 mb-2">🎉 Novidade v0.1.0: Sistema Interno</h4>
                         <p class="text-green-600 text-sm">
-                            O sistema de notificações agora é <strong>totalmente gerenciado internamente</strong> pelo Syncly!
+                            O sistema de notificações agora é <strong>totalmente gerenciado internamente</strong> pelo
+                            Syncly!
                             Não é mais necessário implementar métodos de notificação.
                         </p>
                     </div>
 
                     <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">✅ <strong>Configuração Simplificada</strong> - Apenas uma propriedade:</p>
+                        <p class="text-sm text-gray-600 mb-3">✅ <strong>Configuração Simplificada</strong> - Apenas uma
+                            propriedade:</p>
                         <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>  // ========== NOTIFICAÇÕES SIMPLIFICADAS ==========
   @override
   bool get enableNotifications => true; // Só isso é necessário!
@@ -1717,11 +1704,11 @@ void _setupSyncMonitoring() {
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <pre class="text-sm text-gray-700"><code>class MySyncConfig extends SyncConfig {
   @override
-  String get errorReportingEndpoint => '$baseUrl/api/errors';
+  String get errorReportingEndpoint => '/api/errors';
   
   @override
-  SyncErrorReportConfig get errorReportConfig => const SyncErrorReportConfig(
-    endpoint: '$baseUrl/api/errors',
+  SyncErrorReportConfig get errorReportConfig => SyncErrorReportConfig(
+    endpoint: errorReportingEndpoint,
     maxRetries: 3,
     retryDelay: Duration(seconds: 5),
     batchSize: 10,

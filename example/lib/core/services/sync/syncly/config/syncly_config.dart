@@ -64,12 +64,13 @@ class SynclyConfig extends SyncConfig {
   @override
   String get dataSyncEndpoint => '/api/sync/logs';
 
-  /// Endpoint para envio de logs de erro
-  String get errorLogsEndpoint => '/api/sync/error-logs';
-
   /// Endpoint para sincronização de arquivos
   @override
   String get fileSyncEndpoint => '/api/sync/files';
+
+  /// Endpoint para envio de erros
+  @override
+  String get errorReportingEndpoint => '/api/sync/errors';
   // ========== IMPLEMENTAÇÃO HTTP ==========
 
   @override
@@ -84,7 +85,7 @@ class SynclyConfig extends SyncConfig {
         url,
         queryParameters: queryParameters,
         headers: headers?.cast<String, String>(),
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);
@@ -106,7 +107,7 @@ class SynclyConfig extends SyncConfig {
         url,
         data as Map<String, dynamic>? ?? {},
         headers: headers?.cast<String, String>(),
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);
@@ -128,7 +129,7 @@ class SynclyConfig extends SyncConfig {
         url,
         data as Map<String, dynamic>? ?? {},
         headers: headers?.cast<String, String>(),
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);
@@ -148,7 +149,7 @@ class SynclyConfig extends SyncConfig {
       final response = await restClient.delete(
         url,
         headers: headers?.cast<String, String>(),
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);
@@ -170,7 +171,7 @@ class SynclyConfig extends SyncConfig {
         url,
         data as Map<String, dynamic>? ?? {},
         headers: headers?.cast<String, String>(),
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);
@@ -192,7 +193,7 @@ class SynclyConfig extends SyncConfig {
         url,
         headers: headers?.cast<String, String>(),
         onProgress: onProgress,
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<Uint8List>(response);
@@ -219,7 +220,7 @@ class SynclyConfig extends SyncConfig {
         fields: fields,
         headers: headers?.cast<String, String>(),
         onProgress: onProgress,
-        timeout: timeout,
+        timeout: timeout ?? networkTimeout,
       );
 
       return _buildSyncHttpResponse<T>(response);

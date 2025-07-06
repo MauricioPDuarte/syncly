@@ -120,7 +120,7 @@ class SyncConfigurator {
 
   /// Registra todas as dependências no GetIt
   static void _registerDependencies(
-      SyncConfig provider, 
+      SyncConfig provider,
       List<IDownloadStrategy>? downloadStrategies,
       StrategyResolver? strategyResolver) {
     final getIt = GetIt.instance;
@@ -177,9 +177,7 @@ class SyncConfigurator {
     getIt.registerLazySingleton<ISyncErrorReporter>(() => SyncErrorReporter(
           getIt.get<ISyncErrorManager>(),
           getIt.get<ISyncLoggerDebugProvider>(),
-          SyncErrorReportConfig(
-            endpoint: '${provider.baseUrl ?? ''}/errors',
-          ),
+          provider.errorReportConfig,
           provider,
         ));
 
@@ -219,7 +217,6 @@ class SyncConfigurator {
       'networkTimeout': _provider!.networkTimeout.inSeconds,
       'maxDataBatchSize': _provider!.maxDataBatchSize,
       'maxFileBatchSize': _provider!.maxFileBatchSize,
-      'baseUrl': _provider!.baseUrl,
       'dataSyncEndpoint': _provider!.dataSyncEndpoint,
       'fileSyncEndpoint': _provider!.fileSyncEndpoint,
     };

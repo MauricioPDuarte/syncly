@@ -18,8 +18,9 @@ class SynclyService implements AppSyncService {
   ISyncService get _service {
     if (!_isInitialized) {
       _syncService = ISyncService.getInstance();
-      _appSyncData = ValueNotifier(_convertToAppSyncData(_syncService!.syncData.value));
-      
+      _appSyncData =
+          ValueNotifier(_convertToAppSyncData(_syncService!.syncData.value));
+
       // Escutar mudanças no syncData original e converter para AppSyncData
       _syncService!.syncData.addListener(_onSyncDataChanged);
       _isInitialized = true;
@@ -112,7 +113,11 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logCreate({required String entityType, required String entityId, required Map<String, dynamic> data,}) {
+  Future<void> logCreate({
+    required String entityType,
+    required String entityId,
+    required Map<String, dynamic> data,
+  }) {
     return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -122,7 +127,10 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logUpdate({required String entityType, required String entityId, required Map<String, dynamic> data}) {
+  Future<void> logUpdate(
+      {required String entityType,
+      required String entityId,
+      required Map<String, dynamic> data}) {
     return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -132,7 +140,8 @@ class SynclyService implements AppSyncService {
   }
 
   @override
-  Future<void> logDelete({required String entityType, required String entityId}) {
+  Future<void> logDelete(
+      {required String entityType, required String entityId}) {
     return _service.addToSyncQueue(
       entityType: entityType,
       entityId: entityId,
@@ -140,5 +149,4 @@ class SynclyService implements AppSyncService {
       data: {},
     );
   }
-
 }

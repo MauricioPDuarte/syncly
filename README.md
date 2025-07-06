@@ -211,6 +211,32 @@ class MeuSyncConfig extends SyncConfig {
 }
 ```
 
+### Configuração de Endpoints
+
+```dart
+class MeuSyncConfig extends SyncConfig {
+  @override
+  String get baseUrl => 'https://api.meuapp.com';
+  
+  @override
+  String get dataSyncEndpoint => '/api/sync/data';
+  
+  @override
+  String get fileSyncEndpoint => '/api/sync/files';
+  
+  @override
+  String get errorReportingEndpoint => '/api/sync/errors';
+  
+  @override
+  SyncErrorReportConfig get errorReportConfig => SyncErrorReportConfig(
+    endpoint: errorReportingEndpoint,
+    maxRetries: 3,
+    retryDelay: Duration(seconds: 5),
+    batchSize: 10,
+  );
+}
+```
+
 ### Configurações de Tempo e Comportamento
 
 ```dart
@@ -253,21 +279,8 @@ class MeuSyncConfig extends SyncConfig {
     final token = await getAuthToken();
     return token != null && token.isNotEmpty;
   }
-  
-  @override
-  Future<String?> getAuthToken() async {
-    // Implementar recuperação do token
-    return await SecureStorage.getToken();
-  }
-  
-  @override
-  Future<Map<String, String>> getAuthHeaders() async {
-    final token = await getAuthToken();
-    if (token != null) {
-      return {'Authorization': 'Bearer $token'};
-    }
-    return {};
-  }
+
+
   
   @override
   Future<String?> getCurrentUserId() async {

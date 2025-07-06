@@ -103,7 +103,15 @@ class SyncUploadStrategy {
 
   /// Processa lotes de logs de sincronização
   Future<void> _processBatches(List<SyncLog> logs, SyncBatchType type) async {
-    const int batchSize = 10; // Reduzido para lotes menores
+    final syncConfig = _getSyncConfig();
+    if (syncConfig == null) {
+      throw Exception('SyncConfig não está disponível');
+    }
+    
+    // Usar configurações de lote do SyncConfig
+    final int batchSize = type == SyncBatchType.files 
+        ? syncConfig.maxFileBatchSize 
+        : syncConfig.maxDataBatchSize;
     final int totalBatches = (logs.length / batchSize).ceil();
 
     for (int batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
