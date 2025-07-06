@@ -710,13 +710,13 @@ class SyncService implements ISyncService {
       required Map<String, dynamic> data,
       bool isFileToUpload = false}) async {
     try {
-      await addToSyncQueue(
+      await _syncLogger.logCreate(
         entityType: entityType,
         entityId: entityId,
-        operation: SyncOperation.create,
         data: data,
         isFileToUpload: isFileToUpload,
       );
+      await _updatePendingItemsCount();
 
       _log('info', 'Operação CREATE registrada para sincronização', metadata: {
         'entityType': entityType,
@@ -773,12 +773,12 @@ class SyncService implements ISyncService {
       required String entityId,
       required Map<String, dynamic> data}) async {
     try {
-      await addToSyncQueue(
+      await _syncLogger.logDelete(
         entityType: entityType,
         entityId: entityId,
-        operation: SyncOperation.delete,
         data: data,
       );
+      await _updatePendingItemsCount();
 
       _log('info', 'Operação DELETE registrada para sincronização', metadata: {
         'entityType': entityType,
@@ -800,13 +800,13 @@ class SyncService implements ISyncService {
       required Map<String, dynamic> data,
       bool isFileToUpload = false}) async {
     try {
-      await addToSyncQueue(
+      await _syncLogger.logUpdate(
         entityType: entityType,
         entityId: entityId,
-        operation: SyncOperation.update,
         data: data,
         isFileToUpload: isFileToUpload,
       );
+      await _updatePendingItemsCount();
 
       _log('info', 'Operação UPDATE registrada para sincronização', metadata: {
         'entityType': entityType,

@@ -4,7 +4,6 @@ import '../interfaces/i_sync_log_manager.dart';
 import '../enums/sync_operation.dart';
 import '../interfaces/i_logger_debug_provider.dart';
 import '../interfaces/i_logger_provider.dart';
-import '../contracts/sync_model_syncable.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 
@@ -25,14 +24,19 @@ class LoggerProvider implements ILoggerProvider {
   ISyncLogManager get logManager => _logStorage;
 
   @override
-  Future<void> logCreate<T extends SyncModelSyncable>(T entity) async {
+  Future<void> logCreate({
+    required String entityType,
+    required String entityId,
+    required Map<String, dynamic> data,
+    bool isFileToUpload = false,
+  }) async {
     final log = SyncLog(
       syncId: const Uuid().v4(),
-      entityType: entity.runtimeType.toString(),
-      entityId: entity.id,
+      entityType: entityType,
+      entityId: entityId,
       operation: SyncOperation.create,
-      dataJson: jsonEncode(entity.toJson()),
-      isFileToUpload: entity.isMediaEntity,
+      dataJson: jsonEncode(data),
+      isFileToUpload: isFileToUpload,
       isSynced: false,
       retryCount: 0,
       createdAt: DateTime.now(),
@@ -40,25 +44,30 @@ class LoggerProvider implements ILoggerProvider {
     await _logStorage.createLog(log);
 
     _loggerDebugProvider?.info(
-      'Entity created: ${entity.runtimeType} [${entity.id}]',
+      'Entity created: $entityType [$entityId]',
       category: 'sync_logger',
       tag: 'create',
       metadata: {
-        'entityType': entity.runtimeType.toString(),
-        'entityId': entity.id
+        'entityType': entityType,
+        'entityId': entityId
       },
     );
   }
 
   @override
-  Future<void> logUpdate<T extends SyncModelSyncable>(T entity) async {
+  Future<void> logUpdate({
+    required String entityType,
+    required String entityId,
+    required Map<String, dynamic> data,
+    bool isFileToUpload = false,
+  }) async {
     final log = SyncLog(
       syncId: const Uuid().v4(),
-      entityType: entity.runtimeType.toString(),
-      entityId: entity.id,
+      entityType: entityType,
+      entityId: entityId,
       operation: SyncOperation.update,
-      dataJson: jsonEncode(entity.toJson()),
-      isFileToUpload: entity.isMediaEntity,
+      dataJson: jsonEncode(data),
+      isFileToUpload: isFileToUpload,
       isSynced: false,
       retryCount: 0,
       createdAt: DateTime.now(),
@@ -66,25 +75,29 @@ class LoggerProvider implements ILoggerProvider {
     await _logStorage.createLog(log);
 
     _loggerDebugProvider?.info(
-      'Entity updated: ${entity.runtimeType} [${entity.id}]',
+      'Entity updated: $entityType [$entityId]',
       category: 'sync_logger',
       tag: 'update',
       metadata: {
-        'entityType': entity.runtimeType.toString(),
-        'entityId': entity.id
+        'entityType': entityType,
+        'entityId': entityId
       },
     );
   }
 
   @override
-  Future<void> logDelete<T extends SyncModelSyncable>(T entity) async {
+  Future<void> logDelete({
+    required String entityType,
+    required String entityId,
+    required Map<String, dynamic> data,
+  }) async {
     final log = SyncLog(
       syncId: const Uuid().v4(),
-      entityType: entity.runtimeType.toString(),
-      entityId: entity.id,
+      entityType: entityType,
+      entityId: entityId,
       operation: SyncOperation.delete,
-      dataJson: jsonEncode(entity.toJson()),
-      isFileToUpload: entity.isMediaEntity,
+      dataJson: jsonEncode(data),
+      isFileToUpload: false,
       isSynced: false,
       retryCount: 0,
       createdAt: DateTime.now(),
@@ -92,12 +105,12 @@ class LoggerProvider implements ILoggerProvider {
     await _logStorage.createLog(log);
 
     _loggerDebugProvider?.info(
-      'Entity deleted: ${entity.runtimeType} [${entity.id}]',
+      'Entity deleted: $entityType [$entityId]',
       category: 'sync_logger',
       tag: 'delete',
       metadata: {
-        'entityType': entity.runtimeType.toString(),
-        'entityId': entity.id
+        'entityType': entityType,
+        'entityId': entityId
       },
     );
   }
@@ -136,18 +149,20 @@ class LoggerProvider implements ILoggerProvider {
   }
 
   @override
-  Future<void> logBatch<T extends SyncModelSyncable>(
-    List<T> entities,
-    SyncOperation operation, {
+  Future<void> logBatch({
+    required String entityType,
+    required List<String> entityIds,
+    required List<Map<String, dynamic>> dataList,
+    required SyncOperation operation,
     bool isFileToUpload = false,
   }) async {
-    for (final entity in entities) {
+    for (int i = 0; i < entityIds.length; i++) {
       final log = SyncLog(
         syncId: const Uuid().v4(),
-        entityType: entity.runtimeType.toString(),
-        entityId: entity.id,
+        entityType: entityType,
+        entityId: entityIds[i],
         operation: operation,
-        dataJson: jsonEncode(entity.toJson()),
+        dataJson: jsonEncode(dataList[i]),
         isFileToUpload: isFileToUpload,
         isSynced: false,
         retryCount: 0,
@@ -157,11 +172,11 @@ class LoggerProvider implements ILoggerProvider {
     }
 
     _loggerDebugProvider?.info(
-      'Batch of ${entities.length} logs registered - ${operation.value}',
+      'Batch of ${entityIds.length} logs registered - ${operation.value}',
       category: 'sync_logger',
       tag: 'batch',
       metadata: {
-        'count': entities.length,
+        'count': entityIds.length,
         'operation': operation.value,
         'isFileToUpload': isFileToUpload,
       },

@@ -59,7 +59,7 @@ export 'core/enums/sync_operation.dart' show SyncOperation;
 export 'core/enums/sync_status.dart' show SyncStatus;
 
 /// Contratos e interfaces de modelo
-export 'core/contracts/sync_model_syncable.dart' show SyncModelSyncable;
+
 
 /// Interfaces de storage
 export 'core/interfaces/i_storage_provider.dart' show IStorageProvider;

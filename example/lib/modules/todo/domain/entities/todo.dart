@@ -1,28 +1,23 @@
 import 'package:syncly/sync.dart';
 import 'package:uuid/uuid.dart';
 
-class Todo implements SyncModelSyncable {
-  @override
+class Todo {
   final String id;
   
   final String title;
   final String description;
   final bool isCompleted;
   
-  @override
   final DateTime createdAt;
   
-  @override
   final DateTime updatedAt;
   
   final DateTime? lastSyncAt;
   final bool needsSync;
   final SyncOperation pendingOperation;
   
-  @override
   String get entityType => 'todo';
   
-  @override
   bool get isMediaEntity => false;
 
   Todo({
@@ -63,7 +58,6 @@ class Todo implements SyncModelSyncable {
     );
   }
 
-  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
