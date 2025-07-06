@@ -130,11 +130,11 @@ class SyncUploadStrategy {
         // Enviar lote completo para o backend
         await _sendBatchToBackend(batch, type);
 
-        // Excluir todos os logs do lote após sincronização bem-sucedida
+        // Remover todos os logs do lote após resposta bem-sucedida do back-end
         for (final log in batch) {
           await _syncLogger.removeLog(log.syncId);
           SyncUtils.debugLog(
-              'Log excluído após sincronização: ${log.entityType}/${log.operation}',
+              'Log removido após resposta bem-sucedida: ${log.entityType}/${log.operation}',
               tag: 'SyncUploadStrategy');
         }
 
