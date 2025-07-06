@@ -1,3 +1,5 @@
+import 'package:syncly/core/interfaces/i_sync_error_reporter.dart';
+
 import 'core/interfaces/i_sync_log_manager.dart';
 import 'core/services/sync_log_manager.dart';
 import 'package:get_it/get_it.dart';

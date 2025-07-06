@@ -11,7 +11,7 @@ import 'sync_error_manager.dart';
 /// Implementação do serviço de envio de erros para o backend
 class SyncErrorReporter implements ISyncErrorReporter {
   static const String _tag = 'SyncErrorReporter';
-  
+
   final ISyncErrorManager _errorManager;
   final ISyncLoggerDebugProvider? _loggerProvider;
   final SyncErrorReportConfig _config;
@@ -36,7 +36,8 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
       return await sendErrors(pendingErrors);
     } catch (e) {
-      _loggerProvider?.error('Failed to send pending errors: $e', category: _tag, exception: e);
+      _loggerProvider?.error('Failed to send pending errors: $e',
+          category: _tag, exception: e);
       return SyncErrorReportResult.failure(
         errorIds: const [],
         errorMessage: e.toString(),
@@ -70,7 +71,8 @@ class SyncErrorReporter implements ISyncErrorReporter {
       await _markErrorsAsSent(sentErrorIds);
 
       final success = failedErrorIds.isEmpty;
-      _logErrorReportingResult(sentErrorIds.length, failedErrorIds.length, success);
+      _logErrorReportingResult(
+          sentErrorIds.length, failedErrorIds.length, success);
 
       return SyncErrorReportResult(
         success: success,
@@ -80,7 +82,8 @@ class SyncErrorReporter implements ISyncErrorReporter {
         failedErrorIds: failedErrorIds,
       );
     } catch (e) {
-      _loggerProvider?.error('Failed to send errors: $e', category: _tag, exception: e);
+      _loggerProvider?.error('Failed to send errors: $e',
+          category: _tag, exception: e);
       return SyncErrorReportResult.failure(
         errorIds: errors.map((e) => e.id).toList(),
         errorMessage: e.toString(),
@@ -93,19 +96,23 @@ class SyncErrorReporter implements ISyncErrorReporter {
   Future<void> scheduleErrorReporting() async {
     try {
       await sendPendingErrors();
-      _loggerProvider?.info('Error reporting scheduled and executed', category: _tag);
+      _loggerProvider?.info('Error reporting scheduled and executed',
+          category: _tag);
     } catch (e) {
-      _loggerProvider?.error('Failed to schedule error reporting: $e', category: _tag, exception: e);
+      _loggerProvider?.error('Failed to schedule error reporting: $e',
+          category: _tag, exception: e);
     }
   }
 
   // Métodos privados
 
   /// Verifica se o usuário está autenticado
-  Future<SyncErrorReportResult?> _checkAuthentication(List<SyncError> errors) async {
+  Future<SyncErrorReportResult?> _checkAuthentication(
+      List<SyncError> errors) async {
     final isAuthenticated = await _syncConfig.isAuthenticated();
     if (!isAuthenticated) {
-      _loggerProvider?.warning('Cannot send errors: user not authenticated', category: _tag);
+      _loggerProvider?.warning('Cannot send errors: user not authenticated',
+          category: _tag);
       return SyncErrorReportResult.failure(
         errorIds: errors.map((e) => e.id).toList(),
         errorMessage: 'User not authenticated',
@@ -121,7 +128,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
     List<String> failedErrorIds,
   ) async {
     final batches = _createBatches(errors, _config.batchSize);
-    
+
     for (final batch in batches) {
       final result = await _sendErrorBatch(batch);
       sentErrorIds.addAll(result.sentErrorIds);
@@ -155,22 +162,26 @@ class SyncErrorReporter implements ISyncErrorReporter {
   }
 
   /// Tenta enviar o payload com retry
-  Future<bool> _attemptSendWithRetry(Map<String, dynamic> payload, int errorCount) async {
+  Future<bool> _attemptSendWithRetry(
+      Map<String, dynamic> payload, int errorCount) async {
     int retryCount = 0;
-    
+
     while (retryCount <= _config.maxRetries) {
       try {
-        final response = await _syncConfig.httpPost(_config.endpoint, data: payload);
-        
+        final response =
+            await _syncConfig.httpPost(_config.endpoint, data: payload);
+
         if (response.statusCode >= 200 && response.statusCode < 300) {
-          _loggerProvider?.debug('Error batch sent successfully ($errorCount errors)', category: _tag);
+          _loggerProvider?.debug(
+              'Error batch sent successfully ($errorCount errors)',
+              category: _tag);
           return true;
         } else {
           throw Exception('HTTP ${response.statusCode}: ${response.data}');
         }
       } catch (e) {
         retryCount++;
-        
+
         if (retryCount <= _config.maxRetries) {
           _loggerProvider?.warning(
             'Error batch send failed (attempt $retryCount/${_config.maxRetries}): $e',
@@ -186,7 +197,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
         }
       }
     }
-    
+
     return false;
   }
 
@@ -199,14 +210,15 @@ class SyncErrorReporter implements ISyncErrorReporter {
       _sanitizePayload(payload);
 
       final success = await _attemptSendWithRetry(payload, errors.length);
-      
+
       if (success) {
         sentErrorIds.addAll(errors.map((e) => e.id));
       } else {
         failedErrorIds.addAll(errors.map((e) => e.id));
       }
     } catch (e) {
-      _loggerProvider?.error('Failed to send error batch: $e', category: _tag, exception: e);
+      _loggerProvider?.error('Failed to send error batch: $e',
+          category: _tag, exception: e);
       failedErrorIds.addAll(errors.map((e) => e.id));
     }
 
@@ -219,7 +231,8 @@ class SyncErrorReporter implements ISyncErrorReporter {
     );
   }
 
-  Future<Map<String, dynamic>> _createErrorPayload(List<SyncError> errors) async {
+  Future<Map<String, dynamic>> _createErrorPayload(
+      List<SyncError> errors) async {
     final userId = await _syncConfig.getCurrentUserId();
 
     return {
@@ -255,7 +268,8 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
     // Sanitizar originalData se contém JSON
     if (sanitized.containsKey('originalData')) {
-      sanitized['originalData'] = _sanitizeOriginalData(sanitized['originalData']);
+      sanitized['originalData'] =
+          _sanitizeOriginalData(sanitized['originalData']);
     }
 
     return sanitized;

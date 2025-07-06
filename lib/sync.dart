@@ -68,7 +68,10 @@ export 'core/interfaces/i_storage_provider.dart' show IStorageProvider;
 export 'core/theme/sync_theme.dart' show SyncTheme;
 
 /// Configuração para relatórios de erro
-export 'core/services/sync_error_reporter.dart' show SyncErrorReportConfig;
+export 'core/entities/sync_error_report_config.dart' show SyncErrorReportConfig;
+export 'core/entities/sync_error_report_result.dart' show SyncErrorReportResult;
+export 'core/interfaces/i_sync_error_reporter.dart' show ISyncErrorReporter;
+export 'core/services/sync_error_reporter.dart' show SyncErrorReporter;
 
 // ========== UTILITÁRIOS ==========
 
