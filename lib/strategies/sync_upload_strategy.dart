@@ -263,16 +263,15 @@ class SyncUploadStrategy {
 
   /// Cria entrada de log para envio de dados
   Map<String, dynamic> _createDataLogEntry(SyncLog log) {
-    dynamic data;
+    late Map<String, dynamic> data;
     try {
       if (log.dataJson.isEmpty) {
         data = {};
       } else {
         data = _parseLogData(log);
+
         // Remover base64Content para evitar envio desnecessário
-        if (data is Map<String, dynamic>) {
-          data.remove('base64Content');
-        }
+        data.remove('base64Content');
       }
     } catch (e) {
       data = {}; // Usar objeto vazio em caso de erro
