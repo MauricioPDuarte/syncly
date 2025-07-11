@@ -231,10 +231,7 @@ class SyncErrorReporter implements ISyncErrorReporter {
 
   Future<Map<String, dynamic>> _createErrorPayload(
       List<SyncError> errors) async {
-    final userId = await _syncConfig.getCurrentUserId();
-
     return {
-      'userId': userId,
       'timestamp': DateTime.now().toIso8601String(),
       'errors': errors.map(_createErrorEntry).toList(),
     };

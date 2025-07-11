@@ -299,12 +299,7 @@ class MeuSyncConfig extends SyncConfig {
 
 
   
-  @override
-  Future<String?> getCurrentUserId() async {
-    // Implementar recuperação do ID do usuário
-    return await UserService.getCurrentUserId();
-  }
-  
+
 
 }
 ```

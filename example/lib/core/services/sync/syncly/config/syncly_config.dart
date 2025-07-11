@@ -4,7 +4,6 @@ import 'package:syncly/sync.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:syncly_example/core/services/rest_client/rest_client.dart';
-import 'package:syncly_example/core/services/storage/storage.dart';
 import 'package:syncly_example/modules/todo/data/sync/todo_downloader.dart';
 
 /// Provider de sincronização personalizado para o Syncly Example
@@ -56,9 +55,9 @@ class SynclyConfig extends SyncConfig {
 
   @override
   List<IDownloadStrategy> get downloadStrategies => [
-    // Estratégias de download configuradas
-    Modular.get<TodoDownloader>(),
-  ];
+        // Estratégias de download configuradas
+        Modular.get<TodoDownloader>(),
+      ];
 
   @override
   SyncTheme? get theme => null; // Usa o tema padrão
@@ -241,12 +240,6 @@ class SynclyConfig extends SyncConfig {
     return true;
   }
 
-  @override
-  Future<String?> getCurrentUserId() async {
-    // Implementação simplificada para exemplo
-    return 'example_user_123';
-  }
-
   // ========== NOTIFICAÇÕES GERENCIADAS INTERNAMENTE ==========
   // O Syncly agora possui seu próprio serviço de notificações interno
   // Não é necessário implementar métodos de notificação aqui
@@ -270,14 +263,15 @@ class SynclyConfig extends SyncConfig {
     try {
       final prefs = await SharedPreferences.getInstance();
       final timestamp = prefs.getString('last_sync_timestamp');
-      
+
       if (timestamp != null) {
         final dateTime = DateTime.parse(timestamp);
         debugPrint('Timestamp da última sincronização obtido: $dateTime');
         return dateTime;
       }
-      
-      debugPrint('Nenhum timestamp de sincronização encontrado - primeira sincronização');
+
+      debugPrint(
+          'Nenhum timestamp de sincronização encontrado - primeira sincronização');
       return null;
     } catch (e) {
       debugPrint('Erro ao obter timestamp da última sincronização: $e');
@@ -296,13 +290,12 @@ class SynclyConfig extends SyncConfig {
     }
   }
 
-
-
   @override
   bool get useIncrementalSync => true; // Habilitar sincronização incremental
 
   @override
-  Duration get maxIncrementalSyncInterval => const Duration(days: 3); // Sincronização completa a cada 3 dias
+  Duration get maxIncrementalSyncInterval =>
+      const Duration(days: 3); // Sincronização completa a cada 3 dias
 
   // ========== CALLBACKS DE SINCRONIZAÇÃO ==========
 

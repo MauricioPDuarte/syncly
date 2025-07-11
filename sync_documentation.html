@@ -36,8 +36,10 @@
             <ul class="flex space-x-6 py-4">
                 <li><a href="#overview" class="text-primary hover:text-blue-700 font-medium">Visão Geral</a></li>
                 <li><a href="#architecture" class="text-primary hover:text-blue-700 font-medium">Arquitetura</a></li>
-                <li><a href="#incremental-sync" class="text-primary hover:text-blue-700 font-medium">Sincronização Incremental</a></li>
-                <li><a href="#backend-guide" class="text-primary hover:text-blue-700 font-medium">Guia do Backend</a></li>
+                <li><a href="#incremental-sync" class="text-primary hover:text-blue-700 font-medium">Sincronização
+                        Incremental</a></li>
+                <li><a href="#backend-guide" class="text-primary hover:text-blue-700 font-medium">Guia do Backend</a>
+                </li>
                 <li><a href="#technical-details" class="text-primary hover:text-blue-700 font-medium">Detalhes
                         Técnicos</a></li>
                 <li><a href="#api-routes" class="text-primary hover:text-blue-700 font-medium">Rotas da API</a></li>
@@ -74,7 +76,8 @@
                     <ul class="text-gray-700 space-y-2">
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Arquitetura baseada em
                             estratégias</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> <strong>Sincronização incremental</strong> - baixa apenas dados modificados</li>
+                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> <strong>Sincronização
+                                incremental</strong> - baixa apenas dados modificados</li>
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Configuração
                             centralizada via SyncConfig</li>
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Injeção de dependência
@@ -192,12 +195,14 @@
 
         <!-- Sincronização Incremental -->
         <section id="incremental-sync" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-green-500 pb-2">🚀 Sincronização Incremental</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-green-500 pb-2">🚀 Sincronização
+                Incremental</h2>
 
             <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg mb-8">
                 <h4 class="font-semibold text-green-700 mb-2">🎯 Nova Funcionalidade</h4>
                 <p class="text-green-600">
-                    A sincronização incremental é uma otimização que permite baixar apenas dados novos, modificados ou excluídos,
+                    A sincronização incremental é uma otimização que permite baixar apenas dados novos, modificados ou
+                    excluídos,
                     em vez de apagar todos os dados locais e baixar tudo novamente a cada sincronização.
                 </p>
             </div>
@@ -248,42 +253,57 @@
 
                     <div class="space-y-4">
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</div>
+                            <div
+                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                                1</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Verificação de Timestamp</h4>
-                                <p class="text-gray-600 text-sm">O sistema verifica o timestamp da última sincronização bem-sucedida armazenado localmente.</p>
+                                <p class="text-gray-600 text-sm">O sistema verifica o timestamp da última sincronização
+                                    bem-sucedida armazenado localmente.</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</div>
+                            <div
+                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                                2</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Decisão Inteligente</h4>
-                                <p class="text-gray-600 text-sm">Determina se deve usar sincronização incremental ou completa baseado na configuração e intervalo de tempo.</p>
+                                <p class="text-gray-600 text-sm">Determina se deve usar sincronização incremental ou
+                                    completa baseado na configuração e intervalo de tempo.</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</div>
+                            <div
+                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                                3</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Requisição ao Backend</h4>
-                                <p class="text-gray-600 text-sm">Envia o timestamp para o backend, que retorna apenas dados modificados desde essa data.</p>
+                                <p class="text-gray-600 text-sm">Envia o timestamp para o backend, que retorna apenas
+                                    dados modificados desde essa data.</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</div>
+                            <div
+                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                                4</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Processamento Seletivo</h4>
-                                <p class="text-gray-600 text-sm">Aplica apenas as mudanças necessárias: novos dados, atualizações e remoções específicas.</p>
+                                <p class="text-gray-600 text-sm">Aplica apenas as mudanças necessárias: novos dados,
+                                    atualizações e remoções específicas.</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">5</div>
+                            <div
+                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                                5</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Atualização do Timestamp</h4>
-                                <p class="text-gray-600 text-sm">Salva o novo timestamp da sincronização para uso na próxima execução.</p>
+                                <p class="text-gray-600 text-sm">Salva o novo timestamp da sincronização para uso na
+                                    próxima execução.</p>
                             </div>
                         </div>
                     </div>
@@ -323,8 +343,10 @@
                     <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
                         <h4 class="font-semibold text-yellow-700 mb-2">💡 Dica Importante</h4>
                         <p class="text-yellow-600 text-sm">
-                            O <code>maxIncrementalSyncInterval</code> define o tempo máximo para usar sincronização incremental.
-                            Após esse período, o sistema automaticamente fará uma sincronização completa para garantir consistência.
+                            O <code>maxIncrementalSyncInterval</code> define o tempo máximo para usar sincronização
+                            incremental.
+                            Após esse período, o sistema automaticamente fará uma sincronização completa para garantir
+                            consistência.
                         </p>
                     </div>
                 </div>
@@ -333,12 +355,14 @@
 
         <!-- Guia do Backend -->
         <section id="backend-guide" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">🔧 Guia de Implementação do Backend</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">🔧 Guia de Implementação
+                do Backend</h2>
 
             <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-lg mb-8">
                 <h4 class="font-semibold text-orange-700 mb-2">📋 Para Desenvolvedores Backend</h4>
                 <p class="text-orange-600">
-                    Esta seção explica como implementar os endpoints do backend para suportar a sincronização incremental do Syncly.
+                    Esta seção explica como implementar os endpoints do backend para suportar a sincronização
+                    incremental do Syncly.
                     É essencial seguir este formato para garantir compatibilidade total.
                 </p>
             </div>
@@ -364,8 +388,10 @@ user_id: 12345                        (se necessário para filtrar dados do usu�
                     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
                         <h4 class="font-semibold text-blue-700 mb-2">🔍 Lógica de Decisão</h4>
                         <ul class="text-blue-600 text-sm space-y-1">
-                            <li>• <strong>Se last_sync está presente:</strong> Retornar apenas dados modificados desde essa data</li>
-                            <li>• <strong>Se last_sync está ausente:</strong> Retornar todos os dados (sincronização completa)</li>
+                            <li>• <strong>Se last_sync está presente:</strong> Retornar apenas dados modificados desde
+                                essa data</li>
+                            <li>• <strong>Se last_sync está ausente:</strong> Retornar todos os dados (sincronização
+                                completa)</li>
                         </ul>
                     </div>
                 </div>
@@ -465,7 +491,8 @@ user_id: 12345                        (se necessário para filtrar dados do usu�
 
                         <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
                             <h4 class="font-semibold text-red-700 mb-2">🗑️ deleted</h4>
-                            <p class="text-red-600 text-sm mb-2">Array com IDs dos registros excluídos desde o last_sync</p>
+                            <p class="text-red-600 text-sm mb-2">Array com IDs dos registros excluídos desde o last_sync
+                            </p>
                             <ul class="text-red-600 text-xs space-y-1">
                                 <li>• Apenas os IDs dos registros excluídos</li>
                                 <li>• O cliente removerá estes registros localmente</li>
@@ -1586,12 +1613,7 @@ class AppSyncConfig implements SyncConfig {
   
 
   
-  @override
-  Future<String?> getCurrentUserId() async {
-    // Implementar lógica para obter ID do usuário
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id');
-  }
+
   
   </code></pre>
                     </div>

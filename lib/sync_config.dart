@@ -121,9 +121,6 @@ abstract class SyncConfig {
   /// Verificar se o usuário está autenticado
   Future<bool> isAuthenticated();
 
-  /// Obter ID do usuário atual
-  Future<String?> getCurrentUserId();
-
   // ========== CONFIGURAÇÕES DE NOTIFICAÇÕES ==========
 
   /// Habilitar notificações do sistema de sincronização
