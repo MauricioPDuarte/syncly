@@ -5,6 +5,34 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Sincronização Incremental**: Nova funcionalidade que permite sincronizar apenas dados modificados
+  - Método `getLastSyncTimestamp()` no SyncConfig para obter timestamp da última sincronização
+  - Método `saveLastSyncTimestamp()` no SyncConfig para salvar timestamp da sincronização
+  - Método `clearSpecificData()` no SyncConfig para remover dados específicos excluídos no servidor
+  - Propriedade `useIncrementalSync` no SyncConfig para habilitar/desabilitar sincronização incremental
+  - Propriedade `maxIncrementalSyncInterval` no SyncConfig para controlar intervalo máximo da sincronização incremental
+  - Parâmetro `lastSyncTimestamp` na interface `IDownloadStrategy.downloadData()`
+  - Propriedades `deletedEntities` e `isIncremental` na classe `DownloadResult`
+  - Lógica automática para decidir entre sincronização completa e incremental
+  - Processamento automático de entidades excluídas no servidor
+  - Exemplo de implementação em `IncrementalDownloadStrategyExample`
+  - Guia completo de implementação em `INCREMENTAL_SYNC_GUIDE.md`
+
+### Changed
+- Interface `IDownloadStrategy.downloadData()` agora aceita parâmetro opcional `lastSyncTimestamp`
+- Classe `DownloadResult` expandida com informações sobre sincronização incremental
+- `SyncDownloadStrategy` atualizada para suportar sincronização incremental
+- Exemplo `SynclyConfig` atualizado com implementação dos novos métodos
+
+### Improved
+- Performance da sincronização significativamente melhorada para dados grandes
+- Redução no uso de dados de rede
+- Experiência do usuário aprimorada com sincronizações mais rápidas
+- Menor carga no servidor backend
+
 ## [1.1.4] - 03/07/2025
 
 ### 🚀 Adicionado

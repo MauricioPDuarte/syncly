@@ -141,6 +141,31 @@ abstract class SyncConfig {
   /// conforme a necessidade da aplicação
   Future<void> clearLocalData();
 
+  // ========== MÉTODOS PARA SINCRONIZAÇÃO INCREMENTAL ==========
+
+  /// Obter a data da última sincronização bem-sucedida
+  /// Retorna null se nunca houve sincronização ou se deve fazer sincronização completa
+  Future<DateTime?> getLastSyncTimestamp();
+
+  /// Salvar a data da última sincronização bem-sucedida
+  Future<void> saveLastSyncTimestamp(DateTime timestamp);
+
+  /// Limpar apenas dados específicos baseado em uma lista de IDs
+  /// Este método é usado para remover dados que foram excluídos no servidor
+  Future<void> clearSpecificData({
+    required String entityType,
+    required List<String> entityIds,
+  });
+
+  /// Verificar se deve usar sincronização incremental
+  /// Por padrão retorna true, mas pode ser sobrescrito para forçar sincronização completa
+  bool get useIncrementalSync => true;
+
+  /// Intervalo máximo para sincronização incremental
+  /// Se a última sincronização foi há mais tempo que este intervalo,
+  /// será feita uma sincronização completa
+  Duration get maxIncrementalSyncInterval => const Duration(days: 7);
+
   // ========== MÉTODOS OPCIONAIS - CALLBACKS ==========
 
   /// Callback quando sincronização inicia

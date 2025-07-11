@@ -36,6 +36,8 @@
             <ul class="flex space-x-6 py-4">
                 <li><a href="#overview" class="text-primary hover:text-blue-700 font-medium">Visão Geral</a></li>
                 <li><a href="#architecture" class="text-primary hover:text-blue-700 font-medium">Arquitetura</a></li>
+                <li><a href="#incremental-sync" class="text-primary hover:text-blue-700 font-medium">Sincronização Incremental</a></li>
+                <li><a href="#backend-guide" class="text-primary hover:text-blue-700 font-medium">Guia do Backend</a></li>
                 <li><a href="#technical-details" class="text-primary hover:text-blue-700 font-medium">Detalhes
                         Técnicos</a></li>
                 <li><a href="#api-routes" class="text-primary hover:text-blue-700 font-medium">Rotas da API</a></li>
@@ -72,6 +74,7 @@
                     <ul class="text-gray-700 space-y-2">
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Arquitetura baseada em
                             estratégias</li>
+                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> <strong>Sincronização incremental</strong> - baixa apenas dados modificados</li>
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Configuração
                             centralizada via SyncConfig</li>
                         <li class="flex items-center"><span class="text-secondary mr-2">•</span> Injeção de dependência
@@ -181,6 +184,460 @@
                                 Componentes de UI prontos com tema customizável, incluindo indicadores
                                 de sincronização e diálogos.
                             </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sincronização Incremental -->
+        <section id="incremental-sync" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-green-500 pb-2">🚀 Sincronização Incremental</h2>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg mb-8">
+                <h4 class="font-semibold text-green-700 mb-2">🎯 Nova Funcionalidade</h4>
+                <p class="text-green-600">
+                    A sincronização incremental é uma otimização que permite baixar apenas dados novos, modificados ou excluídos,
+                    em vez de apagar todos os dados locais e baixar tudo novamente a cada sincronização.
+                </p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Benefícios -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-green-600 mb-4">✨ Benefícios da Sincronização Incremental</h3>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-blue-700 mb-2">⚡ Performance</h4>
+                            <p class="text-gray-700 text-sm">
+                                Sincronizações até 90% mais rápidas para grandes volumes de dados,
+                                baixando apenas o que realmente mudou.
+                            </p>
+                        </div>
+
+                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-purple-700 mb-2">📱 Economia de Dados</h4>
+                            <p class="text-gray-700 text-sm">
+                                Redução significativa no uso de dados móveis,
+                                especialmente importante para usuários com planos limitados.
+                            </p>
+                        </div>
+
+                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-orange-700 mb-2">🔋 Menor Consumo</h4>
+                            <p class="text-gray-700 text-sm">
+                                Reduz o uso de bateria e processamento,
+                                melhorando a experiência geral do usuário.
+                            </p>
+                        </div>
+
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-green-700 mb-2">🛡️ Segurança</h4>
+                            <p class="text-gray-700 text-sm">
+                                Fallback automático para sincronização completa
+                                quando necessário, garantindo consistência dos dados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Como Funciona -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-600 mb-4">🔄 Como Funciona</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Verificação de Timestamp</h4>
+                                <p class="text-gray-600 text-sm">O sistema verifica o timestamp da última sincronização bem-sucedida armazenado localmente.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Decisão Inteligente</h4>
+                                <p class="text-gray-600 text-sm">Determina se deve usar sincronização incremental ou completa baseado na configuração e intervalo de tempo.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Requisição ao Backend</h4>
+                                <p class="text-gray-600 text-sm">Envia o timestamp para o backend, que retorna apenas dados modificados desde essa data.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Processamento Seletivo</h4>
+                                <p class="text-gray-600 text-sm">Aplica apenas as mudanças necessárias: novos dados, atualizações e remoções específicas.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">5</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Atualização do Timestamp</h4>
+                                <p class="text-gray-600 text-sm">Salva o novo timestamp da sincronização para uso na próxima execução.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuração -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-purple-600 mb-4">⚙️ Configuração no Flutter</h3>
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>class MeuSyncConfig extends SyncConfig {
+  @override
+  bool get useIncrementalSync => true;
+  
+  @override
+  Duration get maxIncrementalSyncInterval => const Duration(days: 7);
+  
+  @override
+  Future&lt;DateTime?&gt; getLastSyncTimestamp() async {
+    // Implementar persistência do timestamp
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getString('last_sync_timestamp');
+    return timestamp != null ? DateTime.parse(timestamp) : null;
+  }
+  
+  @override
+  Future&lt;void&gt; saveLastSyncTimestamp(DateTime timestamp) async {
+    // Salvar timestamp da última sincronização
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
+  }
+  
+  @override
+  Future&lt;void&gt; clearSpecificData({
+    required String entityType,
+    required List&lt;String&gt; entityIds,
+  }) async {
+    // Remover dados específicos que foram excluídos no servidor
+    switch (entityType) {
+      case 'users':
+        await _removeUsers(entityIds);
+        break;
+      case 'products':
+        await _removeProducts(entityIds);
+        break;
+      // Adicionar outros tipos conforme necessário
+    }
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                        <h4 class="font-semibold text-yellow-700 mb-2">💡 Dica Importante</h4>
+                        <p class="text-yellow-600 text-sm">
+                            O <code>maxIncrementalSyncInterval</code> define o tempo máximo para usar sincronização incremental.
+                            Após esse período, o sistema automaticamente fará uma sincronização completa para garantir consistência.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guia do Backend -->
+        <section id="backend-guide" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">🔧 Guia de Implementação do Backend</h2>
+
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-lg mb-8">
+                <h4 class="font-semibold text-orange-700 mb-2">📋 Para Desenvolvedores Backend</h4>
+                <p class="text-orange-600">
+                    Esta seção explica como implementar os endpoints do backend para suportar a sincronização incremental do Syncly.
+                    É essencial seguir este formato para garantir compatibilidade total.
+                </p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Formato da Requisição -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-600 mb-4">📤 Formato da Requisição do Cliente</h3>
+
+                    <p class="text-gray-700 mb-4">O Syncly enviará requisições com o seguinte formato:</p>
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">GET /api/sync/data</h4>
+                        <pre class="text-sm text-gray-700 font-mono"><code>Headers:
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+Query Parameters:
+last_sync: 2024-01-15T10:30:00.000Z  (opcional - para sincronização incremental)
+user_id: 12345                        (se necessário para filtrar dados do usuário)</code></pre>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                        <h4 class="font-semibold text-blue-700 mb-2">🔍 Lógica de Decisão</h4>
+                        <ul class="text-blue-600 text-sm space-y-1">
+                            <li>• <strong>Se last_sync está presente:</strong> Retornar apenas dados modificados desde essa data</li>
+                            <li>• <strong>Se last_sync está ausente:</strong> Retornar todos os dados (sincronização completa)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Formato da Resposta -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-green-600 mb-4">📥 Formato da Resposta do Backend</h3>
+
+                    <p class="text-gray-700 mb-4">O backend deve retornar dados no seguinte formato JSON:</p>
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>{
+  "success": true,
+  "sync_timestamp": "2024-01-15T15:45:30.123Z",
+  "is_incremental": true,
+  "data": {
+    "users": {
+      "created": [
+        {
+          "id": "user_123",
+          "name": "João Silva",
+          "email": "joao@email.com",
+          "created_at": "2024-01-15T14:20:00.000Z",
+          "updated_at": "2024-01-15T14:20:00.000Z"
+        }
+      ],
+      "updated": [
+        {
+          "id": "user_456",
+          "name": "Maria Santos - Atualizado",
+          "email": "maria@email.com",
+          "created_at": "2024-01-10T10:00:00.000Z",
+          "updated_at": "2024-01-15T15:30:00.000Z"
+        }
+      ],
+      "deleted": ["user_789", "user_101"]
+    },
+    "products": {
+      "created": [
+        {
+          "id": "prod_001",
+          "name": "Produto Novo",
+          "price": 29.99,
+          "created_at": "2024-01-15T13:15:00.000Z",
+          "updated_at": "2024-01-15T13:15:00.000Z"
+        }
+      ],
+      "updated": [],
+      "deleted": ["prod_002"]
+    }
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg">
+                            <h4 class="font-semibold text-green-700 text-sm mb-1">✅ success</h4>
+                            <p class="text-green-600 text-xs">Indica se a operação foi bem-sucedida</p>
+                        </div>
+
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                            <h4 class="font-semibold text-blue-700 text-sm mb-1">🕐 sync_timestamp</h4>
+                            <p class="text-blue-600 text-xs">Timestamp atual do servidor (ISO 8601)</p>
+                        </div>
+
+                        <div class="bg-purple-50 border-l-4 border-purple-500 p-3 rounded-r-lg">
+                            <h4 class="font-semibold text-purple-700 text-sm mb-1">🔄 is_incremental</h4>
+                            <p class="text-purple-600 text-xs">Indica se foi sincronização incremental</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estrutura dos Dados -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-purple-600 mb-4">📊 Estrutura dos Dados</h3>
+
+                    <div class="space-y-4">
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-green-700 mb-2">🆕 created</h4>
+                            <p class="text-green-600 text-sm mb-2">Array com registros criados desde o last_sync</p>
+                            <ul class="text-green-600 text-xs space-y-1">
+                                <li>• Deve incluir todos os campos do registro</li>
+                                <li>• Obrigatório: id, created_at, updated_at</li>
+                                <li>• Usar formato ISO 8601 para datas</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-blue-700 mb-2">🔄 updated</h4>
+                            <p class="text-blue-600 text-sm mb-2">Array com registros modificados desde o last_sync</p>
+                            <ul class="text-blue-600 text-xs space-y-1">
+                                <li>• Deve incluir todos os campos atualizados</li>
+                                <li>• O updated_at deve ser posterior ao last_sync</li>
+                                <li>• Incluir registro completo, não apenas campos alterados</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                            <h4 class="font-semibold text-red-700 mb-2">🗑️ deleted</h4>
+                            <p class="text-red-600 text-sm mb-2">Array com IDs dos registros excluídos desde o last_sync</p>
+                            <ul class="text-red-600 text-xs space-y-1">
+                                <li>• Apenas os IDs dos registros excluídos</li>
+                                <li>• O cliente removerá estes registros localmente</li>
+                                <li>• Importante para manter consistência dos dados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementação SQL -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-orange-600 mb-4">💾 Exemplo de Implementação SQL</h3>
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">Estrutura de Tabelas Recomendada:</h4>
+                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>-- Adicionar colunas de auditoria em todas as tabelas
+ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP NULL;
+
+-- Criar índices para performance
+CREATE INDEX idx_users_updated_at ON users(updated_at);
+CREATE INDEX idx_users_deleted_at ON users(deleted_at);</code></pre>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">Query para Sincronização Incremental:</h4>
+                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>-- Registros criados
+SELECT * FROM users 
+WHERE created_at > ? AND deleted_at IS NULL
+ORDER BY created_at;
+
+-- Registros atualizados (mas não criados no período)
+SELECT * FROM users 
+WHERE updated_at > ? AND created_at <= ? AND deleted_at IS NULL
+ORDER BY updated_at;
+
+-- Registros excluídos (soft delete)
+SELECT id FROM users 
+WHERE deleted_at > ?
+ORDER BY deleted_at;</code></pre>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                        <h4 class="font-semibold text-yellow-700 mb-2">⚠️ Considerações Importantes</h4>
+                        <ul class="text-yellow-600 text-sm space-y-1">
+                            <li>• Use soft delete (deleted_at) em vez de DELETE físico</li>
+                            <li>• Mantenha registros excluídos por pelo menos 30 dias</li>
+                            <li>• Use transações para garantir consistência</li>
+                            <li>• Considere paginação para grandes volumes de dados</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Exemplo Node.js -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">🚀 Exemplo de Implementação (Node.js)</h3>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>app.get('/api/sync/data', async (req, res) => {
+  try {
+    const { last_sync, user_id } = req.query;
+    const currentTimestamp = new Date().toISOString();
+    const isIncremental = !!last_sync;
+    
+    let result = {
+      success: true,
+      sync_timestamp: currentTimestamp,
+      is_incremental: isIncremental,
+      data: {}
+    };
+    
+    if (isIncremental) {
+      // Sincronização incremental
+      const syncDate = new Date(last_sync);
+      
+      // Buscar dados de usuários
+      const usersCreated = await db.query(
+        'SELECT * FROM users WHERE created_at > ? AND deleted_at IS NULL',
+        [syncDate]
+      );
+      
+      const usersUpdated = await db.query(
+        'SELECT * FROM users WHERE updated_at > ? AND created_at <= ? AND deleted_at IS NULL',
+        [syncDate, syncDate]
+      );
+      
+      const usersDeleted = await db.query(
+        'SELECT id FROM users WHERE deleted_at > ?',
+        [syncDate]
+      );
+      
+      result.data.users = {
+        created: usersCreated,
+        updated: usersUpdated,
+        deleted: usersDeleted.map(u => u.id)
+      };
+      
+      // Repetir para outras entidades (products, orders, etc.)
+      
+    } else {
+      // Sincronização completa
+      const allUsers = await db.query(
+        'SELECT * FROM users WHERE deleted_at IS NULL'
+      );
+      
+      result.data.users = {
+        created: allUsers,
+        updated: [],
+        deleted: []
+      };
+    }
+    
+    res.json(result);
+    
+  } catch (error) {
+    console.error('Erro na sincronização:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erro interno do servidor'
+    });
+  }
+});</code></pre>
+                    </div>
+                </div>
+
+                <!-- Boas Práticas -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-red-600 mb-4">🎯 Boas Práticas do Backend</h3>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg">
+                                <h4 class="font-semibold text-green-700 text-sm mb-1">✅ Faça</h4>
+                                <ul class="text-green-600 text-xs space-y-1">
+                                    <li>• Use timestamps UTC (ISO 8601)</li>
+                                    <li>• Implemente soft delete</li>
+                                    <li>• Valide o formato do last_sync</li>
+                                    <li>• Use transações para consistência</li>
+                                    <li>• Implemente paginação se necessário</li>
+                                    <li>• Mantenha logs de sincronização</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg">
+                                <h4 class="font-semibold text-red-700 text-sm mb-1">❌ Evite</h4>
+                                <ul class="text-red-600 text-xs space-y-1">
+                                    <li>• DELETE físico de registros</li>
+                                    <li>• Timestamps em timezone local</li>
+                                    <li>• Retornar dados sensíveis desnecessários</li>
+                                    <li>• Ignorar validação de autenticação</li>
+                                    <li>• Queries sem índices em campos de data</li>
+                                    <li>• Respostas sem tratamento de erro</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

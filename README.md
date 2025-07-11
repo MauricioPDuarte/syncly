@@ -5,6 +5,7 @@ Sistema de sincronização independente e completo para aplicações Flutter com
 ## Características
 
 - ✅ **Sincronização bidirecional** (upload/download)
+- ✅ **Sincronização incremental** - baixa apenas dados modificados
 - ✅ **Sincronização em background** com WorkManager
 - ✅ **Sistema de tema independente** (SyncTheme)
 - ✅ **Gerenciamento de conectividade** automático
@@ -185,6 +186,46 @@ await SyncConfigurator.syncService.resetSyncState();
 ```
 
 ## Configuração Avançada
+
+### Sincronização Incremental
+
+**🚀 Nova Funcionalidade**: Sincronização incremental para otimizar performance!
+
+Em vez de apagar todos os dados e baixar tudo novamente, o Syncly agora pode:
+- ✅ Baixar apenas dados novos e modificados
+- ✅ Remover apenas dados específicos que foram excluídos
+- ✅ Usar timestamps para determinar o que sincronizar
+- ✅ Fallback automático para sincronização completa quando necessário
+
+```dart
+class MeuSyncConfig extends SyncConfig {
+  @override
+  bool get useIncrementalSync => true;
+  
+  @override
+  Duration get maxIncrementalSyncInterval => const Duration(days: 7);
+  
+  @override
+  Future<DateTime?> getLastSyncTimestamp() async {
+    // Implementar persistência do timestamp
+  }
+  
+  @override
+  Future<void> saveLastSyncTimestamp(DateTime timestamp) async {
+    // Salvar timestamp da última sincronização
+  }
+  
+  @override
+  Future<void> clearSpecificData({
+    required String entityType,
+    required List<String> entityIds,
+  }) async {
+    // Remover dados específicos que foram excluídos no servidor
+  }
+}
+```
+
+**📖 Guia Completo**: Veja [INCREMENTAL_SYNC_GUIDE.md](INCREMENTAL_SYNC_GUIDE.md) para implementação detalhada.
 
 ### Tema Personalizado
 

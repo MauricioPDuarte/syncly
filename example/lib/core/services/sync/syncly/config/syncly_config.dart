@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:syncly/sync.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:syncly_example/core/services/rest_client/rest_client.dart';
+import 'package:syncly_example/core/services/storage/storage.dart';
 
 /// Provider de sincronização personalizado para o Syncly Example
 ///
@@ -253,6 +255,115 @@ class SynclyConfig extends SyncConfig {
     // Exemplo: limpar tabelas específicas, resetar contadores, etc.
     debugPrint('Limpando dados locais antes da sincronização...');
   }
+
+  // ========== IMPLEMENTAÇÃO DE SINCRONIZAÇÃO INCREMENTAL ==========
+
+  @override
+  Future<DateTime?> getLastSyncTimestamp() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final timestamp = prefs.getString('last_sync_timestamp');
+      
+      if (timestamp != null) {
+        final dateTime = DateTime.parse(timestamp);
+        debugPrint('Timestamp da última sincronização obtido: $dateTime');
+        return dateTime;
+      }
+      
+      debugPrint('Nenhum timestamp de sincronização encontrado - primeira sincronização');
+      return null;
+    } catch (e) {
+      debugPrint('Erro ao obter timestamp da última sincronização: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveLastSyncTimestamp(DateTime timestamp) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
+      debugPrint('Timestamp da última sincronização salvo: $timestamp');
+    } catch (e) {
+      debugPrint('Erro ao salvar timestamp da última sincronização: $e');
+    }
+  }
+
+  @override
+  Future<void> clearSpecificData({
+    required String entityType,
+    required List<String> entityIds,
+  }) async {
+    try {
+      debugPrint('Removendo dados específicos - Tipo: $entityType, IDs: $entityIds');
+      
+      // Implementação específica para cada tipo de entidade
+      switch (entityType.toLowerCase()) {
+        case 'todos':
+          await _clearSpecificTodos(entityIds);
+          break;
+        case 'users':
+          await _clearSpecificUsers(entityIds);
+          break;
+        default:
+          debugPrint('Tipo de entidade não reconhecido para remoção: $entityType');
+      }
+      
+      debugPrint('Remoção de dados específicos concluída para $entityType');
+    } catch (e) {
+      debugPrint('Erro ao remover dados específicos: $e');
+    }
+  }
+  
+  /// Remove todos específicos do armazenamento local
+  Future<void> _clearSpecificTodos(List<String> todoIds) async {
+    try {
+      final storageService = Modular.get<StorageService>();
+      final todosJson = await storageService.getJsonList('todos');
+      
+      if (todosJson != null) {
+        // Filtrar todos removendo os IDs especificados
+        final filteredTodos = todosJson.where((todoJson) {
+          final todoId = todoJson['id'] as String?;
+          return todoId != null && !todoIds.contains(todoId);
+        }).toList();
+        
+        // Salvar a lista filtrada de volta
+        await storageService.setJsonList('todos', filteredTodos);
+        debugPrint('${todoIds.length} todos removidos do armazenamento local');
+      }
+    } catch (e) {
+      debugPrint('Erro ao remover todos específicos: $e');
+    }
+  }
+  
+  /// Remove usuários específicos do armazenamento local
+  Future<void> _clearSpecificUsers(List<String> userIds) async {
+    try {
+      final storageService = Modular.get<StorageService>();
+      final usersJson = await storageService.getJsonList('users');
+      
+      if (usersJson != null) {
+        // Filtrar usuários removendo os IDs especificados
+        final filteredUsers = usersJson.where((userJson) {
+          final userId = userJson['id'] as String?;
+          return userId != null && !userIds.contains(userId);
+        }).toList();
+        
+        // Salvar a lista filtrada de volta
+        await storageService.setJsonList('users', filteredUsers);
+        debugPrint('${userIds.length} usuários removidos do armazenamento local');
+      }
+    } catch (e) {
+      debugPrint('Erro ao remover usuários específicos: $e');
+    }
+  }
+
+  @override
+  bool get useIncrementalSync => true; // Habilitar sincronização incremental
+
+  @override
+  Duration get maxIncrementalSyncInterval => const Duration(days: 3); // Sincronização completa a cada 3 dias
 
   // ========== CALLBACKS DE SINCRONIZAÇÃO ==========
 

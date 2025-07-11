@@ -23,7 +23,7 @@ class SyncDownloadStrategy {
     return SyncConfigurator.provider;
   }
 
-  /// Executa o download completo de dados do servidor
+  /// Executa o download de dados do servidor (completo ou incremental)
   Future<void> fetchDataFromServer() async {
     final syncConfig = _getSyncConfig();
 
@@ -31,27 +31,54 @@ class SyncDownloadStrategy {
         tag: 'SyncDownloadStrategy');
 
     try {
+      // Determinar se deve usar sincronização incremental
+      final shouldUseIncremental = await _shouldUseIncrementalSync();
+      final lastSyncTimestamp = shouldUseIncremental 
+          ? await syncConfig?.getLastSyncTimestamp() 
+          : null;
+
+      final syncType = shouldUseIncremental ? 'incremental' : 'completa';
+      SyncUtils.debugLog('Tipo de sincronização: $syncType',
+          tag: 'SyncDownloadStrategy');
+      
+      if (lastSyncTimestamp != null) {
+        SyncUtils.debugLog('Última sincronização: $lastSyncTimestamp',
+            tag: 'SyncDownloadStrategy');
+      }
+
       // Mostrar notificação de progresso para busca de dados
       if (syncConfig?.enableNotifications == true) {
         await SyncNotificationService.instance.showProgressNotification(
           title: 'Sincronizando',
           progress: 0,
           maxProgress: 100,
-          message: 'Buscando dados atualizados do servidor...',
+          message: shouldUseIncremental 
+              ? 'Buscando atualizações desde a última sincronização...'
+              : 'Buscando dados atualizados do servidor...',
         );
       }
 
-      // Limpar dados antigos
-      await _clearOldData();
+      // Limpar dados antigos apenas se for sincronização completa
+      if (!shouldUseIncremental) {
+        await _clearOldData();
+      }
 
       // Executar todas as estratégias de download
-      final results = await _executeDownloadStrategies();
+      final results = await _executeDownloadStrategies(lastSyncTimestamp);
+
+      // Processar dados excluídos (apenas para sincronização incremental)
+      if (shouldUseIncremental) {
+        await _processDeletedEntities(results);
+      }
 
       // Processar resultados e extrair IDs de medias para pré-cache
       final mediaIds = _extractMediaIds(results);
 
       // Fazer pré-cache de imagens e limpeza de órfãs
       await _handleImageCaching(mediaIds);
+
+      // Salvar timestamp da sincronização bem-sucedida
+      await syncConfig?.saveLastSyncTimestamp(DateTime.now());
 
       // Cancelar notificações
       await _cancelNotifications();
@@ -98,7 +125,7 @@ class SyncDownloadStrategy {
   }
 
   /// Executa todas as estratégias de download registradas
-  Future<List<DownloadResult>> _executeDownloadStrategies() async {
+  Future<List<DownloadResult>> _executeDownloadStrategies(DateTime? lastSyncTimestamp) async {
     final syncConfig = _getSyncConfig();
 
     try {
@@ -119,7 +146,7 @@ class SyncDownloadStrategy {
       for (final strategy in GetIt.instance.get<List<IDownloadStrategy>>()) {
         SyncUtils.debugLog('Executando estratégia: ${strategy.runtimeType}',
             tag: 'SyncDownloadStrategy');
-        final result = await strategy.downloadData();
+        final result = await strategy.downloadData(lastSyncTimestamp: lastSyncTimestamp);
         results.add(result);
 
         if (!result.success) {
@@ -130,8 +157,9 @@ class SyncDownloadStrategy {
               'Falha na estratégia ${strategy.runtimeType}: ${result.message}');
         }
 
+        final syncTypeLog = result.isIncremental ? 'incremental' : 'completa';
         SyncUtils.debugLog(
-            'Estratégia ${strategy.runtimeType} executada com sucesso: ${result.itemsDownloaded} itens',
+            'Estratégia ${strategy.runtimeType} executada com sucesso ($syncTypeLog): ${result.itemsDownloaded} itens',
             tag: 'SyncDownloadStrategy');
       }
 
@@ -209,6 +237,79 @@ class SyncDownloadStrategy {
       SyncUtils.debugLog('Falha ao cancelar notificações: $e',
           tag: 'SyncDownloadStrategy');
       // Não é crítico, continuar
+    }
+  }
+
+  /// Determina se deve usar sincronização incremental
+  Future<bool> _shouldUseIncrementalSync() async {
+    final syncConfig = _getSyncConfig();
+    
+    // Verificar se a sincronização incremental está habilitada
+    if (syncConfig?.useIncrementalSync != true) {
+      SyncUtils.debugLog('Sincronização incremental desabilitada na configuração',
+          tag: 'SyncDownloadStrategy');
+      return false;
+    }
+
+    try {
+      final lastSyncTimestamp = await syncConfig?.getLastSyncTimestamp();
+      
+      // Se nunca houve sincronização, fazer sincronização completa
+      if (lastSyncTimestamp == null) {
+        SyncUtils.debugLog('Primeira sincronização - usando sincronização completa',
+            tag: 'SyncDownloadStrategy');
+        return false;
+      }
+
+      // Verificar se a última sincronização não foi há muito tempo
+      final now = DateTime.now();
+      final timeSinceLastSync = now.difference(lastSyncTimestamp);
+      final maxInterval = syncConfig?.maxIncrementalSyncInterval ?? const Duration(days: 7);
+
+      if (timeSinceLastSync > maxInterval) {
+        SyncUtils.debugLog(
+            'Última sincronização há ${timeSinceLastSync.inDays} dias - usando sincronização completa',
+            tag: 'SyncDownloadStrategy');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      SyncUtils.debugLog('Erro ao verificar timestamp da última sincronização: $e',
+          tag: 'SyncDownloadStrategy');
+      // Em caso de erro, usar sincronização completa por segurança
+      return false;
+    }
+  }
+
+  /// Processa entidades que foram excluídas no servidor
+  Future<void> _processDeletedEntities(List<DownloadResult> results) async {
+    final syncConfig = _getSyncConfig();
+    
+    try {
+      for (final result in results) {
+        if (result.deletedEntities != null && result.deletedEntities!.isNotEmpty) {
+          for (final entry in result.deletedEntities!.entries) {
+            final entityType = entry.key;
+            final entityIds = entry.value;
+            
+            if (entityIds.isNotEmpty) {
+              SyncUtils.debugLog(
+                  'Removendo ${entityIds.length} entidades excluídas do tipo $entityType',
+                  tag: 'SyncDownloadStrategy');
+              
+              await syncConfig?.clearSpecificData(
+                entityType: entityType,
+                entityIds: entityIds,
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      SyncUtils.debugLog('Erro ao processar entidades excluídas: $e',
+          tag: 'SyncDownloadStrategy');
+      // Não interromper a sincronização por causa disso
     }
   }
 }
