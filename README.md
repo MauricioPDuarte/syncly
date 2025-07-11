@@ -36,7 +36,7 @@ dependencies:
 dependencies:
   syncly:
     git:
-      url: https://github.com/seu-usuario/syncly.git
+      url: https://github.com/MauricioPDuarte/syncly.git
       ref: main
 ```
 

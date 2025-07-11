@@ -208,4 +208,4 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Guias de implementação
 - Exemplos de configuração
 
-[1.0.0]: https://github.com/seu-usuario/syncly/releases/tag/v1.0.0
+[1.0.0]: https://github.com/MauricioPDuarte/syncly/releases/tag/v1.0.0

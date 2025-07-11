@@ -4,2332 +4,907 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Sincronização - Documentação</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#10B981',
-                        accent: '#F59E0B'
-                    }
-                }
-            }
+    <title>Syncly - Guia Completo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </script>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #4a5568;
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+        }
+
+        .section h4 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            white-space: pre;
+            line-height: 1.5;
+        }
+
+        .inline-code {
+            background: #edf2f7;
+            color: #2d3748;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        .warning {
+            background: #fef5e7;
+            border-left: 4px solid #f6ad55;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .step {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: absolute;
+            top: -15px;
+            left: 20px;
+        }
+
+        .toc {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 5px 0;
+            display: block;
+        }
+
+        .toc a:hover {
+            color: #5a67d8;
+            text-decoration: underline;
+        }
+
+        ul,
+        ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 text-gray-900">
-    <!-- Header -->
-    <header class="bg-primary text-white shadow-lg">
-        <div class="container mx-auto px-6 py-4">
-            <h1 class="text-3xl font-bold">Syncly - Sistema de Sincronização</h1>
-            <p class="text-blue-100 mt-2">Documentação Completa - Arquitetura Baseada em Estratégias</p>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Syncly</h1>
+            <p>Biblioteca Flutter para Sincronização de Dados Offline/Online</p>
         </div>
-    </header>
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-6">
-            <ul class="flex space-x-6 py-4">
-                <li><a href="#overview" class="text-primary hover:text-blue-700 font-medium">Visão Geral</a></li>
-                <li><a href="#architecture" class="text-primary hover:text-blue-700 font-medium">Arquitetura</a></li>
-                <li><a href="#incremental-sync" class="text-primary hover:text-blue-700 font-medium">Sincronização
-                        Incremental</a></li>
-                <li><a href="#backend-guide" class="text-primary hover:text-blue-700 font-medium">Guia do Backend</a>
-                </li>
-                <li><a href="#technical-details" class="text-primary hover:text-blue-700 font-medium">Detalhes
-                        Técnicos</a></li>
-                <li><a href="#api-routes" class="text-primary hover:text-blue-700 font-medium">Rotas da API</a></li>
-                <li><a href="#usage" class="text-primary hover:text-blue-700 font-medium">Como Usar</a></li>
-                <li><a href="#examples" class="text-primary hover:text-blue-700 font-medium">Exemplos Práticos</a></li>
-                <li><a href="#error-reporting" class="text-primary hover:text-blue-700 font-medium">Envio de Erros</a>
-                </li>
-                <li><a href="#troubleshooting" class="text-primary hover:text-blue-700 font-medium">Solução de
-                        Problemas</a></li>
+        <div class="toc">
+            <h3>📋 Índice</h3>
+            <ul>
+                <li><a href="#introducao">1. Introdução</a></li>
+                <li><a href="#instalacao">2. Instalação</a></li>
+                <li><a href="#configuracao-basica">3. Configuração Básica</a></li>
+                <li><a href="#backend">4. Configurando o Backend</a></li>
+                <li><a href="#modo-full">5. Sincronização Completa (Full)</a></li>
+                <li><a href="#modo-incremental">6. Sincronização Incremental</a></li>
+                <li><a href="#exemplos-praticos">7. Exemplos Práticos</a></li>
+                <li><a href="#troubleshooting">8. Solução de Problemas</a></li>
             </ul>
         </div>
-    </nav>
 
-    <div class="container mx-auto px-6 py-8">
-        <!-- Visão Geral -->
-        <section id="overview" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-primary pb-2">🔄 Visão Geral do Sistema
-            </h2>
+        <div class="section" id="introducao">
+            <h2>🚀 1. Introdução</h2>
+            <p>O <strong>Syncly</strong> é uma biblioteca Flutter que facilita a sincronização de dados entre seu app e
+                o servidor, funcionando tanto online quanto offline.</p>
 
-            <div class="grid md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-primary mb-4">📋 O que é o Syncly?</h3>
-                    <p class="text-gray-700 leading-relaxed">
-                        O Syncly é um sistema avançado de sincronização para Flutter que mantém os dados do aplicativo
-                        móvel
-                        sincronizados com o servidor backend. Utiliza uma arquitetura baseada em estratégias com
-                        configuração
-                        centralizada via SyncConfig, oferecendo flexibilidade máxima e facilidade de uso.
-                    </p>
-                </div>
+            <h3>✨ O que o Syncly faz por você:</h3>
+            <ul>
+                <li><strong>Sincronização Automática:</strong> Seus dados ficam sempre atualizados</li>
+                <li><strong>Modo Offline:</strong> O app funciona mesmo sem internet</li>
+                <li><strong>Sincronização Incremental:</strong> Transfere apenas dados novos/modificados</li>
+                <li><strong>Gerenciamento de Erros:</strong> Trata falhas de rede automaticamente</li>
+                <li><strong>Interface Visual:</strong> Indicadores de status para o usuário</li>
+            </ul>
 
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-secondary mb-4">✨ Principais Funcionalidades</h3>
-                    <ul class="text-gray-700 space-y-2">
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Arquitetura baseada em
-                            estratégias</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> <strong>Sincronização
-                                incremental</strong> - baixa apenas dados modificados</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Configuração
-                            centralizada via SyncConfig</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Injeção de dependência
-                            com GetIt</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Sistema de notificações
-                            integrado</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Modo offline com fila
-                            de operações</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Upload de arquivos e
-                            autenticação</li>
-                        <li class="flex items-center"><span class="text-secondary mr-2">•</span> Retry automático e
-                            logging detalhado</li>
-                    </ul>
-                </div>
+            <div class="info">
+                <strong>💡 Perfeito para:</strong> Apps de tarefas, notas, e-commerce, CRM, ou qualquer app que precise
+                sincronizar dados.
             </div>
-
-            <div class="bg-blue-50 border-l-4 border-primary p-6 rounded-r-lg">
-                <h4 class="font-semibold text-primary mb-2">🎯 Objetivo Principal</h4>
-                <p class="text-gray-700">
-                    Garantir que todas as operações realizadas pelo usuário (criar, editar, deletar)
-                    sejam sincronizadas com o servidor, e que os dados mais recentes sejam baixados
-                    automaticamente, mesmo em condições de conectividade instável.
-                </p>
-            </div>
-        </section>
-
-        <!-- Arquitetura -->
-        <section id="architecture" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">🏗️ Nova Arquitetura
-                Syncly</h2>
-
-            <div class="space-y-8">
-                <!-- Estrutura de Arquivos -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">📁 Nova Estrutura de Arquivos</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <pre class="text-sm text-gray-700 font-mono"><code>/lib/
-├── sync_config.dart            # Configuração abstrata principal
-├── sync_configurator.dart      # Configurador e injeção de dependência
-├── sync_initializer.dart       # Inicializador simplificado
-└── core/
-    ├── interfaces/             # Interfaces principais (ISyncService, etc.)
-    ├── services/               # Serviços internos
-    ├── strategies/             # Estratégias de download/upload
-    ├── presentation/           # Componentes de UI
-    └── theme/                  # Tema para componentes</code></pre>
-                    </div>
-                </div>
-
-                <!-- Fluxo de Dados -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">🔄 Nova Arquitetura em Camadas</h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-blue-50 p-3 rounded-lg text-center">
-                            <h4 class="font-semibold text-blue-700 text-sm mb-1">📱 App Layer</h4>
-                            <p class="text-xs text-gray-600">SyncConfig implementação</p>
-                        </div>
-                        <div class="bg-green-50 p-3 rounded-lg text-center">
-                            <h4 class="font-semibold text-green-700 text-sm mb-1">🔧 Config Layer</h4>
-                            <p class="text-xs text-gray-600">SyncConfigurator + GetIt</p>
-                        </div>
-                        <div class="bg-purple-50 p-3 rounded-lg text-center">
-                            <h4 class="font-semibold text-purple-700 text-sm mb-1">⚙️ Service Layer</h4>
-                            <p class="text-xs text-gray-600">ISyncService + Strategies</p>
-                        </div>
-                        <div class="bg-orange-50 p-3 rounded-lg text-center">
-                            <h4 class="font-semibold text-orange-700 text-sm mb-1">🎨 UI Layer</h4>
-                            <p class="text-xs text-gray-600">Widgets + Controllers</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Benefícios -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">🎯 Benefícios da Nova Arquitetura</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🔧 Configuração Centralizada</h4>
-                            <p class="text-gray-700 text-sm">
-                                SyncConfig centraliza todas as configurações, métodos HTTP, autenticação e notificações
-                                em uma única classe abstrata.
-                            </p>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">🔄 Injeção de Dependência</h4>
-                            <p class="text-gray-700 text-sm">
-                                SyncConfigurator gerencia automaticamente todas as dependências via GetIt,
-                                simplificando a configuração.
-                            </p>
-                        </div>
-
-                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-purple-700 mb-2">🎯 Estratégias Plugáveis</h4>
-                            <p class="text-gray-700 text-sm">
-                                Sistema baseado em estratégias permite customização completa de download,
-                                upload e limpeza de dados.
-                            </p>
-                        </div>
-
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-orange-700 mb-2">📱 UI Integrada</h4>
-                            <p class="text-gray-700 text-sm">
-                                Componentes de UI prontos com tema customizável, incluindo indicadores
-                                de sincronização e diálogos.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sincronização Incremental -->
-        <section id="incremental-sync" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-green-500 pb-2">🚀 Sincronização
-                Incremental</h2>
-
-            <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg mb-8">
-                <h4 class="font-semibold text-green-700 mb-2">🎯 Nova Funcionalidade</h4>
-                <p class="text-green-600">
-                    A sincronização incremental é uma otimização que permite baixar apenas dados novos, modificados ou
-                    excluídos,
-                    em vez de apagar todos os dados locais e baixar tudo novamente a cada sincronização.
-                </p>
-            </div>
-
-            <div class="space-y-8">
-                <!-- Benefícios -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">✨ Benefícios da Sincronização Incremental</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">⚡ Performance</h4>
-                            <p class="text-gray-700 text-sm">
-                                Sincronizações até 90% mais rápidas para grandes volumes de dados,
-                                baixando apenas o que realmente mudou.
-                            </p>
-                        </div>
-
-                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-purple-700 mb-2">📱 Economia de Dados</h4>
-                            <p class="text-gray-700 text-sm">
-                                Redução significativa no uso de dados móveis,
-                                especialmente importante para usuários com planos limitados.
-                            </p>
-                        </div>
-
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-orange-700 mb-2">🔋 Menor Consumo</h4>
-                            <p class="text-gray-700 text-sm">
-                                Reduz o uso de bateria e processamento,
-                                melhorando a experiência geral do usuário.
-                            </p>
-                        </div>
-
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🛡️ Segurança</h4>
-                            <p class="text-gray-700 text-sm">
-                                Fallback automático para sincronização completa
-                                quando necessário, garantindo consistência dos dados.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Como Funciona -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">🔄 Como Funciona</h3>
-
-                    <div class="space-y-4">
-                        <div class="flex items-start space-x-4">
-                            <div
-                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                                1</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Verificação de Timestamp</h4>
-                                <p class="text-gray-600 text-sm">O sistema verifica o timestamp da última sincronização
-                                    bem-sucedida armazenado localmente.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-4">
-                            <div
-                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                                2</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Decisão Inteligente</h4>
-                                <p class="text-gray-600 text-sm">Determina se deve usar sincronização incremental ou
-                                    completa baseado na configuração e intervalo de tempo.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-4">
-                            <div
-                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                                3</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Requisição ao Backend</h4>
-                                <p class="text-gray-600 text-sm">Envia o timestamp para o backend, que retorna apenas
-                                    dados modificados desde essa data.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-4">
-                            <div
-                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                                4</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Processamento Seletivo</h4>
-                                <p class="text-gray-600 text-sm">Aplica apenas as mudanças necessárias: novos dados,
-                                    atualizações e remoções específicas.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-4">
-                            <div
-                                class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                                5</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Atualização do Timestamp</h4>
-                                <p class="text-gray-600 text-sm">Salva o novo timestamp da sincronização para uso na
-                                    próxima execução.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configuração -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">⚙️ Configuração no Flutter</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>class MeuSyncConfig extends SyncConfig {
-  @override
-  bool get useIncrementalSync => true;
-  
-  @override
-  Duration get maxIncrementalSyncInterval => const Duration(days: 7);
-  
-  @override
-  Future&lt;DateTime?&gt; getLastSyncTimestamp() async {
-    // Implementar persistência do timestamp
-    final prefs = await SharedPreferences.getInstance();
-    final timestamp = prefs.getString('last_sync_timestamp');
-    return timestamp != null ? DateTime.parse(timestamp) : null;
-  }
-  
-  @override
-  Future&lt;void&gt; saveLastSyncTimestamp(DateTime timestamp) async {
-    // Salvar timestamp da última sincronização
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
-  }
-  
-
-}</code></pre>
-                    </div>
-
-                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-yellow-700 mb-2">💡 Dica Importante</h4>
-                        <p class="text-yellow-600 text-sm">
-                            O <code>maxIncrementalSyncInterval</code> define o tempo máximo para usar sincronização
-                            incremental.
-                            Após esse período, o sistema automaticamente fará uma sincronização completa para garantir
-                            consistência.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Guia do Backend -->
-        <section id="backend-guide" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">🔧 Guia de Implementação
-                do Backend</h2>
-
-            <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-lg mb-8">
-                <h4 class="font-semibold text-orange-700 mb-2">📋 Para Desenvolvedores Backend</h4>
-                <p class="text-orange-600">
-                    Esta seção explica como implementar os endpoints do backend para suportar a sincronização
-                    incremental do Syncly.
-                    É essencial seguir este formato para garantir compatibilidade total.
-                </p>
-            </div>
-
-            <div class="space-y-8">
-                <!-- Formato da Requisição -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">📤 Formato da Requisição do Cliente</h3>
-
-                    <p class="text-gray-700 mb-4">O Syncly enviará requisições com o seguinte formato:</p>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">GET /api/sync/data</h4>
-                        <pre class="text-sm text-gray-700 font-mono"><code>Headers:
-Authorization: Bearer &lt;token&gt;
-Content-Type: application/json
-
-Query Parameters:
-last_sync: 2024-01-15T10:30:00.000Z  (opcional - para sincronização incremental)
-user_id: 12345                        (se necessário para filtrar dados do usuário)</code></pre>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-blue-700 mb-2">🔍 Lógica de Decisão</h4>
-                        <ul class="text-blue-600 text-sm space-y-1">
-                            <li>• <strong>Se last_sync está presente:</strong> Retornar apenas dados modificados desde
-                                essa data</li>
-                            <li>• <strong>Se last_sync está ausente:</strong> Retornar todos os dados (sincronização
-                                completa)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Formato da Resposta -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">📥 Formato da Resposta do Backend</h3>
-
-                    <p class="text-gray-700 mb-4">O backend deve retornar dados no seguinte formato JSON:</p>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>{
-  "success": true,
-  "sync_timestamp": "2024-01-15T15:45:30.123Z",
-  "is_incremental": true,
-  "data": {
-    "users": {
-      "created": [
-        {
-          "id": "user_123",
-          "name": "João Silva",
-          "email": "joao@email.com",
-          "created_at": "2024-01-15T14:20:00.000Z",
-          "updated_at": "2024-01-15T14:20:00.000Z"
-        }
-      ],
-      "updated": [
-        {
-          "id": "user_456",
-          "name": "Maria Santos - Atualizado",
-          "email": "maria@email.com",
-          "created_at": "2024-01-10T10:00:00.000Z",
-          "updated_at": "2024-01-15T15:30:00.000Z"
-        }
-      ],
-      "deleted": ["user_789", "user_101"]
-    },
-    "products": {
-      "created": [
-        {
-          "id": "prod_001",
-          "name": "Produto Novo",
-          "price": 29.99,
-          "created_at": "2024-01-15T13:15:00.000Z",
-          "updated_at": "2024-01-15T13:15:00.000Z"
-        }
-      ],
-      "updated": [],
-      "deleted": ["prod_002"]
-    }
-  }
-}</code></pre>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 text-sm mb-1">✅ success</h4>
-                            <p class="text-green-600 text-xs">Indica se a operação foi bem-sucedida</p>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 text-sm mb-1">🕐 sync_timestamp</h4>
-                            <p class="text-blue-600 text-xs">Timestamp atual do servidor (ISO 8601)</p>
-                        </div>
-
-                        <div class="bg-purple-50 border-l-4 border-purple-500 p-3 rounded-r-lg">
-                            <h4 class="font-semibold text-purple-700 text-sm mb-1">🔄 is_incremental</h4>
-                            <p class="text-purple-600 text-xs">Indica se foi sincronização incremental</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Estrutura dos Dados -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">📊 Estrutura dos Dados</h3>
-
-                    <div class="space-y-4">
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🆕 created</h4>
-                            <p class="text-green-600 text-sm mb-2">Array com registros criados desde o last_sync</p>
-                            <ul class="text-green-600 text-xs space-y-1">
-                                <li>• Deve incluir todos os campos do registro</li>
-                                <li>• Obrigatório: id, created_at, updated_at</li>
-                                <li>• Usar formato ISO 8601 para datas</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">🔄 updated</h4>
-                            <p class="text-blue-600 text-sm mb-2">Array com registros modificados desde o last_sync</p>
-                            <ul class="text-blue-600 text-xs space-y-1">
-                                <li>• Deve incluir todos os campos atualizados</li>
-                                <li>• O updated_at deve ser posterior ao last_sync</li>
-                                <li>• Incluir registro completo, não apenas campos alterados</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-red-700 mb-2">🗑️ deleted</h4>
-                            <p class="text-red-600 text-sm mb-2">Array com IDs dos registros excluídos desde o last_sync
-                            </p>
-                            <ul class="text-red-600 text-xs space-y-1">
-                                <li>• Apenas os IDs dos registros excluídos</li>
-                                <li>• O cliente removerá estes registros localmente</li>
-                                <li>• Importante para manter consistência dos dados</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Implementação SQL -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-orange-600 mb-4">💾 Exemplo de Implementação SQL</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">Estrutura de Tabelas Recomendada:</h4>
-                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>-- Adicionar colunas de auditoria em todas as tabelas
-ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP NULL;
-
--- Criar índices para performance
-CREATE INDEX idx_users_updated_at ON users(updated_at);
-CREATE INDEX idx_users_deleted_at ON users(deleted_at);</code></pre>
-                    </div>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">Query para Sincronização Incremental:</h4>
-                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>-- Registros criados
-SELECT * FROM users 
-WHERE created_at > ? AND deleted_at IS NULL
-ORDER BY created_at;
-
--- Registros atualizados (mas não criados no período)
-SELECT * FROM users 
-WHERE updated_at > ? AND created_at <= ? AND deleted_at IS NULL
-ORDER BY updated_at;
-
--- Registros excluídos (soft delete)
-SELECT id FROM users 
-WHERE deleted_at > ?
-ORDER BY deleted_at;</code></pre>
-                    </div>
-
-                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-yellow-700 mb-2">⚠️ Considerações Importantes</h4>
-                        <ul class="text-yellow-600 text-sm space-y-1">
-                            <li>• Use soft delete (deleted_at) em vez de DELETE físico</li>
-                            <li>• Mantenha registros excluídos por pelo menos 30 dias</li>
-                            <li>• Use transações para garantir consistência</li>
-                            <li>• Considere paginação para grandes volumes de dados</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Exemplo Node.js -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">🚀 Exemplo de Implementação (Node.js)</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <pre class="text-sm text-gray-700 font-mono overflow-x-auto"><code>app.get('/api/sync/data', async (req, res) => {
-  try {
-    const { last_sync, user_id } = req.query;
-    const currentTimestamp = new Date().toISOString();
-    const isIncremental = !!last_sync;
-    
-    let result = {
-      success: true,
-      sync_timestamp: currentTimestamp,
-      is_incremental: isIncremental,
-      data: {}
-    };
-    
-    if (isIncremental) {
-      // Sincronização incremental
-      const syncDate = new Date(last_sync);
-      
-      // Buscar dados de usuários
-      const usersCreated = await db.query(
-        'SELECT * FROM users WHERE created_at > ? AND deleted_at IS NULL',
-        [syncDate]
-      );
-      
-      const usersUpdated = await db.query(
-        'SELECT * FROM users WHERE updated_at > ? AND created_at <= ? AND deleted_at IS NULL',
-        [syncDate, syncDate]
-      );
-      
-      const usersDeleted = await db.query(
-        'SELECT id FROM users WHERE deleted_at > ?',
-        [syncDate]
-      );
-      
-      result.data.users = {
-        created: usersCreated,
-        updated: usersUpdated,
-        deleted: usersDeleted.map(u => u.id)
-      };
-      
-      // Repetir para outras entidades (products, orders, etc.)
-      
-    } else {
-      // Sincronização completa
-      const allUsers = await db.query(
-        'SELECT * FROM users WHERE deleted_at IS NULL'
-      );
-      
-      result.data.users = {
-        created: allUsers,
-        updated: [],
-        deleted: []
-      };
-    }
-    
-    res.json(result);
-    
-  } catch (error) {
-    console.error('Erro na sincronização:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erro interno do servidor'
-    });
-  }
-});</code></pre>
-                    </div>
-                </div>
-
-                <!-- Boas Práticas -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-red-600 mb-4">🎯 Boas Práticas do Backend</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg">
-                                <h4 class="font-semibold text-green-700 text-sm mb-1">✅ Faça</h4>
-                                <ul class="text-green-600 text-xs space-y-1">
-                                    <li>• Use timestamps UTC (ISO 8601)</li>
-                                    <li>• Implemente soft delete</li>
-                                    <li>• Valide o formato do last_sync</li>
-                                    <li>• Use transações para consistência</li>
-                                    <li>• Implemente paginação se necessário</li>
-                                    <li>• Mantenha logs de sincronização</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg">
-                                <h4 class="font-semibold text-red-700 text-sm mb-1">❌ Evite</h4>
-                                <ul class="text-red-600 text-xs space-y-1">
-                                    <li>• DELETE físico de registros</li>
-                                    <li>• Timestamps em timezone local</li>
-                                    <li>• Retornar dados sensíveis desnecessários</li>
-                                    <li>• Ignorar validação de autenticação</li>
-                                    <li>• Queries sem índices em campos de data</li>
-                                    <li>• Respostas sem tratamento de erro</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Detalhes Técnicos -->
-        <section id="technical-details" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-purple-500 pb-2">🔧 Detalhes Técnicos do
-                Sistema Interno</h2>
-
-            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-lg mb-8">
-                <h4 class="font-semibold text-yellow-700 mb-2">⚠️ Seção para Desenvolvedores</h4>
-                <p class="text-yellow-600">
-                    Esta seção contém informações técnicas detalhadas sobre o sistema interno de sincronização
-                    localizado em <code>/lib/sync</code>. É destinada a desenvolvedores que farão manutenção,
-                    implementação de novas funcionalidades ou debugging avançado.
-                </p>
-            </div>
-
-            <div class="space-y-8">
-                <!-- Estrutura Completa do Diretório -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">📁 Estrutura Completa do Diretório /lib/sync
-                    </h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <pre class="text-xs text-gray-700 font-mono overflow-x-auto"><code>/lib/sync/
-├── sync.dart                           # Export principal do módulo
-├── sync_configurator.dart              # Configurador simplificado
-├── sync_provider.dart                  # Provider abstrato para implementação
-├── sync_initializer.dart               # Inicializador independente
-
-├── sync_service.dart                   # Implementação principal do ISyncService
-├── background_sync_service.dart        # Serviço de sincronização em background
-├── sync_documentation.html             # Esta documentação
-│
-├── core/                               # Núcleo do sistema
-│   ├── adapters/                       # Adaptadores para integração
-│   ├── config/
-│   │   └── sync_config.dart            # Configurações globais
-│   ├── contracts/                      # Contratos/interfaces principais
-│   │   ├── internal_sync_log_manager.dart
-│   │   ├── sync_auth_provider.dart
-│   │   ├── sync_http_client.dart
-│   │   ├── sync_logger_debug_provider.dart
-│   │   ├── sync_model_syncable.dart
-│   │   └── sync_notification_provider.dart
-│   ├── entities/                       # Entidades de dados
-│   │   ├── sync_connectivity_status.dart
-│   │   ├── sync_data.dart
-│   │   ├── sync_http_exception.dart
-│   │   ├── sync_http_response.dart
-│   │   └── sync_log.dart
-│   ├── enums/                          # Enumerações
-│   │   ├── sync_batch_type.dart
-│   │   ├── sync_connectivity_type.dart
-│   │   ├── sync_http_exception_type.dart
-│   │   ├── sync_log_debug_level.dart
-│   │   ├── sync_operation.dart
-│   │   └── sync_status.dart
-│   ├── interfaces/                     # Interfaces públicas
-│   │   ├── i_download_strategy.dart
-│   │   ├── i_logger_provider.dart
-│   │   ├── i_storage_provider.dart
-│   │   └── i_sync_service.dart
-│   ├── presentation/                   # Componentes de UI
-│   │   ├── controllers/
-│   │   ├── utils/
-│   │   └── widgets/
-│   ├── providers/                      # Implementações padrão
-│   │   ├── default_sync_logger_provider.dart
-│   │   └── default_sync_notification_provider.dart
-│   ├── services/                       # Serviços internos
-│   │   ├── internal_sync_log_storage.dart
-│   │   ├── storage_service.dart
-│   │   ├── sync_connectivity_service.dart
-│   │   ├── sync_data_cleanup_service.dart
-│   │   ├── sync_error_manager.dart
-│   │   ├── sync_error_reporter.dart
-│   │   └── sync_logger_service.dart
-│   ├── theme/
-│   │   └── sync_theme.dart             # Tema para componentes UI
-│   └── utils/
-│       └── sync_utils.dart             # Utilitários gerais
-│
-└── strategies/                         # Estratégias de sincronização
-    ├── sync_download_strategy.dart     # Estratégia de download
-    └── sync_upload_strategy.dart       # Estratégia de upload</code></pre>
-                    </div>
-                </div>
-
-                <!-- Componentes Principais -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">⚙️ Componentes Principais</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">🎯 SyncService</h4>
-                            <p class="text-blue-600 text-sm mb-2">
-                                Implementação principal do <code>ISyncService</code>. Gerencia todo o ciclo de vida
-                                da sincronização, incluindo operações automáticas, tratamento de falhas e modo offline.
-                            </p>
-                            <ul class="text-blue-600 text-xs space-y-1">
-                                <li>• Controle de mutex para operações concorrentes</li>
-                                <li>• Timer para sincronização automática</li>
-                                <li>• Gerenciamento de conectividade</li>
-                                <li>• Recovery automático de falhas</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">📱 BackgroundSyncService</h4>
-                            <p class="text-green-600 text-sm mb-2">
-                                Gerencia sincronização em background usando WorkManager.
-                                Executa sync mesmo quando o app está fechado.
-                            </p>
-                            <ul class="text-green-600 text-xs space-y-1">
-                                <li>• Integração com WorkManager</li>
-                                <li>• Notificações de progresso</li>
-                                <li>• Execução independente do app</li>
-                                <li>• Configuração de intervalos</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-purple-700 mb-2">🔄 Estratégias de Sync</h4>
-                            <p class="text-purple-600 text-sm mb-2">
-                                <code>SyncDownloadStrategy</code> e <code>SyncUploadStrategy</code>
-                                implementam a lógica específica de download e upload.
-                            </p>
-                            <ul class="text-purple-600 text-xs space-y-1">
-                                <li>• Download: limpeza, cache, notificações</li>
-                                <li>• Upload: fila, retry, batch processing</li>
-                                <li>• Estratégias plugáveis via <code>IDownloadStrategy</code></li>
-                                <li>• Orquestração de múltiplas estratégias</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-orange-700 mb-2">📝 Sistema de Logs</h4>
-                            <p class="text-orange-600 text-sm mb-2">
-                                <code>LoggerProvider</code> e <code>InternalSyncLogStorage</code>
-                                gerenciam logs de sincronização de forma independente.
-                            </p>
-                            <ul class="text-orange-600 text-xs space-y-1">
-                                <li>• Storage independente via <code>IStorageProvider</code></li>
-                                <li>• Logs estruturados com metadata</li>
-                                <li>• Retry automático e cleanup</li>
-                                <li>• Debug logging separado</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Fluxo de Dados Interno -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-red-600 mb-4">🔄 Fluxo de Dados Interno</h3>
-
-                    <div class="space-y-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">1. Operação de Log (Create/Update/Delete)</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>AppSyncService.logCreate()</strong> →
-                                    <strong>SynclyService.logCreate()</strong> →
-                                    <strong>SyncService.addToSyncQueue()</strong>
-                                </p>
-                                <p>↓</p>
-                                <p><strong>LoggerProvider.logCustomOperation()</strong> →
-                                    <strong>InternalSyncLogStorage.createLog()</strong>
-                                </p>
-                                <p>↓</p>
-                                <p><strong>IStorageProvider.setString()</strong> (persiste no storage local)</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">2. Ciclo de Sincronização</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>SyncService.forceSync()</strong> → <strong>_executeSyncSafely()</strong></p>
-                                <p>↓</p>
-                                <p><strong>SyncDownloadStrategy.execute()</strong> (baixa dados do servidor)</p>
-                                <p>↓</p>
-                                <p><strong>SyncUploadStrategy.execute()</strong> (envia logs pendentes)</p>
-                                <p>↓</p>
-                                <p><strong>LoggerProvider.markAsSynced()</strong> (marca logs como sincronizados)</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">3. Gerenciamento de Estado</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>SyncService._updateSyncStatus()</strong> → <strong>syncData.value =
-                                        SyncData(...)</strong></p>
-                                <p>↓</p>
-                                <p><strong>ValueNotifier.notifyListeners()</strong> (notifica UI)</p>
-                                <p>↓</p>
-                                <p><strong>Controllers/Widgets</strong> reagem às mudanças de estado</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Interfaces e Contratos -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">🔌 Interfaces e Contratos Principais</h3>
-
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-indigo-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-indigo-700 mb-2">ISyncService</h4>
-                            <p class="text-indigo-600 text-sm mb-2">Interface principal do serviço de sincronização</p>
-                            <ul class="text-indigo-600 text-xs space-y-1">
-                                <li>• <code>startSync()</code>, <code>stopSync()</code>, <code>forceSync()</code></li>
-                                <li>• <code>addToSyncQueue()</code></li>
-                                <li>• <code>logCreate()</code>, <code>logUpdate()</code>, <code>logDelete()</code></li>
-                                <li>• <code>ValueNotifier&lt;SyncData&gt; syncData</code></li>
-                                <li>• <code>ValueNotifier&lt;bool&gt; isOnline</code></li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-teal-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-teal-700 mb-2">ILoggerProvider</h4>
-                            <p class="text-teal-600 text-sm mb-2">Interface para logging de sincronização</p>
-                            <ul class="text-teal-600 text-xs space-y-1">
-                                <li>• <code>logCreate&lt;T&gt;()</code>, <code>logUpdate&lt;T&gt;()</code>,
-                                    <code>logDelete&lt;T&gt;()</code>
-                                </li>
-                                <li>• <code>logCustomOperation()</code></li>
-                                <li>• <code>getPendingLogs()</code></li>
-                                <li>• <code>removeLog()</code>, <code>clearAllLogs()</code></li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-pink-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-pink-700 mb-2">ISyncAuthProvider</h4>
-                            <p class="text-pink-600 text-sm mb-2">Provider de autenticação para sync</p>
-                            <ul class="text-pink-600 text-xs space-y-1">
-                                <li>• <code>isAuthenticated()</code></li>
-                                <li>• <code>getAuthToken()</code></li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-yellow-700 mb-2">ISyncHttpClientProvider</h4>
-                            <p class="text-yellow-600 text-sm mb-2">Provider de cliente HTTP para sync</p>
-                            <ul class="text-yellow-600 text-xs space-y-1">
-                                <li>• <code>httpGet&lt;T&gt;()</code>, <code>httpPost&lt;T&gt;()</code></li>
-                                <li>• <code>httpPut&lt;T&gt;()</code>, <code>httpPatch&lt;T&gt;()</code></li>
-                                <li>• <code>httpDownloadBytes()</code></li>
-                                <li>• <code>httpUploadFile&lt;T&gt;()</code></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configurações e Customização -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">⚙️ Configurações e Customização</h3>
-
-                    <div class="space-y-6">
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">SyncConfig - Configuração Principal</h4>
-                            <p class="text-green-600 text-sm mb-2">Classe abstrata que centraliza todas as
-                                configurações:</p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>abstract class SyncConfig {
-  // Configurações básicas
-  String get appName;
-  String get appVersion;
-  bool get enableLogs => true;
-  bool get enableBackgroundSync => true;
-  
-  // 🎉 v0.1.0+: Sistema de notificações simplificado
-  bool get enableNotifications => true; // Só isso é necessário!
-  
-  // Configurações de tempo
-  Duration get backgroundSyncInterval => Duration(minutes: 15);
-  int get maxRetryAttempts => 3;
-  Duration get networkTimeout => Duration(seconds: 30);
-  
-  // Métodos HTTP obrigatórios
-  Future<T> httpGet<T>(String url, {Map<String, String>? headers});
-  Future<T> httpPost<T>(String url, {dynamic data, Map<String, String>? headers});
-  
-  // Métodos de autenticação obrigatórios
-  Future<bool> isAuthenticated();
-  Future<String?> getAuthToken();
-  
-  // ✅ Notificações agora são gerenciadas internamente!
-  // Não é mais necessário implementar métodos de notificação
-}</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-orange-700 mb-2">Inicialização com SyncConfigurator</h4>
-                            <p class="text-orange-600 text-sm mb-2">Configure e inicialize o sistema de sincronização:
-                            </p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>// 1. Implemente seu SyncConfig
-class MySyncConfig extends SyncConfig {
-  @override
-  String get appName => 'Meu App';
-  
-  @override
-  String get appVersion => '1.0.0';
-  
-  @override
-  Future<T> httpGet<T>(String url, {Map<String, String>? headers}) async {
-    // Implementar requisição GET
-  }
-  
-  // Implementar outros métodos obrigatórios...
-}
-
-// 2. Inicializar o sistema
-final config = MySyncConfig();
-
-// Opção 1: Usar estratégias definidas no SyncConfig (padrão)
-await SyncInitializer.initialize(config);
-
-// Opção 2: Passar estratégias diretamente
-await SyncInitializer.initialize(
-  config,
-  downloadStrategies: [
-    MyDownloader(),
-    AnotherDownloader(),
-  ],
-);
-
-// Estratégias definidas no SyncConfig
-class MySyncConfig extends SyncConfig {
-  @override
-  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
-    Modular.get&lt;MyDownloader&gt;(),
-    GetIt.instance.get&lt;AnotherDownloader&gt;(),
-  ];
-}
-
-await SyncInitializer.initialize(MySyncConfig());
-
-// 3. Acessar o serviço
-final syncService = SyncConfigurator.syncService;</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">Configuração Avançada</h4>
-                            <p class="text-blue-600 text-sm mb-2">Personalize comportamentos e estratégias:</p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>class AdvancedSyncConfig extends SyncConfig {
-  @override
-  Duration get backgroundSyncInterval => Duration(minutes: 5);
-  
-  @override
-  int get maxRetryAttempts => 5;
-  
-  @override
-  int get maxDataBatchSize => 100;
-  
-  @override
-  int get maxFileBatchSize => 10;
-  
-  @override
-  SyncTheme? get theme => SyncTheme(
-    primaryColor: Colors.blue,
-    backgroundColor: Colors.white,
-    textColor: Colors.black,
-  );
-  
-  @override
-  Future<void> onSyncStarted() async {
-    // Callback quando sincronização inicia
-  }
-  
-  @override
-  Future<void> onSyncCompleted(bool success) async {
-    // Callback quando sincronização termina
-  }
-}</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-purple-700 mb-2">Estratégias Customizadas</h4>
-                            <p class="text-purple-600 text-sm mb-2">Implemente estratégias específicas de download e
-                                limpeza:</p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>class MySyncConfig extends SyncConfig {
-  @override
-  Future<void> downloadStrategy() async {
-    // Implementar lógica de download personalizada
-    // Ex: baixar dados específicos, cache, etc.
-    print('Executando download customizado...');
-  }
-  
-  @override
-  Future<void> dataCleanupStrategy() async {
-    // Implementar lógica de limpeza personalizada
-    // Ex: remover dados antigos, cache, etc.
-    print('Executando limpeza customizada...');
-  }
-  
-  @override
-  Future<void> onConnectivityChanged(bool isOnline) async {
-    // Callback quando conectividade muda
-    if (isOnline) {
-      print('Conectado - iniciando sincronização');
-    } else {
-      print('Desconectado - modo offline');
-    }
-  }
-}</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download</h4>
-                            <p class="text-green-600 text-sm mb-2">Configure estratégias de download no SyncConfig:</p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>// Estratégias definidas no SyncConfig
-class MySyncConfig extends SyncConfig {
-  @override
-  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
-    TodoDownloader(),
-    UserDownloader(),
-    FileDownloader(),
-  ];
-}
-
-await SyncInitializer.initialize(MySyncConfig());
-
-// Integração com sistemas de DI
-class MySyncConfig extends SyncConfig {
-  @override
-  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
-    Modular.get&lt;TodoDownloader&gt;(),
-    Modular.get&lt;UserDownloader&gt;(),
-    GetIt.instance.get&lt;FileDownloader&gt;(),
-  ];
-}
-
-// Exemplo para testes com mocks
-class TestSyncConfig extends SyncConfig {
-  @override
-  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
-    MockDownloader(),
-    MockUserDownloader(),
-  ];
-}
-
-// Benefícios:
-// ✅ Configuração centralizada no SyncConfig
-// ✅ Simplicidade e consistência
-// ✅ Fácil para testes unitários
-// ✅ Melhor organização do código
-// ✅ Evita erros de runtime por falta de estratégias</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Debugging e Monitoramento -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-red-600 mb-4">🐛 Debugging e Monitoramento</h3>
-
-                    <div class="space-y-6">
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-red-700 mb-2">Logs de Debug</h4>
-                            <p class="text-red-600 text-sm mb-2">O sistema possui logging em múltiplas camadas:</p>
-                            <ul class="text-red-600 text-sm space-y-1">
-                                <li>• <strong>ISyncLoggerDebugProvider:</strong> Logs de debug detalhados</li>
-                                <li>• <strong>SyncErrorManager:</strong> Gerenciamento de erros</li>
-                                <li>• <strong>SyncErrorReporter:</strong> Relatório de erros para analytics</li>
-                                <li>• <strong>InternalSyncLogStorage:</strong> Logs de operações de sync</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-orange-700 mb-2">Monitoramento de Performance</h4>
-                            <p class="text-orange-600 text-sm mb-2">Métricas importantes para monitorar:</p>
-                            <ul class="text-orange-600 text-sm space-y-1">
-                                <li>• <strong>Tempo de sincronização:</strong> Duração de cada ciclo</li>
-                                <li>• <strong>Taxa de sucesso:</strong> Porcentagem de syncs bem-sucedidos</li>
-                                <li>• <strong>Itens pendentes:</strong> Quantidade na fila de sync</li>
-                                <li>• <strong>Falhas consecutivas:</strong> Indicador de problemas</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-yellow-700 mb-2">Comandos de Debug</h4>
-                            <p class="text-yellow-600 text-sm mb-2">Comandos úteis para debugging:</p>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>// Forçar sincronização imediata
-await syncService.forceSync();
-
-// Verificar logs pendentes
-final logs = await loggerProvider.getPendingLogs();
-print('Logs pendentes: ${logs.length}');
-
-// Limpar todos os logs (cuidado!)
-await loggerProvider.clearAllLogs();
-
-// Verificar conectividade
-final isOnline = await connectivityService.isConnected();
-print('Online: $isOnline');</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Considerações de Manutenção -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">🔧 Considerações de Manutenção</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 border-l-4 border-gray-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-gray-700 mb-2">⚠️ Pontos de Atenção</h4>
-                            <ul class="text-gray-600 text-sm space-y-1">
-                                <li>• <strong>Mutex:</strong> SyncService usa mutex para evitar concorrência</li>
-                                <li>• <strong>Memory Leaks:</strong> Sempre remover listeners no dispose</li>
-                                <li>• <strong>Storage:</strong> Logs são persistidos localmente</li>
-                                <li>• <strong>Background:</strong> WorkManager pode ser terminado pelo sistema</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-blue-700 mb-2">✅ Boas Práticas</h4>
-                            <ul class="text-blue-600 text-sm space-y-1">
-                                <li>• <strong>Testes:</strong> Sempre testar em modo offline</li>
-                                <li>• <strong>Logs:</strong> Implementar cleanup automático</li>
-                                <li>• <strong>Retry:</strong> Configurar retry adequado para cada operação</li>
-                                <li>• <strong>Monitoring:</strong> Implementar métricas de performance</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- API Routes -->
-        <section id="api-routes" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-500 pb-2">🌐 Rotas da API de
-                Sincronização</h2>
-
-            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg mb-8">
-                <h4 class="font-semibold text-indigo-700 mb-2">📋 Visão Geral</h4>
-                <p class="text-indigo-600">
-                    As rotas configuradas no <code>SynclyProvider</code> (linhas 96-106) definem os endpoints
-                    para comunicação com o backend. Cada rota tem um propósito específico e formato de dados
-                    padronizado.
-                </p>
-            </div>
-
-            <div class="space-y-8">
-                <!-- Rota 1: Logs de Sincronização -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="flex items-center mb-4">
-                        <span class="bg-green-500 text-white px-3 py-1 rounded text-sm font-bold mr-3">POST</span>
-                        <code class="text-indigo-700 font-mono text-lg">/api/sync/logs</code>
-                    </div>
-                    <p class="text-gray-600 mb-6">Endpoint principal para envio de logs de sincronização (operações
-                        create, update, delete)</p>
-
-                    <div class="grid lg:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-blue-500 mr-2">📤</span> Request Body
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>{
-  "operation": "create|update|delete",
-  "entityType": "ServiceOrderAppointment",
-  "entityId": "uuid-string",
-  "data": {
-    // Dados da entidade (para create/update)
-    "id": "uuid",
-    "title": "Ordem de Serviço",
-    "status": "pending",
-    "createdAt": "2024-01-15T10:30:00Z"
-  },
-  "timestamp": "2024-01-15T10:30:00Z",
-  "deviceId": "device-uuid",
-  "userId": "user-uuid"
-}</code></pre>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-green-500 mr-2">📥</span> Response
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>// Sucesso:
-{
-  "success": true,
-  "message": "Log processado com sucesso",
-  "logId": "log-uuid",
-  "processedAt": "2024-01-15T10:30:05Z"
-}
-
-// Erro:
-{
-  "success": false,
-  "error": "Validation failed",
-  "details": {
-    "field": "entityId",
-    "message": "Campo obrigatório"
-  }
-}</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rota 2: Logs de Erro -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="flex items-center mb-4">
-                        <span class="bg-red-500 text-white px-3 py-1 rounded text-sm font-bold mr-3">POST</span>
-                        <code class="text-red-700 font-mono text-lg">/api/sync/error-logs</code>
-                    </div>
-                    <p class="text-gray-600 mb-6">Endpoint para envio de logs de erro de sincronização e debugging</p>
-
-                    <div class="grid lg:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-blue-500 mr-2">📤</span> Request Body
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>{
-  "errorType": "sync_failed|network_error|validation_error",
-  "errorMessage": "Falha na sincronização",
-  "stackTrace": "Exception stack trace...",
-  "context": {
-    "operation": "upload",
-    "entityType": "ServiceOrderAppointment",
-    "entityId": "uuid-string",
-    "attemptNumber": 3
-  },
-  "timestamp": "2024-01-15T10:30:00Z",
-  "deviceInfo": {
-    "platform": "android",
-    "version": "1.0.0",
-    "deviceId": "device-uuid"
-  },
-  "userId": "user-uuid"
-}</code></pre>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-green-500 mr-2">📥</span> Response
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>// Sucesso:
-{
-  "success": true,
-  "message": "Log de erro registrado",
-  "errorLogId": "error-log-uuid",
-  "registeredAt": "2024-01-15T10:30:05Z"
-}
-
-// Erro:
-{
-  "success": false,
-  "error": "Invalid error type",
-  "validTypes": [
-    "sync_failed",
-    "network_error",
-    "validation_error"
-  ]
-}</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rota 3: Sincronização de Arquivos -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="flex items-center mb-4">
-                        <span class="bg-blue-500 text-white px-3 py-1 rounded text-sm font-bold mr-3">POST</span>
-                        <code class="text-blue-700 font-mono text-lg">/api/sync/files</code>
-                    </div>
-                    <p class="text-gray-600 mb-6">Endpoint para upload de arquivos e mídia (multipart/form-data)</p>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
-                        <h5 class="font-semibold text-blue-700 mb-2">📋 Campo fileIds</h5>
-                        <p class="text-blue-600 text-sm">
-                            O campo <code>fileIds</code> é um array JSON que contém os IDs dos arquivos na mesma ordem
-                            em que são enviados no campo <code>files</code>. Isso permite ao backend associar
-                            corretamente cada arquivo com seu respectivo ID de entidade.
-                        </p>
-                    </div>
-
-                    <div class="grid lg:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-blue-500 mr-2">📤</span> Request (Multipart)
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>Content-Type: multipart/form-data
-
-// Form fields:
-files: [binary file data] // Múltiplos arquivos
-fileIds: ["uuid1", "uuid2", "uuid3"] // Array JSON com IDs dos arquivos na ordem
-entityType: "ServiceOrderAppointment"
-entityId: "uuid-string"
-fileType: "image|document|video|audio"
-fileName: "photo.jpg"
-fileSize: 1024000
-timestamp: "2024-01-15T10:30:00Z"
-deviceId: "device-uuid"
-userId: "user-uuid"
-
-// Metadata opcional:
-metadata: {
-  "description": "Foto da ordem de serviço",
-  "location": {
-    "lat": -23.5505,
-    "lng": -46.6333
-  }
-}</code></pre>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <span class="text-green-500 mr-2">📥</span> Response
-                            </h5>
-                            <div class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
-                                <pre><code>// Sucesso:
-{
-  "success": true,
-  "message": "Arquivo enviado com sucesso",
-  "fileId": "file-uuid",
-  "fileUrl": "https://api.example.com/files/file-uuid",
-  "thumbnailUrl": "https://api.example.com/thumbnails/file-uuid",
-  "uploadedAt": "2024-01-15T10:30:05Z",
-  "fileSize": 1024000,
-  "mimeType": "image/jpeg"
-}
-
-// Erro:
-{
-  "success": false,
-  "error": "File too large",
-  "maxSize": 10485760,
-  "receivedSize": 15728640
-}</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Headers e Autenticação -->
-                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-lg">
-                    <h4 class="font-semibold text-yellow-700 mb-3">🔐 Headers e Autenticação</h4>
-                    <div class="space-y-4">
-                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
-                            <h5 class="font-semibold text-gray-700 mb-2">Headers Obrigatórios:</h5>
-                            <div class="bg-gray-800 text-green-400 p-3 rounded text-sm">
-                                <pre><code>Authorization: Bearer {jwt-token}
-Content-Type: application/json
-X-Device-ID: {device-uuid}
-X-App-Version: {app-version}</code></pre>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
-                            <h5 class="font-semibold text-gray-700 mb-2">Configuração Automática:</h5>
-                            <p class="text-gray-600 text-sm">
-                                Os headers são configurados automaticamente pelo <code>SynclyProvider</code>
-                                através do método <code>defaultHeaders</code>. A autenticação é gerenciada
-                                pelo <code>ISyncAuthProvider</code> registrado no sistema.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Como Usar -->
-        <section id="usage" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-secondary pb-2">🚀 Como Usar a Nova
-                Arquitetura</h2>
-
-            <div class="space-y-8">
-                <!-- Passo 1: Implementar SyncConfig -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">📦 1. Implementar SyncConfig</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Crie uma classe que implementa <code
-                                class="bg-gray-200 px-2 py-1 rounded">SyncConfig</code> com todos os métodos
-                            obrigatórios:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>// lib/app_sync_config.dart
-import 'package:dio/dio.dart';
-import 'package:syncly/syncly.dart';
-
-class AppSyncConfig implements SyncConfig {
-  final Dio _dio = Dio();
-  
-  // ========== CONFIGURAÇÕES BÁSICAS ==========
-  @override
-  String get appName => 'Meu App';
-  
-  @override
-  String get appVersion => '1.0.0';
-  
-  @override
-  bool get enableDebugLogs => true;
-  
-  @override
-  bool get enableBackgroundSync => true;
-  
-  @override
-  bool get enableNotifications => true;
-  
-  // ========== CONFIGURAÇÕES DE TEMPO ==========
-  @override
-  Duration get syncInterval => const Duration(minutes: 5);
-  
-  @override
-  Duration get backgroundSyncInterval => const Duration(minutes: 15);
-  
-  @override
-  int get maxRetryAttempts => 3;
-  
-  @override
-  Duration get networkTimeout => const Duration(seconds: 30);
-  
-  // ========== CONFIGURAÇÕES DE LOTE ==========
-  @override
-  int get maxDataBatchSize => 20;
-  
-  @override
-  int get maxFileBatchSize => 5;
-  
-  // ========== CONFIGURAÇÕES DE ENDPOINTS ==========
-  @override
-  String? get baseUrl => 'https://api.exemplo.com';
-  
-  @override
-  String get dataSyncEndpoint => '/sync/batch';
-  
-  @override
-  String get fileSyncEndpoint => '/sync/files';
-  
-  
-  @override
-  Map<String, String> get defaultHeaders => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-App-Version': appVersion,
-  };
-}</code></pre>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-blue-700 mb-2">📋 Métodos Obrigatórios</h4>
-                        <p class="text-blue-600 text-sm">
-                            O <code>SyncConfig</code> possui vários métodos obrigatórios que devem ser implementados.
-                            Veja os exemplos completos abaixo.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 1.1: Métodos HTTP -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">🌐 1.1. Implementar Métodos HTTP</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Implemente os métodos HTTP usando Dio ou outro cliente
-                            HTTP:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>  // ========== MÉTODOS HTTP ==========
-  @override
-  Future<SyncHttpResponse<T>> httpGet<T>(
-    String url, {
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? queryParameters,
-    Duration? timeout,
-  }) async {
-    try {
-      final response = await _dio.get(
-        url,
-        queryParameters: queryParameters,
-        options: Options(
-          headers: {...defaultHeaders, ...?headers},
-          receiveTimeout: timeout ?? networkTimeout,
-        ),
-      );
-      
-      return SyncHttpResponse<T>(
-        data: response.data,
-        statusCode: response.statusCode ?? 0,
-        headers: response.headers.map,
-        isSuccess: response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300,
-      );
-    } catch (e) {
-      return SyncHttpResponse<T>(
-        data: null,
-        statusCode: 0,
-        headers: {},
-        isSuccess: false,
-        error: e.toString(),
-      );
-    }
-  }
-  
-  @override
-  Future<SyncHttpResponse<T>> httpPost<T>(
-    String url, {
-    dynamic data,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? queryParameters,
-    Duration? timeout,
-  }) async {
-    try {
-      final response = await _dio.post(
-        url,
-        data: data,
-        queryParameters: queryParameters,
-        options: Options(
-          headers: {...defaultHeaders, ...?headers},
-          receiveTimeout: timeout ?? networkTimeout,
-        ),
-      );
-      
-      return SyncHttpResponse<T>(
-        data: response.data,
-        statusCode: response.statusCode ?? 0,
-        headers: response.headers.map,
-        isSuccess: response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300,
-      );
-    } catch (e) {
-      return SyncHttpResponse<T>(
-        data: null,
-        statusCode: 0,
-        headers: {},
-        isSuccess: false,
-        error: e.toString(),
-      );
-    }
-  }
-  
-  // Implementar também: httpPut, httpDelete, httpPatch, httpDownloadBytes, httpUploadFile</code></pre>
-                    </div>
-                </div>
-
-                <!-- Passo 1.2: Métodos de Autenticação -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-yellow-600 mb-4">🔐 1.2. Implementar Autenticação</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Implemente os métodos de autenticação:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>  // ========== AUTENTICAÇÃO ==========
-  @override
-  Future<bool> isAuthenticated() async {
-    final token = await getAuthToken();
-    return token != null && token.isNotEmpty;
-  }
-  
-
-  
-
-  
-
-  
-  </code></pre>
-                    </div>
-                </div>
-
-                <!-- Passo 1.3: Sistema de Notificações Simplificado -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-pink-600 mb-4">🔔 1.3. Sistema de Notificações (v0.1.0+)</h3>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mb-4">
-                        <h4 class="font-semibold text-green-700 mb-2">🎉 Novidade v0.1.0: Sistema Interno</h4>
-                        <p class="text-green-600 text-sm">
-                            O sistema de notificações agora é <strong>totalmente gerenciado internamente</strong> pelo
-                            Syncly!
-                            Não é mais necessário implementar métodos de notificação.
-                        </p>
-                    </div>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">✅ <strong>Configuração Simplificada</strong> - Apenas uma
-                            propriedade:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>  // ========== NOTIFICAÇÕES SIMPLIFICADAS ==========
-  @override
-  bool get enableNotifications => true; // Só isso é necessário!
-  
-  // ✅ NÃO é mais necessário implementar:
-  // - initializeNotifications()
-  // - showNotification()
-  // - showProgressNotification() 
-  // - cancelNotification()
-  // - cancelAllNotifications()
-  // - areNotificationsEnabled()</code></pre>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-4 mt-4">
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-red-700 mb-2">❌ Antes (v0.0.x)</h4>
-                            <p class="text-red-600 text-sm">
-                                Muito código boilerplate:<br>
-                                • 6+ métodos obrigatórios<br>
-                                • Configuração manual complexa<br>
-                                • Gerenciamento de dependências
-                            </p>
-                        </div>
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">✅ Agora (v0.1.0+)</h4>
-                            <p class="text-green-600 text-sm">
-                                Configuração mínima:<br>
-                                • 1 propriedade apenas<br>
-                                • Sistema automático<br>
-                                • Logs de desenvolvimento integrados
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Passo 1.4: Estratégias e Limpeza -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-teal-600 mb-4">⚙️ 1.4. Estratégias e Limpeza de Dados</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Implemente as estratégias de download e limpeza:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>  // ========== ESTRATÉGIAS DE DOWNLOAD ==========
-  @override
-  List<IDownloadStrategy> get downloadStrategies => [
-    // Exemplo de estratégia personalizada
-    UserDownloadStrategy(),
-    ProductDownloadStrategy(),
-    OrderDownloadStrategy(),
-  ];
-  
-  // ========== LIMPEZA DE DADOS ==========
-  @override
-  Future<void> clearLocalData() async {
-    // Implementar limpeza dos dados locais
-    // Exemplo usando banco de dados:
-    /*
-    final database = await DatabaseHelper.instance.database;
-    await database.delete('users');
-    await database.delete('products');
-    await database.delete('orders');
-    await database.delete('sync_logs');
-    */
-    
-    print('Dados locais limpos');
-  }</code></pre>
-                    </div>
-
-                    <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-teal-700 mb-2">💡 Estratégias de Download</h4>
-                        <p class="text-teal-600 text-sm">
-                            As estratégias de download definem como baixar dados específicos do servidor. Cada
-                            estratégia implementa a interface <code>IDownloadStrategy</code>.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 2: Inicialização -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">🚀 2. Inicialização do Sistema</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Inicialize o Syncly no <code
-                                class="bg-gray-200 px-2 py-1 rounded">main.dart</code>:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>// lib/main.dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Inicializar o sistema de sincronização
-  await SyncConfigurator.initialize(AppSyncConfig());
-  
-  runApp(MyApp());
-}</code></pre>
-                    </div>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-green-700 mb-2">💡 Dica</h4>
-                        <p class="text-green-600 text-sm">
-                            O <code>SyncConfigurator.initialize()</code> configura automaticamente todos os serviços e
-                            dependências necessárias.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 3: Uso nos Datasources -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">💾 3. Uso nos Datasources</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Acesse o serviço de sincronização através do <code
-                                class="bg-gray-200 px-2 py-1 rounded">SyncConfigurator</code>:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>class ServiceOrderAppointmentLocalDatasourceImpl 
-    implements ServiceOrderAppointmentLocalDatasource {
-  
-  // Acessa o serviço através do configurador
-  AppSyncService get _syncService => SyncConfigurator.syncService;
-
-  @override
-  Future<ServiceOrderAppointmentModel> save(
-      ServiceOrderAppointmentModel appointment) async {
-    
-    // 1. Salvar no banco local
-    // await _databaseProvider.insert(appointment);
-    
-    // 2. Registrar para sincronização
-    await _syncService.logCreate(
-      'ServiceOrderAppointment',
-      appointment.id,
-      appointment.toJson(),
-    );
-    
-    return appointment;
-  }
-}</code></pre>
-                    </div>
-
-                    <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-purple-700 mb-2">💡 Vantagem</h4>
-                        <p class="text-purple-600 text-sm">
-                            Não é necessário injeção de dependência manual - o <code>SyncConfigurator</code> gerencia
-                            tudo automaticamente.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 4: Uso nos Controllers -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-orange-600 mb-4">🎮 4. Monitoramento nos Controllers</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Monitore o estado de sincronização nos controllers:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>class HomeController extends BaseController {
-  AppSyncService get syncService => SyncConfigurator.syncService;
-
-  @override
-  void onInit() {
-    super.onInit();
-    // Escuta mudanças no estado de sincronização
-    syncService.syncData.addListener(_onSyncStateChanged);
-  }
-
-  void _onSyncStateChanged() {
-    final syncData = syncService.syncData.value;
-    
-    if (syncData.status == AppSyncStatus.success || 
-        syncData.status == AppSyncStatus.idle) {
-      // Recarregar dados quando sincronização terminar
-      _loadData();
-    }
-  }
-  
-  void forceSync() {
-    syncService.forceSync();
-  }
-  
-  Future<int> getPendingCount() {
-    return syncService.getPendingItemsCount();
-  }
-
-  @override
-  void dispose() {
-    syncService.syncData.removeListener(_onSyncStateChanged);
-    super.dispose();
-  }
-}</code></pre>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Exemplos Práticos -->
-        <section id="examples" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-accent pb-2">💡 Exemplos Práticos</h2>
-
-            <div class="space-y-8">
-                <!-- Exemplo: logCreate -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">✅ Criando Registros com logCreate</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Use <code
-                                class="bg-gray-200 px-2 py-1 rounded">logCreate</code> sempre que criar um novo
-                            registro:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>@override
-Future<ServiceOrderAppointmentModel> save(
-    ServiceOrderAppointmentModel appointment) async {
-  
-  // Acessa o serviço através do configurador
-  final syncService = SyncConfigurator.syncService;
-  
-  // 1. Salvar no banco local
-  // await _databaseProvider.insert(appointment);
-  
-  // 2. Registrar para sincronização
-  await syncService.logCreate(
-    'ServiceOrderAppointment',  // Tipo da entidade
-    appointment.id,             // ID do registro
-    appointment.toJson(),       // Dados do registro
-  );
-  
-  return appointment;
-}</code></pre>
-                    </div>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-green-700 mb-2">💡 Dica</h4>
-                        <p class="text-green-600 text-sm">
-                            O <code>logCreate</code> adiciona o registro na fila de sincronização para ser enviado ao
-                            servidor.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Exemplo: logUpdate -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">🔄 Atualizando Registros com logUpdate</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Use <code
-                                class="bg-gray-200 px-2 py-1 rounded">logUpdate</code> sempre que atualizar um registro
-                            existente:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>@override
-Future<ServiceOrderAppointmentModel> update(
-    ServiceOrderAppointmentModel appointment) async {
-  
-  // Acessa o serviço através do configurador
-  final syncService = SyncConfigurator.syncService;
-  
-  // 1. Atualizar no banco local
-  // await _databaseProvider.update(appointment);
-  
-  // 2. Registrar para sincronização
-  await syncService.logUpdate(
-    'ServiceOrderAppointment',  // Tipo da entidade
-    appointment.id,             // ID do registro
-    appointment.toJson(),       // Dados atualizados
-  );
-  
-  return appointment;
-}</code></pre>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-blue-700 mb-2">💡 Dica</h4>
-                        <p class="text-blue-600 text-sm">
-                            O <code>logUpdate</code> marca o registro para ser atualizado no servidor na próxima
-                            sincronização.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Exemplo: logDelete -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-red-600 mb-4">🗑️ Deletando Registros com logDelete</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Use <code
-                                class="bg-gray-200 px-2 py-1 rounded">logDelete</code> sempre que deletar um registro:
-                        </p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>@override
-Future<void> delete(String appointmentId) async {
-  
-  // Acessa o serviço através do configurador
-  final syncService = SyncConfigurator.syncService;
-  
-  // 1. Buscar o registro antes de deletar (para ter os dados)
-  final appointment = await findById(appointmentId);
-  
-  if (appointment != null) {
-    // 2. Deletar do banco local
-    // await _databaseProvider.delete(appointmentId);
-    
-    // 3. Registrar para sincronização
-    await syncService.logDelete(
-      'ServiceOrderAppointment',  // Tipo da entidade
-      appointment.id,             // ID do registro
-    );
-  }
-}</code></pre>
-                    </div>
-
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mt-4">
-                        <h4 class="font-semibold text-red-700 mb-2">⚠️ Importante</h4>
-                        <p class="text-red-600 text-sm">
-                            Para <code>logDelete</code>, busque o registro antes de deletar para garantir que o ID seja
-                            válido.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Exemplo: Operações em Lote -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">📦 Operações em Lote</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Para operações em lote, chame os métodos de log
-                            individualmente:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>@override
-Future<List<ServiceOrderAppointmentModel>> saveAll(
-    List<ServiceOrderAppointmentModel> appointments) async {
-  
-  final results = <ServiceOrderAppointmentModel>[];
-  
-  for (final appointment in appointments) {
-    // Salva cada item individualmente
-    // Isso garante que cada um seja logado corretamente
-    final saved = await save(appointment);
-    results.add(saved);
-  }
-  
-  return results;
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Exemplo: Monitoramento de Estado -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-orange-600 mb-4">📊 Monitoramento de Estado</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-3">Monitore o estado da sincronização em tempo real:</p>
-                        <pre class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>// No seu controller ou widget
-void _setupSyncMonitoring() {
-  final syncService = SyncConfigurator.syncService;
-  
-  syncService.syncData.addListener(() {
-    final syncData = syncService.syncData.value;
-    
-    switch (syncData.status) {
-      case AppSyncStatus.idle:
-        print('Sincronização inativa');
-        break;
-      case AppSyncStatus.syncing:
-        print('Sincronizando... ${syncData.pendingItems} itens pendentes');
-        break;
-      case AppSyncStatus.success:
-        print('Sincronização concluída com sucesso!');
-        _reloadData();
-        break;
-      case AppSyncStatus.error:
-        print('Erro na sincronização: ${syncData.message}');
-        break;
-      case AppSyncStatus.offline:
-        print('Modo offline - dados serão sincronizados quando conectar');
-        break;
-    }
-  });
-  
-  // Verificar status online/offline
-  final isOnline = await syncService.isOnline();
-  final isSyncing = await syncService.isSyncing();
-  final pendingCount = await syncService.getPendingItemsCount();
-  
-  print('Online: $isOnline, Sincronizando: $isSyncing, Pendentes: $pendingCount');
-}</code></pre>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Envio de Erros para o Back-end -->
-        <section id="error-reporting" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">📊 Sistema de Envio de
-                Erros para o Back-end</h2>
-
-            <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-lg mb-8">
-                <h4 class="font-semibold text-orange-700 mb-2">🎯 Objetivo do Sistema de Erros</h4>
-                <p class="text-orange-600">
-                    O Syncly possui um sistema automático de coleta e envio de erros para o back-end,
-                    permitindo monitoramento em tempo real da saúde da sincronização e identificação
-                    proativa de problemas nos dispositivos dos usuários.
-                </p>
-            </div>
-
-            <div class="space-y-8">
-                <!-- Quando os Erros São Enviados -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-red-600 mb-4">⏰ Quando os Erros São Enviados</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-red-700 mb-2">🚨 Erros Críticos (Automático)</h4>
-                            <p class="text-red-600 text-sm mb-3">
-                                Enviados automaticamente quando o sistema atinge <strong>3 falhas consecutivas</strong>
-                                de sincronização (SyncConstants.maxRetryAttempts).
-                            </p>
-                            <ul class="text-red-600 text-xs space-y-1">
-                                <li>• Falhas de conectividade persistentes</li>
-                                <li>• Erros de autenticação recorrentes</li>
-                                <li>• Problemas de servidor (5xx)</li>
-                                <li>• Timeouts repetidos</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-yellow-700 mb-2">⚠️ Erros Gerais (Programado)</h4>
-                            <p class="text-yellow-600 text-sm mb-3">
-                                Enviados em lotes através do <code>SyncErrorReporter.scheduleErrorReporting()</code>
-                            </p>
-                            <ul class="text-yellow-600 text-xs space-y-1">
-                                <li>• Erros de validação de dados</li>
-                                <li>• Falhas de upload de arquivos</li>
-                                <li>• Problemas de parsing JSON</li>
-                                <li>• Erros de configuração</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Como Funciona o Envio -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-blue-600 mb-4">🔄 Como Funciona o Envio de Erros</h3>
-
-                    <div class="space-y-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">1. Coleta e Armazenamento Local</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>SyncErrorManager.logError()</strong> → Salva erro localmente com metadata</p>
-                                <p>↓</p>
-                                <p><strong>IStorageProvider</strong> → Persiste no storage local do dispositivo</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">2. Verificação de Condições</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>SyncErrorReporter.sendPendingErrors()</strong> → Verifica autenticação</p>
-                                <p>↓</p>
-                                <p><strong>isAuthenticated()</strong> → Só envia se usuário autenticado</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-gray-700 mb-3">3. Envio em Lotes</h4>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>_createBatches()</strong> → Agrupa erros (padrão: 10 por lote)</p>
-                                <p>↓</p>
-                                <p><strong>_sendErrorBatch()</strong> → Envia via HTTP POST</p>
-                                <p>↓</p>
-                                <p><strong>markErrorAsSent()</strong> → Marca como enviado se sucesso</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configuração do Endpoint -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-green-600 mb-4">⚙️ Configuração do Endpoint de Erros</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 class="font-semibold text-gray-700 mb-2">SyncErrorReportConfig</h4>
-                        <pre class="text-sm text-gray-600"><code>const SyncErrorReportConfig({
-  required String endpoint,        // URL do endpoint de erros
-  int maxRetries = 3,             // Máximo de tentativas
-  Duration retryDelay = 5s,       // Delay entre tentativas
-  int batchSize = 10,             // Erros por lote
-  bool includeStackTrace = true,  // Incluir stack trace
-  bool includeMetadata = true,    // Incluir metadata
-});</code></pre>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-blue-700 mb-2">📡 Payload Enviado</h4>
-                        <pre class="text-xs text-blue-600"><code>{
-  "userId": "user123",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "errors": [
-    {
-      "id": "error-uuid",
-      "message": "Falha na sincronização",
-      "stackTrace": "...",
-      "metadata": { "entityType": "user", "operation": "create" },
-      "timestamp": "2024-01-15T10:29:45Z",
-      "category": "sync",
-      "entityType": "user",
-      "entityId": "123"
-    }
-  ]
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Implementação no SyncConfig -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600 mb-4">💻 Implementação no SyncConfig</h3>
-
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <pre class="text-sm text-gray-700"><code>class MySyncConfig extends SyncConfig {
-  @override
-  String get errorReportingEndpoint => '/api/errors';
-  
-  @override
-  SyncErrorReportConfig get errorReportConfig => SyncErrorReportConfig(
-    endpoint: errorReportingEndpoint,
-    maxRetries: 3,
-    retryDelay: Duration(seconds: 5),
-    batchSize: 10,
-    includeStackTrace: true,
-    includeMetadata: true,
-  );
-  
-  // O sistema automaticamente usa httpPost() para enviar
-  @override
-  Future&lt;SyncHttpResponse&gt; httpPost(String url, {Map&lt;String, dynamic&gt;? data}) async {
-    // Sua implementação HTTP aqui
-  }
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Monitoramento e Retry -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">🔍 Monitoramento e Retry</h3>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-indigo-700 mb-2">🔄 Sistema de Retry</h4>
-                            <ul class="text-indigo-600 text-sm space-y-1">
-                                <li>• <strong>3 tentativas</strong> por lote de erros</li>
-                                <li>• <strong>5 segundos</strong> de delay entre tentativas</li>
-                                <li>• Erros não enviados ficam como <code>pending</code></li>
-                                <li>• Próxima execução tenta novamente</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">📊 Status de Envio</h4>
-                            <ul class="text-green-600 text-sm space-y-1">
-                                <li>• <code>SyncErrorReportResult</code> retorna estatísticas</li>
-                                <li>• <code>sentCount</code> e <code>failedCount</code></li>
-                                <li>• <code>sentErrorIds</code> e <code>failedErrorIds</code></li>
-                                <li>• Logs detalhados para debugging</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Solução de Problemas -->
-        <section id="troubleshooting" class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-red-500 pb-2">🔧 Solução de Problemas
-            </h2>
-
-            <div class="space-y-6">
-                <!-- Problema 1 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-red-600 mb-3">❌ Dados não estão sendo sincronizados</h3>
-
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4">
-                        <h4 class="font-semibold text-red-700 mb-2">Possíveis Causas:</h4>
-                        <ul class="text-red-600 text-sm space-y-1">
-                            <li>• Esqueceu de chamar <code>logCreate</code>, <code>logUpdate</code> ou
-                                <code>logDelete</code>
-                            </li>
-                            <li>• SyncConfigurator não foi inicializado no <code>main.dart</code></li>
-                            <li>• Problemas de conectividade ou configuração de rede</li>
-                            <li>• Erro na implementação do <code>toJson()</code> do modelo</li>
-                            <li>• Configuração incorreta no <code>SyncConfig</code></li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-green-700 mb-2">✅ Soluções:</h4>
-                        <ul class="text-green-600 text-sm space-y-1">
-                            <li>• Verifique se todos os métodos CRUD chamam os respectivos métodos de log</li>
-                            <li>• Confirme que <code>SyncConfigurator.initialize()</code> foi chamado no
-                                <code>main.dart</code>
-                            </li>
-                            <li>• Teste a conectividade e verifique as configurações de URL no <code>SyncConfig</code>
-                            </li>
-                            <li>• Valide se o <code>toJson()</code> retorna dados válidos</li>
-                            <li>• Verifique se o token de autenticação está sendo retornado corretamente</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Problema 2 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-red-600 mb-3">❌ Erro de inicialização do sistema</h3>
-
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4">
-                        <h4 class="font-semibold text-red-700 mb-2">Erros Comuns:</h4>
-                        <pre class="text-red-600 text-sm font-mono"><code>SyncConfigurator not initialized
-GetIt: Object/factory with type AppSyncService is not registered</code></pre>
-                    </div>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-green-700 mb-2">✅ Solução:</h4>
-                        <p class="text-green-600 text-sm mb-2">Verifique se o SyncConfigurator foi inicializado no
-                            main.dart:</p>
-                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Inicializar o sistema de sincronização
-  await SyncConfigurator.initialize(AppSyncConfig());
-  
-  runApp(MyApp());
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Problema 3 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-red-600 mb-3">❌ Estado de sincronização não atualiza</h3>
-
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4">
-                        <h4 class="font-semibold text-red-700 mb-2">Possíveis Causas:</h4>
-                        <ul class="text-red-600 text-sm space-y-1">
-                            <li>• Listener não foi adicionado ao <code>syncData</code></li>
-                            <li>• Listener não foi removido no <code>dispose()</code></li>
-                            <li>• Controller não está sendo reconstruído</li>
-                            <li>• SyncConfigurator não foi inicializado</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                        <h4 class="font-semibold text-green-700 mb-2">✅ Solução:</h4>
-                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>// Acessar o serviço através do configurador
-final syncService = SyncConfigurator.syncService;
-
-// Adicionar listener
-syncService.syncData.addListener(_onSyncStateChanged);
-
-// Remover no dispose
-@override
-void dispose() {
-  SyncConfigurator.syncService.syncData.removeListener(_onSyncStateChanged);
-  super.dispose();
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Comandos Úteis -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-blue-600 mb-3">🛠️ Comandos Úteis para Debug</h3>
-
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold mb-2">Verificar análise estática:</h4>
-                            <pre
-                                class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>flutter analyze lib/core lib/modules</code></pre>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold mb-2">Forçar sincronização:</h4>
-                            <pre
-                                class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>await SyncConfigurator.syncService.forceSync();</code></pre>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold mb-2">Verificar itens pendentes:</h4>
-                            <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>final pendingCount = await SyncConfigurator.syncService.getPendingItemsCount();
-print('Itens pendentes: $pendingCount');</code></pre>
-                        </div>
-
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold mb-2">Verificar status do sistema:</h4>
-                            <pre class="bg-gray-800 text-green-400 p-3 rounded text-sm"><code>final syncService = SyncConfigurator.syncService;
-final isOnline = await syncService.isOnline();
-final isSyncing = await syncService.isSyncing();
-print('Online: $isOnline, Sincronizando: $isSyncing');</code></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="container mx-auto px-6 text-center">
-            <p class="text-gray-300">Sistema de Sincronização - Syncly</p>
-            <p class="text-gray-400 text-sm mt-2">Documentação atualizada em 2024</p>
         </div>
-    </footer>
+
+        <div class="section" id="instalacao">
+            <h2>📦 2. Instalação</h2>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Adicione a dependência no pubspec.yaml:</h4>
+                <div class="code-block">
+                    dependencies:
+                    syncly: ^1.0.0
+                    flutter_modular: ^6.3.4 # Para injeção de dependência
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Execute o comando:</h4>
+                <div class="code-block">
+                    flutter pub get
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>Importe a biblioteca:</h4>
+                <div class="code-block">
+                    import 'package:syncly/sync.dart';
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="configuracao-basica">
+            <h2>⚙️ 3. Configuração Básica</h2>
+
+            <h3>Passo 1: Crie sua classe de configuração</h3>
+            <p>Crie um arquivo <span class="inline-code">sync_config.dart</span> e implemente a classe <span
+                    class="inline-code">SyncConfig</span>:</p>
+
+            <div class="code-block">import 'package:syncly/sync.dart';
+                import 'package:dio/dio.dart';
+
+                class MeuSyncConfig extends SyncConfig {
+                final Dio _dio = Dio();
+
+                @override
+                String get appName => 'Meu App';
+
+                @override
+                String get appVersion => '1.0.0';
+
+                @override
+                bool get enableDebugLogs => true;
+
+                // Configurações HTTP
+                @override
+                Future<SyncHttpResponse<T>> httpGet<T>(String url, {Map<String, dynamic>? headers, Map<String, dynamic>?
+                                queryParameters, Duration? timeout}) async {
+                                try {
+                                final response = await _dio.get(url, queryParameters: queryParameters, options:
+                                Options(headers: headers));
+                                return SyncHttpResponse<T>(
+                                    data: response.data,
+                                    statusCode: response.statusCode ?? 200,
+                                    );
+                                    } catch (e) {
+                                    throw Exception('Erro na requisição GET: $e');
+                                    }
+                                    }
+
+                                    @override
+                                    Future<SyncHttpResponse<T>> httpPost<T>(String url, {dynamic data, Map<String,
+                                                dynamic>? headers, Map<String, dynamic>? queryParameters, Duration?
+                                                    timeout}) async {
+                                                    try {
+                                                    final response = await _dio.post(url, data: data, queryParameters:
+                                                    queryParameters, options: Options(headers: headers));
+                                                    return SyncHttpResponse<T>(
+                                                        data: response.data,
+                                                        statusCode: response.statusCode ?? 200,
+                                                        );
+                                                        } catch (e) {
+                                                        throw Exception('Erro na requisição POST: $e');
+                                                        }
+                                                        }
+
+                                                        // Implementar outros métodos HTTP (PUT, DELETE, PATCH, etc.)
+
+                                                        @override
+                                                        Future<bool> isAuthenticated() async {
+                                                            // Verificar se o usuário está logado
+                                                            return true; // Implementar sua lógica
+                                                            }
+
+                                                            @override
+                                                            List<IDownloadStrategy> get downloadStrategies => [
+                                                                // Suas estratégias de download
+                                                                ];
+
+                                                                @override
+                                                                Future<void> clearLocalData() async {
+                                                                    // Limpar dados do banco local
+                                                                    }
+
+                                                                    @override
+                                                                    Future<DateTime?> getLastSyncTimestamp() async {
+                                                                        // Retornar timestamp da última sincronização
+                                                                        return null;
+                                                                        }
+
+                                                                        @override
+                                                                        Future<void> saveLastSyncTimestamp(DateTime
+                                                                            timestamp) async {
+                                                                            // Salvar timestamp da sincronização
+                                                                            }
+                                                                            }
+            </div>
+
+            <h3>Passo 2: Inicialize o Syncly</h3>
+            <p>No seu <span class="inline-code">main.dart</span>:</p>
+
+            <div class="code-block">import 'package:flutter/material.dart';
+                import 'package:syncly/sync.dart';
+                import 'sync_config.dart';
+
+                void main() async {
+                WidgetsFlutterBinding.ensureInitialized();
+
+                // Inicializar o Syncly
+                await SyncInitializer.initialize(
+                config: MeuSyncConfig(),
+                );
+
+                runApp(MeuApp());
+                }
+            </div>
+        </div>
+
+        <div class="section" id="backend">
+            <h2>🖥️ 4. Configurando o Backend</h2>
+
+            <p>Seu backend precisa implementar algumas rotas específicas para funcionar com o Syncly:</p>
+
+            <h3>📍 Rotas Obrigatórias</h3>
+
+            <h4>1. Sincronização de Dados - <span class="inline-code">POST /sync/batch</span></h4>
+            <p>Recebe dados do app e retorna dados atualizados do servidor.</p>
+
+            <div class="code-block">// Exemplo em Node.js/Express
+                app.post('/sync/batch', async (req, res) => {
+                try {
+                const { uploadData, lastSyncTimestamp } = req.body;
+
+                // 1. Processar dados enviados pelo app
+                if (uploadData && uploadData.length > 0) {
+                await processUploadData(uploadData);
+                }
+
+                // 2. Buscar dados atualizados para enviar ao app
+                let downloadData;
+                if (lastSyncTimestamp) {
+                // Sincronização incremental - apenas dados novos
+                downloadData = await getDataSince(lastSyncTimestamp);
+                } else {
+                // Sincronização completa - todos os dados
+                downloadData = await getAllData();
+                }
+
+                res.json({
+                success: true,
+                downloadData: downloadData,
+                timestamp: new Date().toISOString()
+                });
+                } catch (error) {
+                res.status(500).json({ error: error.message });
+                }
+                });
+            </div>
+
+            <h4>2. Relatório de Erros - <span class="inline-code">POST /sync/.error</span></h4>
+            <p>Recebe relatórios de erro do app.</p>
+
+            <div class="code-block">app.post('/sync/.error', async (req, res) => {
+                try {
+                const { userId, timestamp, errors } = req.body;
+
+                // Salvar erros no banco de dados para análise
+                await saveErrorReport({
+                userId,
+                timestamp,
+                errors
+                });
+
+                res.json({ success: true });
+                } catch (error) {
+                res.status(500).json({ error: error.message });
+                }
+                });
+            </div>
+
+            <h3>📊 Formato dos Dados</h3>
+
+            <h4>Dados de Upload (App → Servidor):</h4>
+            <div class="code-block">{
+                "uploadData": [
+                {
+                "id": "123",
+                "entityType": "todo",
+                "action": "create", // create, update, delete
+                "data": {
+                "title": "Minha tarefa",
+                "completed": false
+                },
+                "timestamp": "2024-01-15T10:30:00Z"
+                }
+                ],
+                "lastSyncTimestamp": "2024-01-15T09:00:00Z"
+                }
+            </div>
+
+            <h4>Dados de Download (Servidor → App):</h4>
+            <div class="code-block">{
+                "success": true,
+                "downloadData": [
+                {
+                "id": "456",
+                "entityType": "todo",
+                "data": {
+                "title": "Nova tarefa do servidor",
+                "completed": true
+                },
+                "timestamp": "2024-01-15T10:35:00Z"
+                }
+                ],
+                "timestamp": "2024-01-15T10:40:00Z"
+                }
+            </div>
+        </div>
+
+        <div class="section" id="modo-full">
+            <h2>🔄 5. Sincronização Completa (Full)</h2>
+
+            <p>Na sincronização completa, todos os dados são transferidos entre o app e o servidor.</p>
+
+            <h3>🎯 Quando usar:</h3>
+            <ul>
+                <li>Primeira sincronização do usuário</li>
+                <li>Após muito tempo sem sincronizar</li>
+                <li>Quando há problemas na sincronização incremental</li>
+                <li>Reset manual dos dados</li>
+            </ul>
+
+            <h3>⚙️ Como configurar:</h3>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Configure o SyncConfig para modo full:</h4>
+                <div class="code-block">class MeuSyncConfig extends SyncConfig {
+                    @override
+                    bool get useIncrementalSync => false; // Desabilita incremental
+
+                    @override
+                    Future<DateTime?> getLastSyncTimestamp() async {
+                        return null; // Sempre retorna null para forçar sync completo
+                        }
+                        }
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Implemente a estratégia de download:</h4>
+                <div class="code-block">class TodoDownloadStrategy implements IDownloadStrategy {
+                    @override
+                    String get entityType => 'todo';
+
+                    @override
+                    Future<void> processDownloadedData(List<Map<String, dynamic>> data) async {
+                            // Limpar todos os dados locais
+                            await database.clearAllTodos();
+
+                            // Inserir todos os dados do servidor
+                            for (final item in data) {
+                            await database.insertTodo(Todo.fromJson(item));
+                            }
+                            }
+                            }
+                </div>
+            </div>
+
+            <div class="info">
+                <strong>💡 Dica:</strong> No modo full, sempre limpe os dados locais antes de inserir os novos para
+                evitar duplicatas.
+            </div>
+        </div>
+
+        <div class="section" id="modo-incremental">
+            <h2>⚡ 6. Sincronização Incremental</h2>
+
+            <p>Na sincronização incremental, apenas dados novos ou modificados são transferidos, tornando o processo
+                muito mais rápido.</p>
+
+            <h3>🎯 Vantagens:</h3>
+            <ul>
+                <li>Muito mais rápido</li>
+                <li>Economiza dados móveis</li>
+                <li>Menor uso de bateria</li>
+                <li>Melhor experiência do usuário</li>
+            </ul>
+
+            <h3>⚙️ Como configurar:</h3>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Configure o SyncConfig para modo incremental:</h4>
+                <div class="code-block">
+                    class MeuSyncConfig extends SyncConfig {
+                    @override
+                    bool get useIncrementalSync => true; // Habilita incremental
+
+                    @override
+                    Duration get maxIncrementalSyncInterval => const Duration(days: 7);
+
+                    @override
+                    Future<DateTime?> getLastSyncTimestamp() async {
+                        // Buscar do SharedPreferences ou banco local
+                        final prefs = await SharedPreferences.getInstance();
+                        final timestamp = prefs.getString('last_sync_timestamp');
+                        return timestamp != null ? DateTime.parse(timestamp) : null;
+                        }
+
+                        @override
+                        Future<void> saveLastSyncTimestamp(DateTime timestamp) async {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
+                            }
+                            }
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Implemente a estratégia de download incremental:</h4>
+                <div class="code-block">
+                    class TodoDownloadStrategy implements IDownloadStrategy {
+                    @override
+                    String get entityType => 'todo';
+
+                    @override
+                    Future<void> processDownloadedData(List<Map<String, dynamic>> data) async {
+                            // Processar apenas dados novos/modificados
+                            for (final item in data) {
+                            final todo = Todo.fromJson(item);
+
+                            // Verificar se já existe
+                            final existing = await database.getTodoById(todo.id);
+
+                            if (existing == null) {
+                            // Criar novo
+                            await database.insertTodo(todo);
+                            } else {
+                            // Atualizar existente
+                            await database.updateTodo(todo);
+                            }
+                            }
+                            }
+                            }
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>Configure o backend para retornar apenas dados modificados:</h4>
+                <div class="code-block">
+                    // Backend - buscar dados desde timestamp
+                    async function getDataSince(timestamp) {
+                    return await database.query(`
+                    SELECT * FROM todos
+                    WHERE updated_at > ?
+                    ORDER BY updated_at ASC
+                    `, [timestamp]);
+                    }
+                </div>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Importante:</strong> Seu banco de dados deve ter campos <span
+                    class="inline-code">created_at</span> e <span class="inline-code">updated_at</span> para a
+                sincronização incremental funcionar corretamente.
+            </div>
+        </div>
+
+        <div class="section" id="exemplos-praticos">
+            <h2>💡 7. Exemplos Práticos</h2>
+
+            <h3>📝 Exemplo: App de Tarefas (To-Do)</h3>
+
+            <h4>1. Modelo de Dados:</h4>
+            <div class="code-block">
+                class Todo {
+                final String id;
+                final String title;
+                final bool completed;
+                final DateTime createdAt;
+                final DateTime updatedAt;
+
+                Todo({
+                required this.id,
+                required this.title,
+                required this.completed,
+                required this.createdAt,
+                required this.updatedAt,
+                });
+
+                Map<String, dynamic> toJson() => {
+                    'id': id,
+                    'title': title,
+                    'completed': completed,
+                    'created_at': createdAt.toIso8601String(),
+                    'updated_at': updatedAt.toIso8601String(),
+                    };
+
+                    factory Todo.fromJson(Map<String, dynamic> json) => Todo(
+                        id: json['id'],
+                        title: json['title'],
+                        completed: json['completed'],
+                        createdAt: DateTime.parse(json['created_at']),
+                        updatedAt: DateTime.parse(json['updated_at']),
+                        );
+                        }
+            </div>
+
+            <h4>2. Estratégia de Upload:</h4>
+            <div class="code-block">
+                class TodoUploadStrategy implements IUploadStrategy {
+                @override
+                String get entityType => 'todo';
+
+                @override
+                Future<List<Map<String, dynamic>>> getPendingData() async {
+                    // Buscar todos pendentes de sincronização
+                    final pendingTodos = await database.getPendingTodos();
+
+                    return pendingTodos.map((todo) => {
+                    'id': todo.id,
+                    'entityType': 'todo',
+                    'action': todo.isDeleted ? 'delete' : (todo.isNew ? 'create' : 'update'),
+                    'data': todo.toJson(),
+                    'timestamp': todo.updatedAt.toIso8601String(),
+                    }).toList();
+                    }
+
+                    @override
+                    Future<void> markAsSynced(List<String> ids) async {
+                            await database.markTodosAsSynced(ids);
+                            }
+                            }
+            </div>
+
+            <h4>3. Estratégia de Download:</h4>
+            <div class="code-block">
+                class TodoDownloadStrategy implements IDownloadStrategy {
+                @override
+                String get entityType => 'todo';
+
+                @override
+                Future<void> processDownloadedData(List<Map<String, dynamic>> data) async {
+                        for (final item in data) {
+                        final todo = Todo.fromJson(item['data']);
+                        await database.upsertTodo(todo);
+                        }
+                        }
+                        }
+            </div>
+
+            <h4>4. Configuração Completa:</h4>
+            <div class="code-block">
+                class TodoSyncConfig extends SyncConfig {
+                @override
+                String get appName => 'Todo App';
+
+                @override
+                String get appVersion => '1.0.0';
+
+                @override
+                List<IDownloadStrategy> get downloadStrategies => [
+                    TodoDownloadStrategy(),
+                    ];
+
+                    @override
+                    List<IUploadStrategy> get uploadStrategies => [
+                        TodoUploadStrategy(),
+                        ];
+
+                        // ... implementar métodos HTTP e outros
+                        }
+            </div>
+
+            <h3>🎮 Usando na Interface:</h3>
+            <div class="code-block">
+                class TodoPage extends StatelessWidget {
+                @override
+                Widget build(BuildContext context) {
+                return Scaffold(
+                appBar: AppBar(
+                title: Text('Minhas Tarefas'),
+                actions: [
+                // Indicador de status de sincronização
+                SyncIndicator(),
+                ],
+                ),
+                body: Column(
+                children: [
+                // Botão para sincronização manual
+                ElevatedButton(
+                onPressed: () {
+                SyncInitializer.syncService.forceSync();
+                },
+                child: Text('Sincronizar Agora'),
+                ),
+
+                // Lista de tarefas
+                Expanded(
+                child: TodoList(),
+                ),
+                ],
+                ),
+                floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                // Mostrar detalhes da sincronização
+                SyncDetailsBottomSheet.show(context);
+                },
+                child: Icon(Icons.sync),
+                ),
+                );
+                }
+                }
+            </div>
+        </div>
+
+        <div class="section" id="troubleshooting">
+            <h2>🔧 8. Solução de Problemas</h2>
+
+            <h3>❌ Problemas Comuns</h3>
+
+            <h4>1. "Sincronização não está funcionando"</h4>
+            <div class="step">
+                <div class="step-number">✓</div>
+                <strong>Verificações:</strong>
+                <ul>
+                    <li>O backend está rodando e acessível?</li>
+                    <li>As rotas <span class="inline-code">/sync/batch</span> estão implementadas?</li>
+                    <li>O método <span class="inline-code">isAuthenticated()</span> retorna <span
+                            class="inline-code">true</span>?</li>
+                    <li>As estratégias de download estão configuradas?</li>
+                </ul>
+            </div>
+
+            <h4>2. "Dados duplicados após sincronização"</h4>
+            <div class="step">
+                <div class="step-number">✓</div>
+                <strong>Solução:</strong>
+                <ul>
+                    <li>Use <span class="inline-code">upsert</span> ao invés de <span class="inline-code">insert</span>
+                    </li>
+                    <li>Verifique se os IDs são únicos</li>
+                    <li>No modo full, limpe os dados antes de inserir</li>
+                </ul>
+            </div>
+
+            <h4>3. "Sincronização muito lenta"</h4>
+            <div class="step">
+                <div class="step-number">✓</div>
+                <strong>Soluções:</strong>
+                <ul>
+                    <li>Use sincronização incremental</li>
+                    <li>Reduza o <span class="inline-code">maxDataBatchSize</span></li>
+                    <li>Otimize as consultas do banco de dados</li>
+                    <li>Implemente paginação no backend</li>
+                </ul>
+            </div>
+
+            <h3>🐛 Debug e Logs</h3>
+
+            <h4>Habilitando logs detalhados:</h4>
+            <div class="code-block">
+                class MeuSyncConfig extends SyncConfig {
+                @override
+                bool get enableDebugLogs => true; // Habilita logs
+                }
+            </div>
+
+            <h4>Verificando status da sincronização:</h4>
+            <div class="code-block">
+                // Escutar mudanças no status
+                SyncInitializer.syncService.syncData.addListener(() {
+                final status = SyncInitializer.syncService.syncData.value.status;
+                print('Status da sincronização: $status');
+                });
+            </div>
+
+            <h3>📊 Comparação: Full vs Incremental</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>Sincronização Full</th>
+                        <th>Sincronização Incremental</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Velocidade</strong></td>
+                        <td>❌ Mais lenta</td>
+                        <td>✅ Muito mais rápida</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Uso de Dados</strong></td>
+                        <td>❌ Alto consumo</td>
+                        <td>✅ Baixo consumo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Complexidade</strong></td>
+                        <td>✅ Simples de implementar</td>
+                        <td>⚠️ Mais complexa</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Confiabilidade</strong></td>
+                        <td>✅ Muito confiável</td>
+                        <td>⚠️ Requer cuidado com timestamps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quando usar</strong></td>
+                        <td>Primeira sync, reset, poucos dados</td>
+                        <td>Syncs regulares, muitos dados</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success">
+                <strong>🎉 Parabéns!</strong> Agora você sabe como usar o Syncly para criar apps com sincronização
+                robusta e eficiente. Comece com o modo full e evolua para incremental conforme sua necessidade.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 Recursos Adicionais</h2>
+            <ul>
+                <li><strong>GitHub:</strong> <a
+                        href="https://github.com/MauricioPDuarte/syncly">github.com/MauricioPDuarte/syncly</a></li>
+                <li><strong>Exemplos:</strong> Veja a pasta <span class="inline-code">example/</span> do projeto</li>
+                <li><strong>Issues:</strong> Reporte problemas no GitHub</li>
+                <li><strong>Documentação da API:</strong> Consulte os comentários no código</li>
+            </ul>
+        </div>
+    </div>
 </body>
 
 </html>

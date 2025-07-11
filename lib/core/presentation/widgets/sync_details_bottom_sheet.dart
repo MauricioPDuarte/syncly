@@ -5,6 +5,7 @@ import '../../theme/sync_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import '../../../sync_initializer.dart';
+import '../../../sync_configurator.dart';
 import '../controllers/sync_indicator_controller.dart';
 import '../utils/sync_status_helpers.dart';
 import '../utils/sync_icon_builder.dart';
@@ -395,8 +396,30 @@ class _SyncDetailsBottomSheetState extends State<SyncDetailsBottomSheet> {
     );
 
     if (confirmed && mounted) {
-      syncService.resetSyncState();
-      navigator.pop();
+      try {
+        // Limpar dados locais primeiro
+        final syncConfig = SyncConfigurator.provider;
+        if (syncConfig != null) {
+          await syncConfig.clearLocalData();
+          
+          // Resetar o timestamp da última sincronização
+          // Passando uma data muito antiga para forçar sincronização completa
+          await syncConfig.saveLastSyncTimestamp(DateTime(1970));
+        }
+        
+        // Depois resetar o estado de sincronização
+        syncService.resetSyncState();
+        navigator.pop();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao resetar dados: $e'),
+              backgroundColor: SyncThemeProvider.current.error,
+            ),
+          );
+        }
+      }
     }
   }
 }
