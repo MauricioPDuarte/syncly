@@ -17,13 +17,14 @@ class IncrementalDownloadStrategyExample implements IDownloadStrategy {
   });
 
   @override
-  Future<DownloadResult> downloadData({DateTime? lastSyncTimestamp}) async {
+  Future<DownloadResult> downloadData({
+    DateTime? lastSyncTimestamp,
+    bool isIncremental = false,
+  }) async {
     try {
-      final isIncremental = lastSyncTimestamp != null;
-      
       debugPrint('=== Iniciando download $entityType (${isIncremental ? 'incremental' : 'completo'}) ===');
       
-      if (isIncremental) {
+      if (isIncremental && lastSyncTimestamp != null) {
         debugPrint('Última sincronização: $lastSyncTimestamp');
         return await _performIncrementalSync(lastSyncTimestamp);
       } else {

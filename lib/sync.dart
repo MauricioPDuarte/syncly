@@ -11,7 +11,11 @@
 /// ```dart
 /// // 1. Implementar provider
 /// class MySyncConfig extends SyncConfig {
-///   // implementar métodos obrigatórios
+///   @override
+///   List<IDownloadStrategy> get downloadStrategies => [
+///     MinhaEstrategiaDownload(),
+///   ];
+///   // implementar outros métodos obrigatórios
 /// }
 ///
 /// // 2. Inicializar

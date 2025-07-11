@@ -316,22 +316,7 @@
     await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
   }
   
-  @override
-  Future&lt;void&gt; clearSpecificData({
-    required String entityType,
-    required List&lt;String&gt; entityIds,
-  }) async {
-    // Remover dados específicos que foram excluídos no servidor
-    switch (entityType) {
-      case 'users':
-        await _removeUsers(entityIds);
-        break;
-      case 'products':
-        await _removeProducts(entityIds);
-        break;
-      // Adicionar outros tipos conforme necessário
-    }
-  }
+
 }</code></pre>
                     </div>
 
@@ -968,14 +953,16 @@ await SyncInitializer.initialize(
   ],
 );
 
-// Opção 3: StrategyResolver para integração com DI (v1.1.4)
-await SyncInitializer.initialize(
-  config,
-  strategyResolver: () =&gt; [
+// Estratégias definidas no SyncConfig
+class MySyncConfig extends SyncConfig {
+  @override
+  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
     Modular.get&lt;MyDownloader&gt;(),
     GetIt.instance.get&lt;AnotherDownloader&gt;(),
-  ],
-);
+  ];
+}
+
+await SyncInitializer.initialize(MySyncConfig());
 
 // 3. Acessar o serviço
 final syncService = SyncConfigurator.syncService;</code></pre>
@@ -1053,73 +1040,46 @@ final syncService = SyncConfigurator.syncService;</code></pre>
                         </div>
 
                         <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download Flexíveis</h4>
-                            <p class="text-green-600 text-sm mb-2">Múltiplas opções para configurar estratégias de
-                                download:</p>
+                            <h4 class="font-semibold text-green-700 mb-2">🎉 Estratégias de Download</h4>
+                            <p class="text-green-600 text-sm mb-2">Configure estratégias de download no SyncConfig:</p>
                             <div class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">
-                                <pre><code>// Opção 1: Estratégias definidas no SyncConfig (padrão)
+                                <pre><code>// Estratégias definidas no SyncConfig
 class MySyncConfig extends SyncConfig {
   @override
   List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
     TodoDownloader(),
     UserDownloader(),
+    FileDownloader(),
   ];
 }
 
 await SyncInitializer.initialize(MySyncConfig());
 
-// Opção 2: Estratégias passadas diretamente
-await SyncInitializer.initialize(
-  MySyncConfig(),
-  downloadStrategies: [
-    TodoDownloader(),
-    UserDownloader(),
-    FileDownloader(), // Estratégia adicional
-  ],
-);
-
-// Opção 3: StrategyResolver para integração com DI (v1.1.4)
-// Com Flutter Modular
-await SyncInitializer.initialize(
-  MySyncConfig(),
-  strategyResolver: () =&gt; [
+// Integração com sistemas de DI
+class MySyncConfig extends SyncConfig {
+  @override
+  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
     Modular.get&lt;TodoDownloader&gt;(),
     Modular.get&lt;UserDownloader&gt;(),
-  ],
-);
+    GetIt.instance.get&lt;FileDownloader&gt;(),
+  ];
+}
 
-// Com GetIt
-await SyncInitializer.initialize(
-  MySyncConfig(),
-  strategyResolver: () =&gt; [
-    GetIt.instance.get&lt;TodoDownloader&gt;(),
-    GetIt.instance.get&lt;UserDownloader&gt;(),
-  ],
-);
-
-// Exemplo prático: Diferentes contextos
-// Desenvolvimento com mocks
-await SyncInitializer.initialize(
-  config,
-  downloadStrategies: [MockDownloader()],
-);
-
-// Produção com DI
-await SyncInitializer.initialize(
-  config,
-  strategyResolver: () =&gt; [
-    Modular.get&lt;TodoDownloader&gt;(),
-    Modular.get&lt;UserDownloader&gt;(),
-    Modular.get&lt;FileDownloader&gt;(),
-  ],
-);
+// Exemplo para testes com mocks
+class TestSyncConfig extends SyncConfig {
+  @override
+  List&lt;IDownloadStrategy&gt; get downloadStrategies =&gt; [
+    MockDownloader(),
+    MockUserDownloader(),
+  ];
+}
 
 // Benefícios:
-// ✅ Flexibilidade para diferentes contextos e sistemas de DI
-// ✅ Lazy loading - resolve dependências quando necessário
-// ✅ Fácil para testes unitários (mock de estratégias)
-// ✅ Resolve problemas de ordem de inicialização
-// ✅ Compatibilidade total com versões anteriores</code></pre>
+// ✅ Configuração centralizada no SyncConfig
+// ✅ Simplicidade e consistência
+// ✅ Fácil para testes unitários
+// ✅ Melhor organização do código
+// ✅ Evita erros de runtime por falta de estratégias</code></pre>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import 'package:syncly/core/entities/sync_error_report_config.dart';
+import 'package:syncly/core/interfaces/i_download_strategy.dart';
 
 import 'core/theme/sync_theme.dart';
 import 'core/entities/sync_http_response.dart';
@@ -132,7 +133,12 @@ abstract class SyncConfig {
   bool get enableNotifications => true;
 
   // ========== MÉTODOS OBRIGATÓRIOS - ESTRATÉGIAS DE DOWNLOAD ==========
-  // REMOVIDO: downloadStrategies agora são passadas diretamente no SyncInitializer.initialize()
+
+  /// Lista de estratégias de download que serão executadas durante a sincronização
+  ///
+  /// Cada estratégia deve implementar a interface IDownloadStrategy e será
+  /// executada em sequência durante o processo de sincronização.
+  List<IDownloadStrategy> get downloadStrategies;
 
   // ========== MÉTODOS OBRIGATÓRIOS - LIMPEZA DE DADOS ==========
 
@@ -149,13 +155,6 @@ abstract class SyncConfig {
 
   /// Salvar a data da última sincronização bem-sucedida
   Future<void> saveLastSyncTimestamp(DateTime timestamp);
-
-  /// Limpar apenas dados específicos baseado em uma lista de IDs
-  /// Este método é usado para remover dados que foram excluídos no servidor
-  Future<void> clearSpecificData({
-    required String entityType,
-    required List<String> entityIds,
-  });
 
   /// Verificar se deve usar sincronização incremental
   /// Por padrão retorna true, mas pode ser sobrescrito para forçar sincronização completa

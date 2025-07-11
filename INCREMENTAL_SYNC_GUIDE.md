@@ -71,11 +71,12 @@ Modifique suas estratégias de download para suportar o parâmetro `lastSyncTime
 ```dart
 class MinhaDownloadStrategy implements IDownloadStrategy {
   @override
-  Future<DownloadResult> downloadData({DateTime? lastSyncTimestamp}) async {
+  Future<DownloadResult> downloadData({
+    DateTime? lastSyncTimestamp,
+    bool isIncremental = false,
+  }) async {
     try {
-      final isIncremental = lastSyncTimestamp != null;
-      
-      if (isIncremental) {
+      if (isIncremental && lastSyncTimestamp != null) {
         return await _performIncrementalSync(lastSyncTimestamp);
       } else {
         return await _performFullSync();

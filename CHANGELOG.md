@@ -7,11 +7,23 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING CHANGE**: Estratégias de download agora são obrigatórias no `SyncConfig`
+  - Propriedade `downloadStrategies` no `SyncConfig` não é mais opcional
+  - Todas as implementações de `SyncConfig` devem fornecer pelo menos uma estratégia de download
+  - Melhora a consistência e previsibilidade do sistema de sincronização
+  - Evita erros de runtime por falta de estratégias configuradas
+
+### Removed
+- **BREAKING CHANGE**: Removido suporte ao `StrategyResolver`
+  - Parâmetros `downloadStrategies` e `strategyResolver` removidos do `SyncInitializer.initialize()`
+  - Typedef `StrategyResolver` removido
+  - Estratégias agora devem ser definidas exclusivamente no `SyncConfig`
+
 ### Added
 - **Sincronização Incremental**: Nova funcionalidade que permite sincronizar apenas dados modificados
   - Método `getLastSyncTimestamp()` no SyncConfig para obter timestamp da última sincronização
   - Método `saveLastSyncTimestamp()` no SyncConfig para salvar timestamp da sincronização
-  - Método `clearSpecificData()` no SyncConfig para remover dados específicos excluídos no servidor
   - Propriedade `useIncrementalSync` no SyncConfig para habilitar/desabilitar sincronização incremental
   - Propriedade `maxIncrementalSyncInterval` no SyncConfig para controlar intervalo máximo da sincronização incremental
   - Parâmetro `lastSyncTimestamp` na interface `IDownloadStrategy.downloadData()`
@@ -22,10 +34,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Guia completo de implementação em `INCREMENTAL_SYNC_GUIDE.md`
 
 ### Changed
-- Interface `IDownloadStrategy.downloadData()` agora aceita parâmetro opcional `lastSyncTimestamp`
+- Interface `IDownloadStrategy.downloadData()` agora aceita parâmetros opcionais `lastSyncTimestamp` e `isIncremental`
 - Classe `DownloadResult` expandida com informações sobre sincronização incremental
-- `SyncDownloadStrategy` atualizada para suportar sincronização incremental
+- `SyncDownloadStrategy` atualizada para suportar sincronização incremental e passar parâmetro `isIncremental`
 - Exemplo `SynclyConfig` atualizado com implementação dos novos métodos
+- Estratégias de download agora recebem explicitamente se devem fazer sincronização incremental
 
 ### Improved
 - Performance da sincronização significativamente melhorada para dados grandes

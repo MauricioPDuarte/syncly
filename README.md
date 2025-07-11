@@ -102,26 +102,8 @@ class MeuSyncConfig extends SyncConfig {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Opção 1: Inicializar usando estratégias definidas no SyncConfig
+  // Inicializar o sistema de sincronização
   await SyncInitializer.initialize(MeuSyncConfig());
-  
-  // Opção 2: Passar estratégias de download diretamente
-  await SyncInitializer.initialize(
-    MeuSyncConfig(),
-    downloadStrategies: [
-      MeuDownloader(),
-      OutroDownloader(),
-    ],
-  );
-  
-  // Opção 3: Usar StrategyResolver para integração com DI (novo na v1.1.4)
-  await SyncInitializer.initialize(
-    MeuSyncConfig(),
-    strategyResolver: () => [
-      Modular.get<MeuDownloader>(),
-      GetIt.instance.get<OutroDownloader>(),
-    ],
-  );
   
   runApp(MeuApp());
 }
@@ -215,13 +197,7 @@ class MeuSyncConfig extends SyncConfig {
     // Salvar timestamp da última sincronização
   }
   
-  @override
-  Future<void> clearSpecificData({
-    required String entityType,
-    required List<String> entityIds,
-  }) async {
-    // Remover dados específicos que foram excluídos no servidor
-  }
+
 }
 ```
 
@@ -381,11 +357,9 @@ class MeuSyncConfig extends SyncConfig {
 }
 ```
 
-### Estratégias de Download Flexíveis
+### Estratégias de Download
 
-**🎉 Novidade na v0.1.0**: Agora você pode passar as estratégias de download diretamente no método `initialize()`!
-
-#### Opção 1: Definir no SyncConfig (padrão)
+As estratégias de download são definidas diretamente no `SyncConfig` através da propriedade `downloadStrategies`:
 
 ```dart
 class MeuSyncConfig extends SyncConfig {
@@ -401,74 +375,12 @@ class MeuSyncConfig extends SyncConfig {
 await SyncInitializer.initialize(MeuSyncConfig());
 ```
 
-#### Opção 2: Passar diretamente no initialize()
-
-```dart
-// Estratégias passadas diretamente - mais flexível!
-await SyncInitializer.initialize(
-  MeuSyncConfig(),
-  downloadStrategies: [
-    TodoDownloader(),
-    UserDownloader(),
-    FileDownloader(),
-  ],
-);
-```
-
-#### Opção 3: Integração com Sistemas de DI (novo na v1.1.4)
-
-**🎉 Novidade**: Agora você pode integrar perfeitamente com sistemas de injeção de dependência como Modular, GetIt, etc.!
-
-```dart
-// Com Flutter Modular
-await SyncInitializer.initialize(
-  MeuSyncConfig(),
-  strategyResolver: () => [
-    Modular.get<TodoDownloader>(),
-    Modular.get<UserDownloader>(),
-  ],
-);
-
-// Com GetIt
-await SyncInitializer.initialize(
-  MeuSyncConfig(),
-  strategyResolver: () => [
-    GetIt.instance.get<TodoDownloader>(),
-    GetIt.instance.get<UserDownloader>(),
-  ],
-);
-
-// Misto - diferentes sistemas de DI
-await SyncInitializer.initialize(
-  MeuSyncConfig(),
-  strategyResolver: () => [
-    Modular.get<TodoDownloader>(),
-    GetIt.instance.get<UserDownloader>(),
-    ServiceLocator.get<FileDownloader>(),
-  ],
-);
-```
-
-**Benefícios do StrategyResolver:**
-- ✅ **Lazy Loading**: Estratégias resolvidas apenas quando necessário
-- ✅ **Flexibilidade**: Funciona com qualquer sistema de DI
-- ✅ **Ordem de Inicialização**: Resolve problemas de dependências não registradas
-- ✅ **Compatibilidade**: Mantém suporte às opções anteriores
-
-**Quando usar cada opção:**
- - **Opção 1**: Para projetos simples sem DI complexo
- - **Opção 2**: Para controle manual das instâncias
- - **Opção 3**: Para projetos com sistemas de DI estabelecidos
-
-**Benefícios da nova abordagem:**
- - ✅ **Flexibilidade**: Diferentes estratégias para diferentes contextos
+**Benefícios desta abordagem:**
+- ✅ **Simplicidade**: Configuração centralizada em um só lugar
+- ✅ **Consistência**: Todas as configurações ficam no SyncConfig
 - ✅ **Testabilidade**: Fácil de mockar estratégias em testes
-- ✅ **Modularidade**: Estratégias podem ser definidas em módulos separados
-- ✅ **Compatibilidade**: Funciona com a abordagem anterior
-
-**Quando usar cada opção:**
-- **SyncConfig**: Quando as estratégias são fixas para toda a aplicação
-- **initialize()**: Quando você precisa de flexibilidade ou estratégias dinâmicas
+- ✅ **Modularidade**: Estratégias podem ser organizadas por módulos
+- ✅ **Manutenibilidade**: Menos pontos de configuração para gerenciar
 
 ## Arquitetura
 

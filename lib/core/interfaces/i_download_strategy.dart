@@ -11,7 +11,12 @@ abstract class IDownloadStrategy {
   ///
   /// [lastSyncTimestamp] - Data da última sincronização para sincronização incremental.
   /// Se null, fará sincronização completa.
-  Future<DownloadResult> downloadData({DateTime? lastSyncTimestamp});
+  /// [isIncremental] - Indica explicitamente se deve fazer sincronização incremental.
+  /// Permite maior controle sobre o tipo de sincronização independentemente do timestamp.
+  Future<DownloadResult> downloadData({
+    DateTime? lastSyncTimestamp,
+    bool isIncremental = false,
+  });
 }
 
 /// Resultado do download de dados

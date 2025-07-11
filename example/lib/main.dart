@@ -13,7 +13,6 @@ void main() async {
     // Inicializar o sistema de sincronização
     await SyncInitializer.initialize(
       SynclyConfig(),
-      strategyResolver: () => [Modular.get<TodoDownloader>()],
     );
     
     debugPrint('-- SyncInitializer INITIALIZED');

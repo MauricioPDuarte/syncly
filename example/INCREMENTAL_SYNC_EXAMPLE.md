@@ -48,13 +48,7 @@ Future<void> saveLastSyncTimestamp(DateTime timestamp) async {
   await prefs.setString('last_sync_timestamp', timestamp.toIso8601String());
 }
 
-@override
-Future<void> clearSpecificData({
-  required String entityType,
-  required List<String> entityIds,
-}) async {
-  // Remove entidades específicas do armazenamento local
-}
+
 ```
 
 ## Como Funciona
@@ -74,7 +68,7 @@ Future<void> clearSpecificData({
 1. getLastSyncTimestamp() retorna timestamp da última sync
 2. TodoDownloader._performIncrementalSync() é executado
 3. Apenas dados modificados são baixados
-4. Entidades excluídas são processadas via clearSpecificData()
+4. Entidades excluídas são processadas pelas estratégias de download
 5. Novo timestamp é salvo
 ```
 
@@ -197,7 +191,7 @@ Timestamp da última sincronização salvo: 2024-01-15 11:30:00.000
 - Verifique logs para identificar erros
 
 ### Dados não sendo removidos
-- Confirme se `clearSpecificData()` está implementado corretamente
+- Confirme se a estratégia de download está processando as deleções corretamente
 - Verifique se o backend está retornando IDs corretos no campo `deleted`
 - Teste a remoção manual para validar a lógica
 

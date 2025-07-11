@@ -66,10 +66,7 @@ class SyncDownloadStrategy {
       // Executar todas as estratégias de download
       final results = await _executeDownloadStrategies(lastSyncTimestamp);
 
-      // Processar dados excluídos (apenas para sincronização incremental)
-      if (shouldUseIncremental) {
-        await _processDeletedEntities(results);
-      }
+
 
       // Processar resultados e extrair IDs de medias para pré-cache
       final mediaIds = _extractMediaIds(results);
@@ -142,11 +139,15 @@ class SyncDownloadStrategy {
       }
 
       final results = <DownloadResult>[];
+      final isIncremental = lastSyncTimestamp != null;
 
       for (final strategy in GetIt.instance.get<List<IDownloadStrategy>>()) {
         SyncUtils.debugLog('Executando estratégia: ${strategy.runtimeType}',
             tag: 'SyncDownloadStrategy');
-        final result = await strategy.downloadData(lastSyncTimestamp: lastSyncTimestamp);
+        final result = await strategy.downloadData(
+          lastSyncTimestamp: lastSyncTimestamp,
+          isIncremental: isIncremental,
+        );
         results.add(result);
 
         if (!result.success) {
@@ -282,34 +283,5 @@ class SyncDownloadStrategy {
     }
   }
 
-  /// Processa entidades que foram excluídas no servidor
-  Future<void> _processDeletedEntities(List<DownloadResult> results) async {
-    final syncConfig = _getSyncConfig();
-    
-    try {
-      for (final result in results) {
-        if (result.deletedEntities != null && result.deletedEntities!.isNotEmpty) {
-          for (final entry in result.deletedEntities!.entries) {
-            final entityType = entry.key;
-            final entityIds = entry.value;
-            
-            if (entityIds.isNotEmpty) {
-              SyncUtils.debugLog(
-                  'Removendo ${entityIds.length} entidades excluídas do tipo $entityType',
-                  tag: 'SyncDownloadStrategy');
-              
-              await syncConfig?.clearSpecificData(
-                entityType: entityType,
-                entityIds: entityIds,
-              );
-            }
-          }
-        }
-      }
-    } catch (e) {
-      SyncUtils.debugLog('Erro ao processar entidades excluídas: $e',
-          tag: 'SyncDownloadStrategy');
-      // Não interromper a sincronização por causa disso
-    }
-  }
+
 }

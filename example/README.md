@@ -105,16 +105,7 @@ O exemplo demonstra como:
    }
    ```
 
-4. **Processar Dados Excluídos**:
-   ```dart
-   @override
-   Future<void> clearSpecificData({
-     required String entityType,
-     required List<String> entityIds,
-   }) async {
-     // Remove entidades específicas do armazenamento local
-   }
-   ```
+
 
 ### Sincronização Incremental
 
