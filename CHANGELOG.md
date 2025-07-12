@@ -7,20 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Changed
-- **BREAKING CHANGE**: Estratégias de download agora são obrigatórias no `SyncConfig`
-  - Propriedade `downloadStrategies` no `SyncConfig` não é mais opcional
-  - Todas as implementações de `SyncConfig` devem fornecer pelo menos uma estratégia de download
-  - Melhora a consistência e previsibilidade do sistema de sincronização
-  - Evita erros de runtime por falta de estratégias configuradas
-
-### Removed
-- **BREAKING CHANGE**: Removido suporte ao `StrategyResolver`
-  - Parâmetros `downloadStrategies` e `strategyResolver` removidos do `SyncInitializer.initialize()`
-  - Typedef `StrategyResolver` removido
-  - Estratégias agora devem ser definidas exclusivamente no `SyncConfig`
-
 ### Added
+- **Sistema de Permissões de Notificação**: Verificação e solicitação automática de permissões
+  - Método `_requestNotificationPermission()` interno no `SyncInitializer` com implementação completa
+  - Método público `checkNotificationPermission()` para verificar status das permissões
+  - Método público `requestNotificationPermission()` para solicitar permissões manualmente
+  - Verificação automática de permissões durante a inicialização quando `enableNotifications = true`
+  - Integração com `permission_handler` para gerenciamento robusto de permissões
+  - Tratamento de diferentes estados de permissão (concedida, negada, negada permanentemente)
+  - Logs detalhados sobre o status das permissões de notificação
+  - Guia completo de configuração em `NOTIFICATION_PERMISSIONS_GUIDE.md`
+- **Dependência permission_handler**: Adicionada versão ^11.3.1 para gerenciamento de permissões
 - **Sincronização Incremental**: Nova funcionalidade que permite sincronizar apenas dados modificados
   - Método `getLastSyncTimestamp()` no SyncConfig para obter timestamp da última sincronização
   - Método `saveLastSyncTimestamp()` no SyncConfig para salvar timestamp da sincronização
@@ -34,6 +31,19 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Guia completo de implementação em `INCREMENTAL_SYNC_GUIDE.md`
 
 ### Changed
+- **BREAKING CHANGE**: Estratégias de download agora são obrigatórias no `SyncConfig`
+  - Propriedade `downloadStrategies` no `SyncConfig` não é mais opcional
+  - Todas as implementações de `SyncConfig` devem fornecer pelo menos uma estratégia de download
+  - Melhora a consistência e previsibilidade do sistema de sincronização
+  - Evita erros de runtime por falta de estratégias configuradas
+
+### Removed
+- **BREAKING CHANGE**: Removido suporte ao `StrategyResolver`
+  - Parâmetros `downloadStrategies` e `strategyResolver` removidos do `SyncInitializer.initialize()`
+  - Typedef `StrategyResolver` removido
+  - Estratégias agora devem ser definidas exclusivamente no `SyncConfig`
+
+### Changed
 - Interface `IDownloadStrategy.downloadData()` agora aceita parâmetros opcionais `lastSyncTimestamp` e `isIncremental`
 - Classe `DownloadResult` expandida com informações sobre sincronização incremental
 - `SyncDownloadStrategy` atualizada para suportar sincronização incremental e passar parâmetro `isIncremental`
@@ -41,6 +51,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Estratégias de download agora recebem explicitamente se devem fazer sincronização incremental
 
 ### Improved
+- **Sistema de Permissões**: Implementação robusta com tratamento completo de estados
+  - Verificação automática do status atual das permissões
+  - Solicitação inteligente apenas quando necessário
+  - Tratamento específico para permissões negadas permanentemente
+  - Logs informativos para debugging e monitoramento
 - Performance da sincronização significativamente melhorada para dados grandes
 - Redução no uso de dados de rede
 - Experiência do usuário aprimorada com sincronizações mais rápidas

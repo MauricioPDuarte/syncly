@@ -118,6 +118,65 @@ Este exemplo implementa sincronização incremental completa:
 
 📖 **Para detalhes completos, consulte**: [INCREMENTAL_SYNC_EXAMPLE.md](INCREMENTAL_SYNC_EXAMPLE.md)
 
+### Permissões de Notificação
+
+O exemplo demonstra como gerenciar permissões de notificação:
+
+1. **Configuração Automática**:
+   ```dart
+   class SynclyConfig extends SyncConfig {
+     @override
+     bool get enableNotifications => true; // Permissões verificadas automaticamente
+   }
+   ```
+
+2. **Verificação Manual de Permissões**:
+   ```dart
+   // Verificar se as permissões estão concedidas
+   bool hasPermission = await SyncInitializer.checkNotificationPermission();
+   
+   if (!hasPermission) {
+     // Solicitar permissão manualmente
+     bool granted = await SyncInitializer.requestNotificationPermission();
+     
+     if (granted) {
+       print('Permissão concedida - notificações habilitadas');
+     } else {
+       print('Permissão negada - funcionalidade limitada');
+     }
+   }
+   ```
+
+3. **Tratamento de Estados de Permissão**:
+   ```dart
+   Future<void> handleNotificationSetup() async {
+     // O Syncly verifica automaticamente durante a inicialização
+     await SyncInitializer.initialize(syncConfig);
+     
+     // Verificação adicional se necessário
+     bool hasPermission = await SyncInitializer.checkNotificationPermission();
+     
+     if (!hasPermission) {
+       // Mostrar dialog explicativo antes de solicitar
+       await showNotificationPermissionDialog();
+       
+       // Solicitar permissão
+       bool granted = await SyncInitializer.requestNotificationPermission();
+       
+       if (!granted) {
+         // Orientar usuário para configurações manuais
+         await showManualPermissionInstructions();
+       }
+     }
+   }
+   ```
+
+**Configurações Nativas Necessárias:**
+- **Android 13+**: Adicionar `POST_NOTIFICATIONS` no AndroidManifest.xml
+- **iOS**: Configurar background modes no Info.plist
+
+📖 **Para configuração completa, consulte**: [NOTIFICATION_PERMISSIONS_GUIDE.md](../NOTIFICATION_PERMISSIONS_GUIDE.md)
+
 ## Configuração da API
 
 Para habilitar a sincronização com um servidor, você precisa:

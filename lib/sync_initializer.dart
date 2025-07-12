@@ -1,4 +1,3 @@
-import 'core/interfaces/i_download_strategy.dart';
 import 'core/interfaces/i_logger_debug_provider.dart';
 import 'core/interfaces/i_storage_provider.dart';
 import 'core/interfaces/i_sync_service.dart';
@@ -7,6 +6,7 @@ import 'core/theme/sync_theme.dart';
 import 'sync_config.dart';
 import 'sync_configurator.dart';
 import 'package:get_it/get_it.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Classe responsável por inicializar os serviços de sincronização usando SyncConfig
 class SyncInitializer {
@@ -20,7 +20,7 @@ class SyncInitializer {
   static ISyncLoggerDebugProvider get logger => _defaultLogger;
 
   /// Inicializa o sistema de sincronização com um SyncConfig
-  /// 
+  ///
   /// [provider] - Configuração do sistema de sincronização
   static Future<void> initialize(SyncConfig provider) async {
     if (_isInitialized) {
@@ -34,6 +34,11 @@ class SyncInitializer {
       _provider = provider;
       _defaultLogger.info('SyncConfig configurado com sucesso',
           category: 'SyncInitializer');
+
+      // Solicita permissão de notificação se habilitadas
+      if (provider.enableNotifications) {
+        await _requestNotificationPermission();
+      }
 
       // Configura o tema se fornecido
       if (provider.theme != null) {
@@ -152,6 +157,133 @@ class SyncInitializer {
           'SyncInitializer não foi inicializado. Chame initialize() primeiro.');
     }
     return SyncConfigurator.syncService;
+  }
+
+  /// Solicita permissão para notificações
+  static Future<bool> _requestNotificationPermission() async {
+    try {
+      _defaultLogger.info(
+        'Verificando permissões de notificação...',
+        category: 'SyncInitializer',
+      );
+
+      // Verifica o status atual da permissão
+      PermissionStatus status = await Permission.notification.status;
+
+      _defaultLogger.info(
+        'Status atual da permissão de notificação: $status',
+        category: 'SyncInitializer',
+      );
+
+      // Se já está concedida, retorna true
+      if (status.isGranted) {
+        _defaultLogger.info(
+          'Permissão de notificação já concedida',
+          category: 'SyncInitializer',
+        );
+        return true;
+      }
+
+      // Se foi negada permanentemente, orienta o usuário
+      if (status.isPermanentlyDenied) {
+        _defaultLogger.warning(
+          'Permissão de notificação negada permanentemente. '
+          'O usuário deve habilitar manualmente nas configurações do dispositivo.',
+          category: 'SyncInitializer',
+        );
+        return false;
+      }
+
+      // Solicita a permissão
+      _defaultLogger.info(
+        'Solicitando permissão de notificação...',
+        category: 'SyncInitializer',
+      );
+
+      PermissionStatus result = await Permission.notification.request();
+
+      _defaultLogger.info(
+        'Resultado da solicitação de permissão: $result',
+        category: 'SyncInitializer',
+      );
+
+      if (result.isGranted) {
+        _defaultLogger.info(
+          'Permissão de notificação concedida com sucesso',
+          category: 'SyncInitializer',
+        );
+        return true;
+      } else {
+        _defaultLogger.warning(
+          'Permissão de notificação negada pelo usuário',
+          category: 'SyncInitializer',
+        );
+        return false;
+      }
+    } catch (e) {
+      _defaultLogger.error(
+        'Erro ao solicitar permissão de notificação: $e',
+        category: 'SyncInitializer',
+        exception: e,
+      );
+      return false;
+    }
+  }
+
+  /// Verifica se as permissões de notificação estão concedidas
+  static Future<bool> checkNotificationPermission() async {
+    try {
+      if (!_isInitialized || _provider == null) {
+        throw Exception('SyncInitializer não foi inicializado');
+      }
+
+      if (!_provider!.enableNotifications) {
+        _defaultLogger.info(
+          'Notificações desabilitadas na configuração',
+          category: 'SyncInitializer',
+        );
+        return false;
+      }
+
+      _defaultLogger.info(
+        'Verificando status das permissões de notificação...',
+        category: 'SyncInitializer',
+      );
+
+      PermissionStatus status = await Permission.notification.status;
+
+      _defaultLogger.info(
+        'Status da permissão de notificação: $status',
+        category: 'SyncInitializer',
+      );
+
+      return status.isGranted;
+    } catch (e) {
+      _defaultLogger.error(
+        'Erro ao verificar status das permissões de notificação: $e',
+        category: 'SyncInitializer',
+        exception: e,
+      );
+      return false;
+    }
+  }
+
+  /// Solicita permissão de notificação manualmente
+  static Future<bool> requestNotificationPermission() async {
+    try {
+      if (!_isInitialized || _provider == null) {
+        throw Exception('SyncInitializer não foi inicializado');
+      }
+
+      return await _requestNotificationPermission();
+    } catch (e) {
+      _defaultLogger.error(
+        'Erro ao solicitar permissão de notificação: $e',
+        category: 'SyncInitializer',
+        exception: e,
+      );
+      return false;
+    }
   }
 
   /// Reset do inicializador (útil para testes)

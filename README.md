@@ -328,6 +328,65 @@ class MeuSyncConfig extends SyncConfig {
 - ✅ **Manutenção automática**: Notificações gerenciadas internamente
 - ✅ **Logs de desenvolvimento**: Sistema de debug integrado
 - ✅ **Compatibilidade**: Funciona imediatamente sem configuração adicional
+- ✅ **Permissões automáticas**: Verificação e solicitação automática de permissões
+
+#### 🔐 Configuração de Permissões
+
+O Syncly verifica automaticamente as permissões de notificação durante a inicialização:
+
+```dart
+// Verificação automática durante a inicialização
+await SyncInitializer.initialize(meuSyncConfig);
+
+// Verificação manual (opcional)
+bool hasPermission = await SyncInitializer.checkNotificationPermission();
+if (!hasPermission) {
+  bool granted = await SyncInitializer.requestNotificationPermission();
+}
+```
+
+#### 📱 Configurações Nativas Necessárias
+
+**Para Android:**
+
+1. **Android 13+ (API 33+)** - Adicione no `android/app/src/main/AndroidManifest.xml`:
+```xml
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+```
+
+2. **Todas as versões** - Configure o ícone de notificação em `android/app/src/main/res/drawable/`:
+```xml
+<!-- ic_notification.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorOnPrimary">
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z"/>
+</vector>
+```
+
+**Para iOS:**
+
+1. **Adicione no `ios/Runner/Info.plist`:**
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>background-processing</string>
+    <string>background-fetch</string>
+</array>
+```
+
+2. **Configure as permissões de notificação:**
+```xml
+<key>NSUserNotificationAlertStyle</key>
+<string>alert</string>
+```
+
+📚 **Para configuração completa de permissões e solução de problemas, consulte o [Guia de Permissões de Notificação](NOTIFICATION_PERMISSIONS_GUIDE.md)**
 
 **Migração da v0.0.x para v0.1.0:**
 ```dart
