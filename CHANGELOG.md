@@ -7,6 +7,23 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.1.5] - 06/06/2025
+### 🚀 Adicionado
+- **Notificações Reais**: Implementação completa de notificações nativas usando `flutter_local_notifications`
+- **Canais de Notificação**: Organização por categorias (Status, Erros, Conectividade, Progresso)
+- **Notificações de Progresso**: Barras visuais de progresso para downloads e uploads
+- **Configuração Automática**: Inicialização automática dos canais de notificação
+
+### 🔧 Modificado
+- **SyncNotificationService**: Migração de simulação para notificações reais do sistema
+- **Dependências**: Adicionado `flutter_local_notifications: ^17.2.3`
+- **Permissões Android**: Adicionadas permissões necessárias no exemplo
+
+### 📱 Melhorias
+- **UX**: Notificações agora aparecem na barra de notificações do dispositivo
+- **Organização**: Canais separados por tipo de notificação
+- **Fallback**: Mantido fallback para debug em caso de erro
+
 ### Added
 - **Sistema de Permissões de Notificação**: Verificação e solicitação automática de permissões
   - Método `_requestNotificationPermission()` interno no `SyncInitializer` com implementação completa

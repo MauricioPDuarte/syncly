@@ -6,7 +6,7 @@ Sistema de sincronização independente e completo para aplicações Flutter com
 
 - ✅ **Sincronização bidirecional** (upload/download)
 - ✅ **Sincronização incremental** - baixa apenas dados modificados
-- ✅ **Sincronização em background** com WorkManager
+- ✅ **Sincronização em background** com WorkManager (ativada por padrão)
 - ✅ **Sistema de tema independente** (SyncTheme)
 - ✅ **Gerenciamento de conectividade** automático
 - ✅ **Sistema de logs e debug** configurável
@@ -262,7 +262,7 @@ class MeuSyncConfig extends SyncConfig {
   bool get enableDebugLogs => true;
   
   @override
-  bool get enableBackgroundSync => true;
+  bool get enableBackgroundSync => true; // Ativada por padrão - pode ser desabilitada
   
   @override
   bool get enableNotifications => true;
@@ -306,20 +306,22 @@ class MeuSyncConfig extends SyncConfig {
 
 ### Sistema de Notificações Simplificado
 
-**🎉 Novidade na v0.1.0**: O sistema de notificações agora é **totalmente gerenciado internamente** pelo Syncly!
+**🎉 Novidade na v1.1.4**: O sistema de notificações agora usa **notificações reais do sistema** com `flutter_local_notifications`!
 
 ```dart
 class MeuSyncConfig extends SyncConfig {
   @override
-  bool get enableNotifications => true; // Só isso é necessário!
+  bool get enableNotifications => true; // Ativa notificações reais!
   
-  // ✅ Não é mais necessário implementar:
-  // - initializeNotifications()
-  // - showNotification()
-  // - showProgressNotification()
-  // - cancelNotification()
-  // - cancelAllNotifications()
-  // - areNotificationsEnabled()
+  // ✅ Notificações reais incluem:
+  // - Notificações de status da sincronização
+  // - Notificações de progresso com barra visual
+  // - Notificações de erro com alta prioridade
+  // - Notificações de conectividade
+  // - Canais organizados por categoria
+  
+  // ✅ Não é necessário implementar nada:
+  // O Syncly gerencia tudo automaticamente!
 }
 ```
 
@@ -387,6 +389,50 @@ if (!hasPermission) {
 ```
 
 📚 **Para configuração completa de permissões e solução de problemas, consulte o [Guia de Permissões de Notificação](NOTIFICATION_PERMISSIONS_GUIDE.md)**
+
+### Sincronização em Background
+
+**🔄 A sincronização em background vem ativada por padrão** e funciona automaticamente usando o WorkManager.
+
+```dart
+class MeuSyncConfig extends SyncConfig {
+  @override
+  bool get enableBackgroundSync => true; // ✅ Ativada por padrão
+  
+  @override
+  Duration get backgroundSyncInterval => Duration(minutes: 15); // Intervalo padrão
+}
+```
+
+**Características:**
+- ✅ **Ativada automaticamente**: Não requer configuração adicional
+- ✅ **Execução inteligente**: Só executa quando há dados para sincronizar
+- ✅ **Respeita conectividade**: Aguarda conexão de rede disponível
+- ✅ **Notificações de progresso**: Informa o usuário sobre o status
+- ✅ **Controle pelo usuário**: Pode ser desabilitada nas configurações do app
+
+**Como desabilitar (se necessário):**
+```dart
+class MeuSyncConfig extends SyncConfig {
+  @override
+  bool get enableBackgroundSync => false; // Desabilita completamente
+}
+```
+
+**Controle programático:**
+```dart
+// Parar temporariamente
+await SyncConfigurator.syncService.stopBackgroundSync();
+
+// Reiniciar
+await SyncConfigurator.syncService.startBackgroundSync();
+
+// Verificar status
+bool isActive = await SyncConfigurator.syncService.isBackgroundSyncActive();
+
+// Executar imediatamente
+await SyncConfigurator.syncService.triggerImmediateBackgroundSync();
+```
 
 **Migração da v0.0.x para v0.1.0:**
 ```dart

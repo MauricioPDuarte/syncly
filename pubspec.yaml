@@ -1,6 +1,6 @@
 name: syncly
 description: Sistema de sincronização independente para aplicações Flutter
-version: 1.1.4
+version: 1.1.5
 maintainer: Mauricio Duarte <prussdev@gmail.com>
 
 environment:
@@ -28,6 +28,9 @@ dependencies:
   
   # Permission Handler
   permission_handler: ^11.3.1
+  
+  # Local Notifications
+  flutter_local_notifications: ^17.2.3
 
 dev_dependencies:
   flutter_test:

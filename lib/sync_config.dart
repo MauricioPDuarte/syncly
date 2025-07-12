@@ -22,6 +22,10 @@ abstract class SyncConfig {
   bool get enableDebugLogs => false;
 
   /// Habilitar sincronização em background
+  /// 
+  /// Por padrão está sempre ativada (true). O usuário pode sobrescrever
+  /// este método para retornar false se quiser desabilitar a sincronização
+  /// em background.
   bool get enableBackgroundSync => true;
 
   // ========== CONFIGURAÇÕES DE TEMPO ==========

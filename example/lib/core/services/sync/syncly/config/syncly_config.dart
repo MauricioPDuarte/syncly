@@ -32,7 +32,7 @@ class SynclyConfig extends SyncConfig {
   bool get enableDebugLogs => true;
 
   @override
-  bool get enableBackgroundSync => true;
+  bool get enableBackgroundSync => true; // Ativada por padrão - pode ser desabilitada
 
   @override
   bool get enableNotifications => true;

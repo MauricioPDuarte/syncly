@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Serviço interno de notificações do Syncly
 ///
@@ -17,14 +18,85 @@ class SyncNotificationService {
   bool _isInitialized = false;
   final Map<int, String> _activeNotifications = {};
   int _notificationIdCounter = 1000;
+  
+  late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  
+  // Canais de notificação
+  static const String _syncStatusChannelId = 'sync_status';
+  static const String _syncErrorsChannelId = 'sync_errors';
+  static const String _connectivityChannelId = 'connectivity';
+  static const String _progressChannelId = 'progress';
 
   /// Inicializa o serviço de notificações
   Future<void> initialize({required bool enabled}) async {
     _isEnabled = enabled;
-    _isInitialized = true;
-
+    
     if (_isEnabled) {
-      debugPrint('[Syncly] Serviço de notificações inicializado');
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      
+      // Configurações para Android
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      
+      // Configurações para iOS
+      const DarwinInitializationSettings initializationSettingsIOS =
+          DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
+      
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
+      
+      await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      
+      // Criar canais de notificação para Android
+      await _createNotificationChannels();
+      
+      debugPrint('[Syncly] Serviço de notificações inicializado com flutter_local_notifications');
+    }
+    
+    _isInitialized = true;
+  }
+
+  /// Cria os canais de notificação para Android
+  Future<void> _createNotificationChannels() async {
+    final List<AndroidNotificationChannel> channels = [
+      const AndroidNotificationChannel(
+        _syncStatusChannelId,
+        'Status da Sincronização',
+        description: 'Notificações sobre o status da sincronização de dados',
+        importance: Importance.defaultImportance,
+      ),
+      const AndroidNotificationChannel(
+        _syncErrorsChannelId,
+        'Erros de Sincronização',
+        description: 'Notificações sobre erros durante a sincronização',
+        importance: Importance.high,
+      ),
+      const AndroidNotificationChannel(
+        _connectivityChannelId,
+        'Conectividade',
+        description: 'Notificações sobre mudanças na conectividade',
+        importance: Importance.defaultImportance,
+      ),
+      const AndroidNotificationChannel(
+        _progressChannelId,
+        'Progresso',
+        description: 'Notificações de progresso de download e upload',
+        importance: Importance.low,
+        showBadge: false,
+      ),
+    ];
+    
+    for (final channel in channels) {
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
     }
   }
 
@@ -42,14 +114,41 @@ class SyncNotificationService {
 
     final id = notificationId ?? _generateNotificationId();
     _activeNotifications[id] = title;
+    final channel = channelId ?? _syncStatusChannelId;
 
-    // Para desenvolvimento, apenas log no console
-    // Em produção, aqui seria integrado com flutter_local_notifications
-    debugPrint('[Syncly Notification] $title: $message');
-
-    // Simular notificação visual no debug
-    if (kDebugMode) {
-      debugPrint('🔔 [$title] $message');
+    try {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        _syncStatusChannelId,
+        'Status da Sincronização',
+        channelDescription: 'Notificações sobre o status da sincronização de dados',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
+      
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+      
+      const NotificationDetails platformChannelSpecifics =
+          NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+      
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        message,
+        platformChannelSpecifics,
+      );
+      
+      debugPrint('[Syncly] Notificação exibida: $title - $message');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao exibir notificação: $e');
+      // Fallback para debug print
+      if (kDebugMode) {
+        debugPrint('🔔 [$title] $message');
+      }
     }
   }
 
@@ -68,13 +167,45 @@ class SyncNotificationService {
 
     final percentage = ((progress / maxProgress) * 100).round();
 
-    // Para desenvolvimento, apenas log no console
-    debugPrint('[Syncly Progress] $title: $message ($percentage%)');
-
-    // Simular notificação de progresso no debug
-    if (kDebugMode) {
-      final progressBar = _generateProgressBar(progress, maxProgress);
-      debugPrint('📊 [$title] $progressBar $percentage% - $message');
+    try {
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        _progressChannelId,
+        'Progresso',
+        channelDescription: 'Notificações de progresso de download e upload',
+        importance: Importance.low,
+        priority: Priority.low,
+        showProgress: true,
+        maxProgress: maxProgress,
+        progress: progress,
+        onlyAlertOnce: true,
+        showWhen: false,
+      );
+      
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+      
+      final NotificationDetails platformChannelSpecifics =
+          NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+      
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        '$message ($percentage%)',
+        platformChannelSpecifics,
+      );
+      
+      debugPrint('[Syncly] Notificação de progresso: $title - $percentage%');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao exibir notificação de progresso: $e');
+      // Fallback para debug print
+      if (kDebugMode) {
+        final progressBar = _generateProgressBar(progress, maxProgress);
+        debugPrint('📊 [$title] $progressBar $percentage% - $message');
+      }
     }
   }
 
@@ -82,17 +213,27 @@ class SyncNotificationService {
   Future<void> cancelNotification(int notificationId) async {
     if (!isEnabled) return;
 
-    _activeNotifications.remove(notificationId);
-    debugPrint('[Syncly] Notificação $notificationId cancelada');
+    try {
+      await _flutterLocalNotificationsPlugin.cancel(notificationId);
+      _activeNotifications.remove(notificationId);
+      debugPrint('[Syncly] Notificação $notificationId cancelada');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao cancelar notificação $notificationId: $e');
+    }
   }
 
   /// Cancela todas as notificações
   Future<void> cancelAllNotifications() async {
     if (!isEnabled) return;
 
-    final count = _activeNotifications.length;
-    _activeNotifications.clear();
-    debugPrint('[Syncly] $count notificações canceladas');
+    try {
+      await _flutterLocalNotificationsPlugin.cancelAll();
+      final count = _activeNotifications.length;
+      _activeNotifications.clear();
+      debugPrint('[Syncly] $count notificações canceladas');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao cancelar todas as notificações: $e');
+    }
   }
 
   /// Mostra notificação de início de sincronização
@@ -100,7 +241,7 @@ class SyncNotificationService {
     await showNotification(
       title: 'Sincronização',
       message: 'Iniciando sincronização de dados...',
-      channelId: 'sync_status',
+      channelId: _syncStatusChannelId,
     );
   }
 
@@ -109,35 +250,31 @@ class SyncNotificationService {
     await showNotification(
       title: 'Sincronização',
       message: 'Sincronização concluída com sucesso',
-      channelId: 'sync_status',
+      channelId: _syncStatusChannelId,
     );
   }
 
   /// Mostra notificação de erro na sincronização
   Future<void> showSyncErrorNotification(String error) async {
-    await showNotification(
+    await _showErrorNotification(
       title: 'Erro na Sincronização',
       message: 'Falha ao sincronizar: $error',
-      channelId: 'sync_errors',
     );
   }
 
   /// Mostra notificação de modo offline
   Future<void> showOfflineModeNotification() async {
-    await showNotification(
+    await _showConnectivityNotification(
       title: 'Modo Offline',
-      message:
-          'Aplicativo em modo offline. Dados serão sincronizados quando a conexão for restabelecida.',
-      channelId: 'connectivity',
+      message: 'Aplicativo em modo offline. Dados serão sincronizados quando a conexão for restabelecida.',
     );
   }
 
   /// Mostra notificação de volta ao modo online
   Future<void> showOnlineModeNotification() async {
-    await showNotification(
+    await _showConnectivityNotification(
       title: 'Conectado',
       message: 'Conexão restabelecida. Iniciando sincronização...',
-      channelId: 'connectivity',
     );
   }
 
@@ -173,6 +310,98 @@ class SyncNotificationService {
     );
   }
 
+  /// Mostra notificação de erro com canal específico
+  Future<void> _showErrorNotification({
+    required String title,
+    required String message,
+    int? notificationId,
+  }) async {
+    if (!isEnabled) return;
+
+    final id = notificationId ?? _generateNotificationId();
+    _activeNotifications[id] = title;
+
+    try {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        _syncErrorsChannelId,
+        'Erros de Sincronização',
+        channelDescription: 'Notificações sobre erros durante a sincronização',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+      
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+      
+      const NotificationDetails platformChannelSpecifics =
+          NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+      
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        message,
+        platformChannelSpecifics,
+      );
+      
+      debugPrint('[Syncly] Notificação de erro exibida: $title - $message');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao exibir notificação de erro: $e');
+      if (kDebugMode) {
+        debugPrint('❌ [$title] $message');
+      }
+    }
+  }
+
+  /// Mostra notificação de conectividade com canal específico
+  Future<void> _showConnectivityNotification({
+    required String title,
+    required String message,
+    int? notificationId,
+  }) async {
+    if (!isEnabled) return;
+
+    final id = notificationId ?? _generateNotificationId();
+    _activeNotifications[id] = title;
+
+    try {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        _connectivityChannelId,
+        'Conectividade',
+        channelDescription: 'Notificações sobre mudanças na conectividade',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
+      
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+      
+      const NotificationDetails platformChannelSpecifics =
+          NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+      
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        message,
+        platformChannelSpecifics,
+      );
+      
+      debugPrint('[Syncly] Notificação de conectividade exibida: $title - $message');
+    } catch (e) {
+      debugPrint('[Syncly] Erro ao exibir notificação de conectividade: $e');
+      if (kDebugMode) {
+        debugPrint('🌐 [$title] $message');
+      }
+    }
+  }
+
   /// Gera um ID único para notificação
   int _generateNotificationId() {
     return _notificationIdCounter++;
@@ -197,6 +426,9 @@ class SyncNotificationService {
 
   /// Limpa o serviço (usado para testes)
   void dispose() {
+    if (_isEnabled && _isInitialized) {
+      cancelAllNotifications();
+    }
     _activeNotifications.clear();
     _isInitialized = false;
     _notificationIdCounter = 1000;

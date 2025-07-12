@@ -141,7 +141,7 @@ Duration get maxIncrementalSyncInterval => const Duration(days: 3);
 Duration get syncInterval => const Duration(minutes: 5); // Sync automática
 
 @override
-Duration get backgroundSyncInterval => const Duration(minutes: 15); // Background
+Duration get backgroundSyncInterval => const Duration(minutes: 15); // Background (ativada por padrão)
 ```
 
 ## Benefícios

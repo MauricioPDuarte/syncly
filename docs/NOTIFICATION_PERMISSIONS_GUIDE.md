@@ -214,9 +214,12 @@ dependencies:
 
 ### Background Sync não funciona
 
+**Nota**: A sincronização em background vem **ativada por padrão** no Syncly.
+
 1. Verifique as permissões de background
 2. Confirme que a otimização de bateria não está bloqueando o app
-3. Teste em dispositivos diferentes (alguns fabricantes têm restrições específicas)
+3. Verifique se `enableBackgroundSync` não foi desabilitado manualmente
+4. Teste em dispositivos diferentes (alguns fabricantes têm restrições específicas)
 
 ## 📞 Suporte
 
