@@ -47,6 +47,32 @@ class _TodoPageState extends State<TodoPage> {
             onPressed: controller.loadTodos,
             tooltip: 'Refresh',
           ),
+          IconButton(
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              try {
+                await SyncConfigurator.syncService.startSync();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Sincronização iniciada! Verifique as notificações.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao iniciar sincronização: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            tooltip: 'Testar Sincronização',
+          ),
         ],
       ),
       body: Column(
